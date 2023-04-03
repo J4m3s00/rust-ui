@@ -1,4 +1,4 @@
-use c_interface::hello_world;
+use graphics::hello_world;
 
 fn main() {
     println!("Hello, world! From rust_main");

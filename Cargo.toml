@@ -1,6 +1,6 @@
 [workspace]
 
 members = [
-    "rust_main",
-    "c_interface",
+    "editor",
+    "graphics",
 ]
