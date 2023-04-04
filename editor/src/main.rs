@@ -1,7 +1,6 @@
-use graphics::hello_world;
+use graphics::{hello_world, start_editor};
 
 fn main() {
     println!("Hello, world! From rust_main");
-    let x = hello_world();
-    println!("Got {}", x);
+    start_editor();
 }

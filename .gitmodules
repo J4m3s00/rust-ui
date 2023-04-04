@@ -1,0 +1,3 @@
+[submodule "graphics/backend/deps/sdl"]
+	path = graphics/backend/deps/sdl
+	url = https://github.com/libsdl-org/SDL.git
