@@ -2,13 +2,13 @@
 #include <stdio.h>
 #include "SDL.h"
 
-EXTERN int c_hello_world()
+EXPORT int c_hello_world()
 {
     printf("Hello World From C++\n");
     return 420;
 }
 
-EXTERN int c_start_application()
+EXPORT int c_start_application()
 {
     // Setup SDL
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
@@ -16,7 +16,7 @@ EXTERN int c_start_application()
         printf("Error: %s\n", SDL_GetError());
         return -1;
     }
-
+/*
     // Decide GL+GLSL versions
 #if defined(IMGUI_IMPL_OPENGL_ES2)
     // GL ES 2.0 + GLSL 100
@@ -62,6 +62,6 @@ EXTERN int c_start_application()
             }
         }
     }
-
+*/
     return 0;
 }

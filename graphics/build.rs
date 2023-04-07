@@ -11,6 +11,7 @@ fn main() {
 
     let bindings = bindgen::Builder::default()
         .header("backend/bindings.h")
+        // dont make functions public
         .generate()
         .expect("Unable to generate bindings");
     let out_path = std::path::PathBuf::from("src");

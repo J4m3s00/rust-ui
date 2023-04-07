@@ -8,7 +8,6 @@ pub fn hello_world() -> i32 {
     unsafe { c_hello_world() }
 }
 
-pub fn start_editor() {
-    println!("Hello, world! From rust_main");
-    unsafe { c_start_application() };
+pub fn start_editor() -> i32 {
+    unsafe { c_start_application() }
 }
