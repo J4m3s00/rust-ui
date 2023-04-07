@@ -1,3 +1,8 @@
+#ifndef INTERFACE_EXPORT
+#define INTERFACE_EXPORT
+#endif
+
+
 #include "bindings.h"
 #include <stdio.h>
 #include "SDL.h"
@@ -50,12 +55,26 @@ EXPORT int c_start_application()
     SDL_GL_MakeCurrent(window, gl_context);
     SDL_GL_SetSwapInterval(1); // Enable vsync
 
+
+    SDL_Renderer* renderer = SDL_CreateRenderer(window, "OpenGL", SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+    if (!renderer) {
+        printf("SDL_CreateRenderer Error: %s\n", SDL_GetError());
+        return -1;
+    }
+
     bool done = false;
     while (!done)
     {
         SDL_Event event;
         while (SDL_PollEvent(&event))
         {
+            SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+            SDL_RenderClear(renderer);
+
+            SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+            SDL_RenderLine(renderer, 0, 0, 640, 480);
+
+            SDL_RenderPresent(renderer);
             if (event.type == SDL_EVENT_QUIT)
             {
                 done = true;
