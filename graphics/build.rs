@@ -7,7 +7,7 @@ fn main() {
     let dst = Config::new("backend").build();
 
     println!("cargo:rustc-link-search=native={}", dst.display());
-    println!("cargo:rustc-link-lib=static=backend");
+    println!("cargo:rustc-link-lib=dylib=backend");
 
     let bindings = bindgen::Builder::default()
         .header("backend/bindings.h")

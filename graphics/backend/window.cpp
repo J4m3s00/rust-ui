@@ -16,7 +16,7 @@ EXPORT int c_start_application()
         printf("Error: %s\n", SDL_GetError());
         return -1;
     }
-/*
+
     // Decide GL+GLSL versions
 #if defined(IMGUI_IMPL_OPENGL_ES2)
     // GL ES 2.0 + GLSL 100
@@ -62,6 +62,6 @@ EXPORT int c_start_application()
             }
         }
     }
-*/
+
     return 0;
 }
