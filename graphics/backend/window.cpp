@@ -10,13 +10,7 @@
 #include "SDL.h"
 #include "renderer/renderer.h"
 
-EXPORT int c_hello_world()
-{
-    printf("Hello World From C++\n");
-    return 420;
-}
-
-EXPORT int c_start_application()
+EXPORT int c_start_application(const InitApp *app)
 {
     printf("Starting Application\n");
     // Setup SDL
@@ -54,7 +48,7 @@ EXPORT int c_start_application()
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
     SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
     SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
-    SDL_Window *window = SDL_CreateWindow("Dear ImGui SDL2+OpenGL3 example", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, window_flags);
+    SDL_Window *window = SDL_CreateWindow(app->title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, window_flags);
     if (window == NULL)
     {
         printf("Error: %s\n", SDL_GetError());
@@ -65,6 +59,8 @@ EXPORT int c_start_application()
     SDL_GL_SetSwapInterval(1); // Enable vsync
 
     sr::srLoad((sr::SRLoadProc)SDL_GL_GetProcAddress);
+
+    sr::Font font = sr::srLoadFont("/Users/lucaherzke/Documents/DEV/rust-ui/graphics/backend/deps/software-rendering/Roboto.ttf", 96);
 
     int window_width, window_height;
     SDL_GetWindowSize(window, &window_width, &window_height);
@@ -98,10 +94,17 @@ EXPORT int c_start_application()
 
         sr::srNewFrame(window_width, window_height);
 
+        sr::srDrawRectangleFilled({0, 0}, {100, 100}, {50, 50});
+        sr::srDrawGrid({0, 0}, 10, 10, 100.0f, 100.0f);
+        sr::srDrawText(font, "Hallo Feli!", {100, 100});
+
         sr::srEndFrame();
 
         SDL_GL_SwapWindow(window);
     }
 
+    sr::srTerminate();
+    SDL_DestroyWindow(window);
+    SDL_Quit();
     return 0;
 }

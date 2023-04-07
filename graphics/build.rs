@@ -9,8 +9,11 @@ fn main() {
     println!("cargo:rustc-link-search=native={}", dst.display());
     println!("cargo:rustc-link-lib=dylib=backend");
 
+    //println!("cargo:rerun-if-changed=backend/bindings.h");
+
     let bindings = bindgen::Builder::default()
         .header("backend/bindings.h")
+        .rustfmt_bindings(true)
         // dont make functions public
         .generate()
         .expect("Unable to generate bindings");

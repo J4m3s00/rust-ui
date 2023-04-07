@@ -14,5 +14,9 @@
 #define EXPORT EXTERN
 #endif
 
-EXPORT int c_hello_world();
-EXPORT int c_start_application();
+typedef struct InitApp
+{
+    const char *title;
+} InitApp;
+
+EXPORT int c_start_application(const InitApp *initApp);

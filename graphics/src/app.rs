@@ -15,7 +15,7 @@ impl App {
 
     pub fn run(self) -> Self {
         println!("Running {} v{}", self.name, self.version);
-        start_editor();
+        start_editor(self.name.as_str());
         self
     }
 }
