@@ -1,0 +1,3 @@
+[submodule "graphics/backend/deps/software-rendering"]
+	path = graphics/backend/deps/software-rendering
+	url = https://github.com/104-Berlin/software-rendering.git
