@@ -1,6 +1,5 @@
-use graphics::{hello_world, start_editor};
+use graphics::app::App;
 
 fn main() {
-    println!("Hello, world! From rust_main");
-    start_editor();
+    App::new("Rust Editor", "0.0.1").run();
 }
