@@ -36,3 +36,21 @@ impl Vec4 {
         Self { x, y, z, w }
     }
 }
+
+impl From<(f32, f32)> for Vec2 {
+    fn from((x, y): (f32, f32)) -> Self {
+        Self { x, y }
+    }
+}
+
+impl From<(f32, f32, f32)> for Vec3 {
+    fn from((x, y, z): (f32, f32, f32)) -> Self {
+        Self { x, y, z }
+    }
+}
+
+impl From<(f32, f32, f32, f32)> for Vec4 {
+    fn from((x, y, z, w): (f32, f32, f32, f32)) -> Self {
+        Self { x, y, z, w }
+    }
+}

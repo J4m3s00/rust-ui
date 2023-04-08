@@ -1,5 +1,6 @@
 use crate::{
-    bindings::c_draw_rect, quit_editor, start_editor, update_editor, version::Version, AppEvent,
+    draw_command::DrawCommand, quit_editor, rect::Rect, run_draw_command, start_editor, text::Text,
+    update_editor, version::Version, AppEvent,
 };
 
 pub struct App {
@@ -20,7 +21,8 @@ impl App {
         start_editor(self.name.as_str());
         loop {
             match update_editor(|| {
-                unsafe { c_draw_rect(0., 0., 200., 200.) };
+                run_draw_command(DrawCommand::Rect(Rect::new(0.0, 100.0, 100.0, 0.0)));
+                run_draw_command(DrawCommand::Text(Text::new((0., 100.), "Hello World!")));
             }) {
                 AppEvent::Quit => break,
                 AppEvent::None => {}

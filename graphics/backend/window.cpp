@@ -9,6 +9,7 @@
 #include "glad/glad.h"
 #include "SDL.h"
 #include "renderer/renderer.h"
+#include "intern.h"
 
 struct AppState
 {
@@ -79,7 +80,7 @@ c_start_application(const InitApp *app)
 
     sr::srLoad((sr::SRLoadProc)SDL_GL_GetProcAddress);
 
-    sr::Font font = sr::srLoadFont("/Users/lucaherzke/Documents/DEV/rust-ui/graphics/backend/deps/software-rendering/Roboto.ttf", 96);
+    sr::Font font = sr::srLoadFont("/Users/lucaherzke/Documents/DEV/rust-ui/graphics/backend/deps/software-rendering/Roboto.ttf", 24);
 
     int window_width, window_height;
     SDL_GetWindowSize(window, &window_width, &window_height);
@@ -126,10 +127,6 @@ EXPORT AppEvent *c_pre_update_application()
 
     sr::srNewFrame(state.window_width, state.window_height);
 
-    sr::srDrawRectangleFilled({0, 0}, {100, 100}, {0, 0});
-    sr::srDrawGrid({0, 0}, 10, 10, 100.0f, 100.0f);
-    sr::srDrawText(state.font, "Hallo Feli!", {100, 100});
-
     return result;
 }
 
@@ -145,4 +142,9 @@ EXPORT void c_clean_up_editor()
     sr::srTerminate();
     SDL_DestroyWindow(state.window);
     SDL_Quit();
+}
+
+sr::Font get_current_font()
+{
+    return state.font;
 }

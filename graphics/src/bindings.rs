@@ -118,3 +118,12 @@ extern "C" {
 extern "C" {
     pub fn c_draw_rect(x: f32, y: f32, width: f32, height: f32);
 }
+extern "C" {
+    pub fn c_draw_circle(x: f32, y: f32, radius: f32);
+}
+extern "C" {
+    pub fn c_draw_line(x1: f32, y1: f32, x2: f32, y2: f32);
+}
+extern "C" {
+    pub fn c_draw_text(x: f32, y: f32, text: *const ::std::os::raw::c_char);
+}
