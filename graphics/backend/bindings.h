@@ -55,3 +55,6 @@ EXPORT void c_draw_rect(float x, float y, float width, float height);
 EXPORT void c_draw_circle(float x, float y, float radius);
 EXPORT void c_draw_line(float x1, float y1, float x2, float y2);
 EXPORT void c_draw_text(float x, float y, const char *text);
+
+
+EXPORT float c_get_current_font_size();

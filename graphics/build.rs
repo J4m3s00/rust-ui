@@ -9,7 +9,7 @@ fn main() {
     println!("cargo:rustc-link-search=native={}", dst.display());
     println!("cargo:rustc-link-lib=dylib=backend");
 
-    println!("cargo:rerun-if-changed=backend");
+    println!("cargo:rerun-if-changed=backend/");
 
     let bindings = bindgen::Builder::default()
         .header("backend/bindings.h")

@@ -1,3 +1,5 @@
+use std::ops::{Add, Mul, Sub};
+
 #[derive(Debug, Clone, Copy, Default)]
 pub struct Vec2 {
     pub x: f32,
@@ -43,8 +45,32 @@ impl From<(f32, f32)> for Vec2 {
     }
 }
 
+impl From<Vec3> for Vec2 {
+    fn from(Vec3 { x, y, .. }: Vec3) -> Self {
+        Self { x, y }
+    }
+}
+
+impl From<Vec4> for Vec2 {
+    fn from(Vec4 { x, y, .. }: Vec4) -> Self {
+        Self { x, y }
+    }
+}
+
 impl From<(f32, f32, f32)> for Vec3 {
     fn from((x, y, z): (f32, f32, f32)) -> Self {
+        Self { x, y, z }
+    }
+}
+
+impl From<Vec2> for Vec3 {
+    fn from(Vec2 { x, y, .. }: Vec2) -> Self {
+        Self { x, y, z: 0.0 }
+    }
+}
+
+impl From<Vec4> for Vec3 {
+    fn from(Vec4 { x, y, z, .. }: Vec4) -> Self {
         Self { x, y, z }
     }
 }
@@ -52,5 +78,130 @@ impl From<(f32, f32, f32)> for Vec3 {
 impl From<(f32, f32, f32, f32)> for Vec4 {
     fn from((x, y, z, w): (f32, f32, f32, f32)) -> Self {
         Self { x, y, z, w }
+    }
+}
+
+impl From<Vec2> for Vec4 {
+    fn from(Vec2 { x, y, .. }: Vec2) -> Self {
+        Self {
+            x,
+            y,
+            z: 0.0,
+            w: 0.0,
+        }
+    }
+}
+
+impl From<Vec3> for Vec4 {
+    fn from(Vec3 { x, y, z, .. }: Vec3) -> Self {
+        Self { x, y, z, w: 0.0 }
+    }
+}
+
+impl Add for Vec2 {
+    type Output = Self;
+
+    fn add(self, other: Self) -> Self {
+        Self {
+            x: self.x + other.x,
+            y: self.y + other.y,
+        }
+    }
+}
+
+impl Add for Vec3 {
+    type Output = Self;
+
+    fn add(self, other: Self) -> Self {
+        Self {
+            x: self.x + other.x,
+            y: self.y + other.y,
+            z: self.z + other.z,
+        }
+    }
+}
+
+impl Add for Vec4 {
+    type Output = Self;
+
+    fn add(self, other: Self) -> Self {
+        Self {
+            x: self.x + other.x,
+            y: self.y + other.y,
+            z: self.z + other.z,
+            w: self.w + other.w,
+        }
+    }
+}
+
+impl Sub for Vec2 {
+    type Output = Self;
+
+    fn sub(self, other: Self) -> Self {
+        Self {
+            x: self.x - other.x,
+            y: self.y - other.y,
+        }
+    }
+}
+
+impl Sub for Vec3 {
+    type Output = Self;
+
+    fn sub(self, other: Self) -> Self {
+        Self {
+            x: self.x - other.x,
+            y: self.y - other.y,
+            z: self.z - other.z,
+        }
+    }
+}
+
+impl Sub for Vec4 {
+    type Output = Self;
+
+    fn sub(self, other: Self) -> Self {
+        Self {
+            x: self.x - other.x,
+            y: self.y - other.y,
+            z: self.z - other.z,
+            w: self.w - other.w,
+        }
+    }
+}
+
+impl Mul<f32> for Vec2 {
+    type Output = Self;
+
+    fn mul(self, other: f32) -> Self {
+        Self {
+            x: self.x * other,
+            y: self.y * other,
+        }
+    }
+}
+
+impl Mul<f32> for Vec3 {
+    type Output = Self;
+
+    fn mul(self, other: f32) -> Self {
+        Self {
+            x: self.x * other,
+            y: self.y * other,
+            z: self.z * other,
+        }
+    }
+}
+
+impl Mul<f32> for Vec4 {
+    type Output = Self;
+
+    fn mul(self, other: f32) -> Self {
+        Self {
+            x: self.x * other,
+            y: self.y * other,
+            z: self.z * other,
+            w: self.w * other,
+        }
     }
 }

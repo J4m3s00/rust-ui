@@ -1,7 +1,7 @@
 #![allow(non_snake_case, non_camel_case_types, non_upper_case_globals)]
 use bindings::{
     c_clean_up_editor, c_draw_circle, c_draw_line, c_draw_rect, c_draw_text,
-    c_post_update_application, c_pre_update_application, InitApp,
+    c_get_current_font_size, c_post_update_application, c_pre_update_application, InitApp,
 };
 use draw_command::DrawCommand;
 
@@ -11,8 +11,11 @@ pub mod app;
 mod bindings;
 pub mod circle;
 pub mod color;
+pub mod cursor;
 pub mod draw_command;
+pub mod label;
 pub mod rect;
+pub mod stack;
 pub mod style;
 pub mod text;
 pub mod vec;
@@ -75,4 +78,8 @@ pub fn run_draw_command(command: DrawCommand) {
             c_draw_text(text.position.x, text.position.y, c_msg.as_ptr());
         },
     }
+}
+
+pub fn get_current_font_size() -> f32 {
+    unsafe { c_get_current_font_size() }
 }

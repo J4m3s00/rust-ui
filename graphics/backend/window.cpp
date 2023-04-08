@@ -148,3 +148,8 @@ sr::Font get_current_font()
 {
     return state.font;
 }
+
+EXPORT float c_get_current_font_size()
+{
+    return state.font.Size;
+}

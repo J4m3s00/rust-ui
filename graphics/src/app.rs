@@ -1,11 +1,20 @@
 use crate::{
-    draw_command::DrawCommand, quit_editor, rect::Rect, run_draw_command, start_editor, text::Text,
-    update_editor, version::Version, AppEvent,
+    cursor::{Cursor, CursorDirection},
+    label::Label,
+    quit_editor, run_draw_command,
+    stack::VStack,
+    start_editor, update_editor,
+    vec::Vec2,
+    version::Version,
+    widget::Widget,
+    AppEvent,
 };
 
 pub struct App {
     pub name: String,
     pub version: Version,
+
+    v_stack: VStack,
 }
 
 impl App {
@@ -13,6 +22,19 @@ impl App {
         Self {
             name: name.into(),
             version: version.into(),
+            v_stack: VStack {
+                children: vec![
+                    Box::new(Label {
+                        text: "Hello, world!".to_string(),
+                        style: Default::default(),
+                    }),
+                    Box::new(Label {
+                        text: "Hello, world 2!".to_string(),
+                        style: Default::default(),
+                    }),
+                ],
+                style: Default::default(),
+            },
         }
     }
 
@@ -21,8 +43,16 @@ impl App {
         start_editor(self.name.as_str());
         loop {
             match update_editor(|| {
-                run_draw_command(DrawCommand::Rect(Rect::new(0.0, 100.0, 100.0, 0.0)));
-                run_draw_command(DrawCommand::Text(Text::new((0., 100.), "Hello World!")));
+                for command in self
+                    .v_stack
+                    .build(&Cursor {
+                        direction: CursorDirection::Down,
+                        position: Vec2::new(0.0, 0.0),
+                    })
+                    .commands
+                {
+                    run_draw_command(command);
+                }
             }) {
                 AppEvent::Quit => break,
                 AppEvent::None => {}

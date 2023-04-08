@@ -127,3 +127,6 @@ extern "C" {
 extern "C" {
     pub fn c_draw_text(x: f32, y: f32, text: *const ::std::os::raw::c_char);
 }
+extern "C" {
+    pub fn c_get_current_font_size() -> f32;
+}
