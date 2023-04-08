@@ -4,7 +4,7 @@ project(GraphicsBackend)
 set(SDL_STATIC ON CACHE BOOL "Use Static SDL" FORCE)
 add_subdirectory(deps/software-rendering)
 
-add_library(backend SHARED window.cpp)
+add_library(backend SHARED window.cpp draw.cpp)
 
 target_link_libraries(backend PUBLIC srRenderer SDL2-static)
 target_include_directories(backend SYSTEM PUBLIC deps/sdl2/include)

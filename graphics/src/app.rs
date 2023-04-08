@@ -1,4 +1,6 @@
-use crate::{start_editor, version::Version};
+use crate::{
+    bindings::c_draw_rect, quit_editor, start_editor, update_editor, version::Version, AppEvent,
+};
 
 pub struct App {
     pub name: String,
@@ -16,6 +18,15 @@ impl App {
     pub fn run(self) -> Self {
         println!("Running {} v{}", self.name, self.version);
         start_editor(self.name.as_str());
+        loop {
+            match update_editor(|| {
+                unsafe { c_draw_rect(0., 0., 200., 200.) };
+            }) {
+                AppEvent::Quit => break,
+                AppEvent::None => {}
+            }
+        }
+        quit_editor();
         self
     }
 }

@@ -10,8 +10,27 @@
 #include "SDL.h"
 #include "renderer/renderer.h"
 
-EXPORT int c_start_application(const InitApp *app)
+struct AppState
 {
+    bool done = false;
+    SDL_Window *window = NULL;
+    int window_width = 1280;
+    int window_height = 720;
+    sr::Font font;
+};
+
+static AppState state;
+static bool initialized = false;
+
+EXPORT int
+c_start_application(const InitApp *app)
+{
+    if (initialized)
+    {
+        printf("Application already started\n");
+        return -1;
+    }
+    initialized = true;
     printf("Starting Application\n");
     // Setup SDL
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
@@ -65,46 +84,65 @@ EXPORT int c_start_application(const InitApp *app)
     int window_width, window_height;
     SDL_GetWindowSize(window, &window_width, &window_height);
 
-    bool done = false;
-    while (!done)
+    state.done = false;
+    state.window = window;
+    state.window_width = window_width;
+    state.window_height = window_height;
+    state.font = font;
+    return 0;
+}
+
+EXPORT AppEvent *c_pre_update_application()
+{
+    AppEvent *result = new AppEvent();
+#define RETURN_EXIT                              \
+    AppEvent *ret = new AppEvent();              \
+    ret->type = AppEventType::AppEventType_Quit; \
+    return ret;
+
+    SDL_Event event;
+    while (SDL_PollEvent(&event))
     {
-        SDL_Event event;
-        while (SDL_PollEvent(&event))
+        switch (event.type)
         {
-            switch (event.type)
+        case SDL_QUIT:
+            state.done = true;
+            break;
+        case SDL_WINDOWEVENT:
+            if (event.window.event == SDL_WINDOWEVENT_CLOSE && event.window.windowID == SDL_GetWindowID(state.window))
+                result->type = AppEventType_Quit;
+            else if (event.window.event == SDL_WINDOWEVENT_RESIZED)
             {
-            case SDL_QUIT:
-                done = true;
-                break;
-            case SDL_WINDOWEVENT:
-                if (event.window.event == SDL_WINDOWEVENT_CLOSE && event.window.windowID == SDL_GetWindowID(window))
-                    done = true;
-                else if (event.window.event == SDL_WINDOWEVENT_RESIZED)
-                {
-                    window_width = event.window.data1;
-                    window_height = event.window.data2;
-                }
-                break;
+                state.window_width = event.window.data1;
+                state.window_height = event.window.data2;
             }
-            if (event.type == SDL_QUIT)
-                done = true;
-            if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE && event.window.windowID == SDL_GetWindowID(window))
-                done = true;
+            break;
         }
-
-        sr::srNewFrame(window_width, window_height);
-
-        sr::srDrawRectangleFilled({0, 0}, {100, 100}, {50, 50});
-        sr::srDrawGrid({0, 0}, 10, 10, 100.0f, 100.0f);
-        sr::srDrawText(font, "Hallo Feli!", {100, 100});
-
-        sr::srEndFrame();
-
-        SDL_GL_SwapWindow(window);
+        if (event.type == SDL_QUIT)
+            result->type = AppEventType_Quit;
+        if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE && event.window.windowID == SDL_GetWindowID(state.window))
+            result->type = AppEventType_Quit;
     }
 
+    sr::srNewFrame(state.window_width, state.window_height);
+
+    sr::srDrawRectangleFilled({0, 0}, {100, 100}, {0, 0});
+    sr::srDrawGrid({0, 0}, 10, 10, 100.0f, 100.0f);
+    sr::srDrawText(state.font, "Hallo Feli!", {100, 100});
+
+    return result;
+}
+
+EXPORT void c_post_update_application()
+{
+    sr::srEndFrame();
+
+    SDL_GL_SwapWindow(state.window);
+}
+
+EXPORT void c_clean_up_editor()
+{
     sr::srTerminate();
-    SDL_DestroyWindow(window);
+    SDL_DestroyWindow(state.window);
     SDL_Quit();
-    return 0;
 }

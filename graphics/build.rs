@@ -9,12 +9,10 @@ fn main() {
     println!("cargo:rustc-link-search=native={}", dst.display());
     println!("cargo:rustc-link-lib=dylib=backend");
 
-    //println!("cargo:rerun-if-changed=backend/bindings.h");
+    println!("cargo:rerun-if-changed=backend");
 
     let bindings = bindgen::Builder::default()
         .header("backend/bindings.h")
-        .rustfmt_bindings(true)
-        // dont make functions public
         .generate()
         .expect("Unable to generate bindings");
     let out_path = std::path::PathBuf::from("src");

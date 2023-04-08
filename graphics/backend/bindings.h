@@ -19,4 +19,36 @@ typedef struct InitApp
     const char *title;
 } InitApp;
 
+enum AppEventType
+{
+    AppEventType_None,
+    AppEventType_Quit,
+    AppEventType_KeyDown,
+    AppEventType_KeyUp,
+    AppEventType_MouseDown,
+    AppEventType_MouseUp,
+    AppEventType_MouseMove,
+    AppEventType_MouseWheel,
+    AppEventType_WindowResize,
+};
+
+typedef struct AppEvent
+{
+    enum AppEventType type;
+    int key;
+    int x;
+    int y;
+} AppEvent;
+
+// initApp is borrowed.
 EXPORT int c_start_application(const InitApp *initApp);
+// Ownership of AppEvent is transferred to the caller.
+// Update application and return an event.
+// After that you can render things
+EXPORT AppEvent *c_pre_update_application();
+
+// Post rendering update of the application
+EXPORT void c_post_update_application();
+EXPORT void c_clean_up_editor();
+
+EXPORT void c_draw_rect(float x, float y, float width, float height);
