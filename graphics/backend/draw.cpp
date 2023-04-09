@@ -13,7 +13,7 @@
 
 EXPORT void c_draw_rect(float x, float y, float width, float height)
 {
-    sr::srDrawRectangleFilledOutlineC({x, y}, {width, height}, {width / 2.0f, height / 2.0f}, 0.1f);
+    sr::srDrawRectangleFilledOutlineC({x, y}, {width, height}, {0.0f, 0.0f /*width / 2.0f, height / 2.0f*/}, 0.1f);
 }
 EXPORT void c_draw_circle(float x, float y, float radius)
 {

@@ -1,12 +1,15 @@
 use crate::{
     cursor::{Cursor, CursorDirection},
+    draw_command::DrawCommand,
     label::Label,
-    quit_editor, run_draw_command,
+    quit_editor,
+    rect::Rect,
+    run_draw_command,
     stack::VStack,
     start_editor, update_editor,
     vec::Vec2,
     version::Version,
-    widget::Widget,
+    widget::{Widget, WidgetBuilder},
     AppEvent,
 };
 
@@ -43,14 +46,17 @@ impl App {
         start_editor(self.name.as_str());
         loop {
             match update_editor(|| {
-                for command in self
-                    .v_stack
-                    .build(&Cursor {
+                let mut builder = WidgetBuilder {
+                    commands: vec![],
+                    cursor: Cursor {
+                        position: Vec2::new(100., 200.),
                         direction: CursorDirection::Down,
-                        position: Vec2::new(0.0, 0.0),
-                    })
-                    .commands
-                {
+                    },
+                    panel_rect: Rect::new(0., 400., 400., 0.),
+                };
+                run_draw_command(DrawCommand::Rect(builder.panel_rect.clone()));
+                self.v_stack.build(&mut builder);
+                for command in builder.commands {
                     run_draw_command(command);
                 }
             }) {

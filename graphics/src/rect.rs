@@ -1,3 +1,4 @@
+#[derive(Default, Clone, Copy, Debug)]
 pub struct Rect {
     pub top: f32,
     pub left: f32,

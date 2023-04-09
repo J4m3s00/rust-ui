@@ -1,8 +1,7 @@
 use crate::{
-    cursor::{Cursor, CursorDirection},
+    cursor::CursorDirection,
     style::Style,
-    vec::Vec2,
-    widget::{Widget, WidgetBuild},
+    widget::{Widget, WidgetBuilder},
 };
 
 pub struct VStack {
@@ -19,20 +18,10 @@ impl Widget for VStack {
         &mut self.style
     }
 
-    fn build(&self, cursor: &Cursor) -> WidgetBuild {
-        let mut commands = vec![];
-        let mut cursor = cursor.clone();
-        cursor.direction = CursorDirection::Down;
-
+    fn build(&self, builder: &mut WidgetBuilder) {
+        builder.cursor.direction = CursorDirection::Down;
         for child in &self.children {
-            let build = child.build(&cursor);
-            commands.extend(build.commands);
-            cursor.position = build.cursor;
-        }
-
-        WidgetBuild {
-            commands,
-            cursor: cursor.position,
+            child.build(builder);
         }
     }
 }

@@ -9,6 +9,7 @@ use crate::bindings::{c_start_application, AppEventType_AppEventType_Quit};
 
 pub mod app;
 mod bindings;
+pub mod button;
 pub mod circle;
 pub mod color;
 pub mod cursor;
