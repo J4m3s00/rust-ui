@@ -10,18 +10,18 @@ use crate::{
 pub struct WidgetBuilder {
     pub commands: Vec<DrawCommand>,
     pub cursor: Cursor,
-    pub panel_rect: Rect,
+    pub content_rect_stack: Vec<Rect>,
 }
 
 impl WidgetBuilder {
-    pub fn new(panel_rect: Rect) -> Self {
+    pub fn new() -> Self {
         Self {
             commands: vec![],
             cursor: Cursor {
-                position: (panel_rect.left, panel_rect.bottom).into(),
+                position: (0., 0.).into(),
                 direction: CursorDirection::Down,
             },
-            panel_rect,
+            content_rect_stack: vec![],
         }
     }
 
@@ -29,11 +29,30 @@ impl WidgetBuilder {
         self.commands.push(command);
     }
 
-    pub fn get_available_space(&self) -> Vec2 {
-        Vec2::new(
-            self.panel_rect.right - self.cursor.position.x,
-            self.cursor.position.y - self.panel_rect.bottom,
-        )
+    pub fn begin(&mut self, size: Vec2) {
+        self.content_rect_stack.push(Rect::new(
+            self.cursor.position.x,
+            self.cursor.position.y,
+            self.cursor.position.x + size.x,
+            self.cursor.position.y - size.y,
+        ));
+    }
+
+    pub fn end(&mut self) {
+        self.content_rect_stack
+            .pop()
+            .expect("Invalid order of begin and end");
+    }
+
+    pub fn add_item(&mut self, size: Vec2) {}
+
+    pub fn get_content_region_available(&self) -> Rect {
+        self.content_rect_stack
+            .last()
+            .expect("Invalid order of begin and end")
+            .clone()
+            .set_top(self.cursor.position.y)
+            .set_left(self.cursor.position.x)
     }
 }
 

@@ -2,6 +2,7 @@
 #define INTERFACE_EXPORT
 #endif
 
+#include <stdint.h>
 #include "bindings.h"
 #include "pch.h"
 #include <stdio.h>
@@ -11,9 +12,20 @@
 
 #include "intern.h"
 
-EXPORT void c_draw_rect(float x, float y, float width, float height)
+EXPORT void c_draw_rect(float x, float y, float width, float height, float origin_x, float origin_y, float rotation, float corner_radius, bool fill, bool outline, uint32_t fill_color, uint32_t outline_color, float outline_thickness)
 {
-    sr::srDrawRectangleFilledOutlineC({x, y}, {width, height}, {0.0f, 0.0f /*width / 2.0f, height / 2.0f*/}, 0.1f);
+    sr::PathType path_type = 0;
+    if (fill)
+        path_type |= sr::PathType_Fill;
+    if (outline)
+        path_type |= sr::PathType_Stroke;
+
+    sr::PathStyle path_style = {};
+    path_style.FillColor = fill_color;
+    path_style.StrokeColor = outline_color;
+    path_style.StrokeWidth = outline_thickness;
+
+    sr::srDrawRectanglePro({x, y}, {origin_x, origin_y, width, height}, rotation, corner_radius, path_type, path_style);
 }
 EXPORT void c_draw_circle(float x, float y, float radius)
 {

@@ -1,4 +1,4 @@
-use crate::{get_current_font_size, rect::Rect, vec::Vec2};
+use crate::{get_current_font_size, vec::Vec2};
 
 #[derive(Clone)]
 pub enum CursorDirection {

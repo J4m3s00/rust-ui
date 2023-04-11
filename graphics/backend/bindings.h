@@ -2,6 +2,9 @@
 #define EXTERN extern "C"
 #else
 #define EXTERN extern
+#define false 0
+#define true 1
+typedef int bool; // or #define bool int
 #endif
 
 #if defined(_WIN32) || defined(_WIN64)
@@ -13,6 +16,8 @@
 #else
 #define EXPORT EXTERN
 #endif
+
+#include <stdint.h>
 
 typedef struct InitApp
 {
@@ -51,10 +56,9 @@ EXPORT AppEvent *c_pre_update_application();
 EXPORT void c_post_update_application();
 EXPORT void c_clean_up_editor();
 
-EXPORT void c_draw_rect(float x, float y, float width, float height);
+EXPORT void c_draw_rect(float x, float y, float width, float height, float origin_x, float origin_y, float rotation, float corner_radius, bool fill, bool outline, uint32_t fill_color, uint32_t outline_color, float outline_thickness);
 EXPORT void c_draw_circle(float x, float y, float radius);
 EXPORT void c_draw_line(float x1, float y1, float x2, float y2);
 EXPORT void c_draw_text(float x, float y, const char *text);
-
 
 EXPORT float c_get_current_font_size();

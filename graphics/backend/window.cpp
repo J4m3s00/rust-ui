@@ -67,7 +67,7 @@ c_start_application(const InitApp *app)
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
     SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
-    SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
+    SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
     SDL_Window *window = SDL_CreateWindow(app->title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, window_flags);
     if (window == NULL)
     {
@@ -82,14 +82,10 @@ c_start_application(const InitApp *app)
 
     sr::Font font = sr::srLoadFont("/Users/lucaherzke/Documents/DEV/rust-ui/graphics/backend/deps/software-rendering/Roboto.ttf", 24);
 
-    int window_width, window_height;
-    SDL_GetWindowSize(window, &window_width, &window_height);
-
     state.done = false;
     state.window = window;
-    state.window_width = window_width;
-    state.window_height = window_height;
     state.font = font;
+    SDL_GL_GetDrawableSize(window, &state.window_width, &state.window_height);
     return 0;
 }
 
@@ -116,6 +112,7 @@ EXPORT AppEvent *c_pre_update_application()
             {
                 state.window_width = event.window.data1;
                 state.window_height = event.window.data2;
+                SDL_GL_GetDrawableSize(state.window, &state.window_width, &state.window_height);
             }
             break;
         }

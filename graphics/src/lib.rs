@@ -11,6 +11,7 @@ pub mod app;
 mod bindings;
 pub mod button;
 pub mod circle;
+pub mod clickable;
 pub mod color;
 pub mod cursor;
 pub mod draw_command;
@@ -56,27 +57,46 @@ pub fn quit_editor() {
     unsafe { c_clean_up_editor() };
 }
 
-pub fn run_draw_command(command: DrawCommand) {
+pub fn run_draw_command(command: &DrawCommand) {
     match command {
-        DrawCommand::Rect(rect) => unsafe {
+        DrawCommand::Rect {
+            left,
+            bottom,
+            width,
+            height,
+            fill,
+            stroke,
+        } => unsafe {
             c_draw_rect(
-                rect.left,
-                rect.bottom,
-                rect.right - rect.left,
-                rect.top - rect.bottom,
+                *left,
+                *bottom,
+                *width,
+                *height,
+                width / 2.,
+                height / 2.,
+                0.0,
+                0.0,
+                fill.is_some() as i32,
+                stroke.is_some() as i32,
+                fill.as_ref().map(|f| f.color.as_int()).unwrap_or(0),
+                stroke.as_ref().map(|s| s.color.as_int()).unwrap_or(0),
+                stroke.as_ref().map(|s| s.width).unwrap_or(0.0),
             )
         },
         DrawCommand::Circle(circle) => unsafe {
             c_draw_circle(circle.center.x, circle.center.y, circle.radius);
         },
         DrawCommand::Line { x1, y1, x2, y2 } => unsafe {
-            c_draw_line(x1, y1, x2, y2);
+            c_draw_line(*x1, *y1, *x2, *y2);
         },
         DrawCommand::Text(text) => unsafe {
             let c_msg = std::ffi::CString::new(text.text.as_str())
-                .map_err(|_| println!("Error: Could not convert text to CString"))
-                .unwrap_or_default();
-            c_draw_text(text.position.x, text.position.y, c_msg.as_ptr());
+                .unwrap_or(std::ffi::CString::new("ERROR Converting string").unwrap());
+            c_draw_text(
+                text.position.x,
+                text.position.y - text.style.font_size,
+                c_msg.as_ptr(),
+            );
         },
     }
 }

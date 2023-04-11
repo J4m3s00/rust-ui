@@ -27,12 +27,14 @@ impl Widget for Button {
             self.text.clone(),
         )));
 
-        builder.commands.push(DrawCommand::Rect(Rect::new(
-            builder.cursor.position.x,
-            builder.cursor.position.y,
-            builder.cursor.position.x + builder.get_available_space().x,
-            builder.cursor.position.y + get_current_font_size(),
-        )));
+        builder.commands.push(DrawCommand::Rect {
+            left: builder.cursor.position.x,
+            bottom: builder.cursor.position.y + get_current_font_size(),
+            width: builder.get_content_region_available().width(),
+            height: builder.cursor.position.y,
+            fill: None,
+            stroke: None,
+        });
         builder.cursor.position += builder.cursor.direction.get_default_step();
     }
 }

@@ -1,10 +1,7 @@
 use crate::{
-    cursor::{Cursor, CursorDirection},
-    draw_command::DrawCommand,
+    clickable::Clickable,
     label::Label,
-    quit_editor,
-    rect::Rect,
-    run_draw_command,
+    quit_editor, run_draw_command,
     stack::VStack,
     start_editor, update_editor,
     vec::Vec2,
@@ -27,14 +24,8 @@ impl App {
             version: version.into(),
             v_stack: VStack {
                 children: vec![
-                    Box::new(Label {
-                        text: "Hello, world!".to_string(),
-                        style: Default::default(),
-                    }),
-                    Box::new(Label {
-                        text: "Hello, world 2!".to_string(),
-                        style: Default::default(),
-                    }),
+                    Box::new(Clickable::default()),
+                    Box::new(Clickable::default()),
                 ],
                 style: Default::default(),
             },
@@ -46,17 +37,11 @@ impl App {
         start_editor(self.name.as_str());
         loop {
             match update_editor(|| {
-                let mut builder = WidgetBuilder {
-                    commands: vec![],
-                    cursor: Cursor {
-                        position: Vec2::new(100., 200.),
-                        direction: CursorDirection::Down,
-                    },
-                    panel_rect: Rect::new(0., 400., 400., 0.),
-                };
-                run_draw_command(DrawCommand::Rect(builder.panel_rect.clone()));
+                let mut builder = WidgetBuilder::new();
+                builder.begin(Vec2::new(400., 300.));
                 self.v_stack.build(&mut builder);
-                for command in builder.commands {
+                builder.end();
+                for command in builder.commands.iter() {
                     run_draw_command(command);
                 }
             }) {
