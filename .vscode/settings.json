@@ -1,7 +1,0 @@
-{
-    "files.associations": {
-        "xiosbase": "c",
-        "filesystem": "cpp"
-    },
-    "cmake.configureOnOpen": false
-}
