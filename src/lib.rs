@@ -1,42 +1,26 @@
-use bevy_ecs::{schedule::Schedule, system::Query};
-use gui::widget::Widget;
-use rust_graphics::{app::App, run_app, draw_command::DrawCommand};
-use scene::scene::Scene;
+use gui::widget::{SizePolicy, Widget};
+use rust_graphics::{
+    app::App,
+    color::COLOR_CYAN,
+    draw_command::{DrawCommand, Fill},
+    run_app, run_draw_command,
+};
 
-pub mod scene;
 pub mod error;
 pub mod gui;
 
-struct UIApp {
-    scene: Scene,
-    scheduler: Schedule,
-}
-
-fn test_system(query : Query<&Widget>) {
-    for widget in query.iter() {
-        println!("Drawing Widget {:?}", widget);
-    }
-}
+struct UIApp {}
 
 impl Default for UIApp {
     fn default() -> Self {
-        let mut scheduler = Schedule::new();
-        scheduler.add_system(test_system);
-        Self {
-            scene: Scene::new(),
-            scheduler,
-        }
+        Self {}
     }
 }
 
 impl App for UIApp {
-    fn on_start(&mut self) {
-        let test_widget = self.scene.add_entity(None);
-    }
+    fn on_start(&mut self) {}
 
-    fn on_draw(&mut self) {
-        self.scene.run_schedule(&mut self.scheduler);
-    }
+    fn on_draw(&mut self) {}
 }
 
 pub fn start_app() {

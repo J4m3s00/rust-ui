@@ -1,5 +1,3 @@
-use bevy_ecs::prelude::Component;
-
 #[derive(Debug)]
 pub enum SizePolicy {
     Fixed(f32),
@@ -9,7 +7,7 @@ pub enum SizePolicy {
 
 pub type WidgetSize = (SizePolicy, SizePolicy);
 
-#[derive(Component, Debug)]
+#[derive(Debug)]
 pub struct Widget {
     pub size: WidgetSize,
 }
