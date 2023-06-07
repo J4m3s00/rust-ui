@@ -1,4 +1,4 @@
-use super::widget_builder::{PushChild, WidgetBuilder};
+use super::widget_builder::PushChild;
 
 #[derive(Debug, Clone, Copy)]
 pub enum SizePolicy {

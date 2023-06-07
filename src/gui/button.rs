@@ -18,10 +18,10 @@ impl Button {
 
 impl Widget for Button {
     fn build(&self, builder: &PushChild, size: SizePolicy2D) {
-        builder.child(size, |child| {
-            child
-                .widget(&self.label, SizePolicy::Fill.into())
-                .interaction(WidgetInteractionType::Click);
-        });
+        builder
+            .push_child(size)
+            .widget(&self.label, SizePolicy::Fill.into())
+            .interaction(WidgetInteractionType::Click)
+            .pop_child();
     }
 }

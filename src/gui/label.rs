@@ -14,7 +14,7 @@ impl Label {
 }
 
 impl Widget for Label {
-    fn build(&self, builder: &PushChild, size: SizePolicy2D) {
+    fn build(&self, builder: &PushChild, _size: SizePolicy2D) {
         builder.text(self.text.clone());
     }
 }

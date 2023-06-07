@@ -56,57 +56,54 @@ impl WidgetBuilder {
     }
 }
 
-pub struct PushChild<'a>(RefCell<&'a mut WidgetBuilder>);
+pub struct PushChild<'a> {
+    builder: RefCell<&'a mut WidgetBuilder>,
+}
 
 impl<'a> PushChild<'a> {
     pub fn new(builder: RefCell<&'a mut WidgetBuilder>) -> Self {
-        Self(builder)
+        Self { builder }
     }
 
     pub fn text(&self, text: impl Into<String>) -> &Self {
-        let pos = self.0.borrow().cursor_pos;
-        self.0.borrow_mut().texts.push((text.into(), pos));
+        let pos = self.builder.borrow().cursor_pos;
+        self.builder.borrow_mut().texts.push((text.into(), pos));
         self
     }
 
     pub fn interaction(&self, interaction: WidgetInteractionType) -> &Self {
-        let widget_id = self.0.borrow().node_ptr;
-        self.0.borrow_mut().interactions.push(WidgetInteraction {
-            interaction_type: interaction,
-            widget_id,
-        });
+        let widget_id = self.builder.borrow().node_ptr;
+        self.builder
+            .borrow_mut()
+            .interactions
+            .push(WidgetInteraction {
+                interaction_type: interaction,
+                widget_id,
+            });
         self
     }
 
     pub fn widget<T>(&self, widget: &T, size: SizePolicy2D) -> &Self
     where
-        T: Widget,
+        T: Widget + ?Sized,
     {
         widget.build(&self, size);
         self
     }
 
-    pub fn child<Func>(&'a self, content_area: SizePolicy2D, nest: Func) -> &Self
-    where
-        Func: FnOnce(&Self),
-    {
-        let mut builder = self.0.borrow_mut();
-        let child = builder.push_child(content_area);
+    pub fn push_child(&self, content_area: SizePolicy2D) -> &Self {
+        self.builder.borrow_mut().push_child(content_area);
+        self
+    }
 
-        //nest(&child);
-        builder.pop_child();
+    pub fn pop_child(&self) -> &Self {
+        self.builder.borrow_mut().pop_child();
         self
     }
 }
 
-impl<'a> Drop for PushChild<'a> {
-    fn drop(&mut self) {
-        self.0.borrow_mut().pop_child();
-    }
-}
-
 impl<'a> WidgetBuilder {
-    fn push_child(&'a mut self, content_area: SizePolicy2D) -> PushChild {
+    fn push_child(&'a mut self, content_area: SizePolicy2D) {
         let current_node = self
             .get_node(self.node_ptr)
             .expect("Failed to push child. The node pointer was not found!");
@@ -134,7 +131,6 @@ impl<'a> WidgetBuilder {
             println!("Failed to push child: {}", err);
         }
         self.node_ptr = node_id;
-        PushChild::new(RefCell::new(self))
     }
 
     pub fn pop_child(&mut self) {

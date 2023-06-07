@@ -11,6 +11,7 @@ use rust_graphics::{
     draw_command::{DrawCommand, Fill, Stroke},
     rect::Rect,
     run_app, run_draw_command,
+    vec::Vec2,
 };
 
 pub mod error;
@@ -25,10 +26,9 @@ pub struct UIApp {
 
 impl UIApp {
     pub fn new() -> Self {
-        let content_region = Rect::new_from_xy(100., 100., 800., 600.);
         Self {
-            main_container: Container::new(content_region.size()),
-            builder: WidgetBuilder::new(content_region),
+            main_container: Container::default(),
+            builder: WidgetBuilder::new(Rect::new_from_xy(100., 100., 800., 600.)),
         }
     }
 
@@ -90,7 +90,7 @@ impl App for UIApp {
         for (text, pos) in self.builder.texts() {
             run_draw_command(&DrawCommand::Text {
                 text: text.clone(),
-                position: *pos,
+                position: *pos + Vec2::new(0., 16.),
                 color: COLOR_BLACK,
             });
         }

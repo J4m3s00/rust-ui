@@ -1,25 +1,16 @@
-use rust_graphics::vec::Vec2;
-
 use crate::error::{Error, Result};
 
 use super::{
-    widget::{SizePolicy2D, Widget},
+    widget::{SizePolicy, SizePolicy2D, Widget},
     widget_builder::PushChild,
 };
 
+#[derive(Default)]
 pub struct Container {
-    size: Vec2,
     children: Vec<Box<dyn Widget>>,
 }
 
 impl Container {
-    pub fn new(size: Vec2) -> Self {
-        Self {
-            size,
-            children: Vec::new(),
-        }
-    }
-
     pub fn add_child<T>(&mut self, child: T) -> Result<&dyn Widget>
     where
         T: Widget + 'static,
@@ -37,8 +28,12 @@ impl Container {
 
 impl Widget for Container {
     fn build(&self, push_child: &PushChild, size: SizePolicy2D) {
-        for child in self.children.iter() {
-            child.build(push_child, size.clone());
+        push_child.push_child(size);
+        {
+            for child in self.children.iter() {
+                push_child.widget(child.as_ref(), SizePolicy::Fill.into());
+            }
         }
+        push_child.pop_child();
     }
 }
