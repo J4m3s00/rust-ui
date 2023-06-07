@@ -4,7 +4,11 @@ use gui::{
     widget_builder::WidgetBuilder,
 };
 use rust_graphics::{
-    app::App, color::COLOR_BLACK, draw_command::DrawCommand, run_app, run_draw_command,
+    app::App,
+    color::{Color, COLOR_BLACK},
+    draw_command::{DrawCommand, Fill, Stroke},
+    rect::Rect,
+    run_app, run_draw_command,
 };
 
 pub mod error;
@@ -14,12 +18,15 @@ use error::Result;
 
 pub struct UIApp {
     main_container: Container,
+    builder: WidgetBuilder,
 }
 
 impl UIApp {
     pub fn new() -> Self {
+        let content_region = Rect::new_from_xy(100., 100., 800., 600.);
         Self {
-            main_container: Container::new((800., 600.).into()),
+            main_container: Container::new(content_region.size()),
+            builder: WidgetBuilder::new(content_region),
         }
     }
 
@@ -40,15 +47,45 @@ impl UIApp {
 }
 
 impl App for UIApp {
-    fn on_start(&mut self) {}
+    fn on_start(&mut self) {
+        self.main_container.build(
+            &mut self.builder,
+            (SizePolicy::Fill, SizePolicy::Fixed(20.)).into(),
+        );
+    }
 
     fn on_draw(&mut self) {
-        let mut builder = WidgetBuilder::default();
+        let main_content = self.builder.child_content_area(1).unwrap();
+        run_draw_command(&DrawCommand::Rect {
+            left: main_content.left,
+            top: main_content.top,
+            width: main_content.width(),
+            height: main_content.height(),
+            fill: None,
+            stroke: Some(Stroke {
+                width: 4.,
+                color: COLOR_BLACK,
+            }),
+        });
 
-        self.main_container
-            .build(&mut builder, (SizePolicy::Fill, SizePolicy::Fixed(20.)));
+        for interaction in self.builder.interactions() {
+            let area = self
+                .builder
+                .child_content_area(interaction.widget_id)
+                .unwrap();
+            run_draw_command(&DrawCommand::Rect {
+                left: area.left,
+                top: area.top,
+                width: area.width(),
+                height: area.height(),
+                fill: Some(Fill {
+                    color: Color::new(55, 55, 55, 255),
+                }),
+                stroke: None,
+            })
+        }
 
-        for (text, pos) in builder.texts() {
+        for (text, pos) in self.builder.texts() {
             run_draw_command(&DrawCommand::Text {
                 text: text.clone(),
                 position: *pos,

@@ -33,3 +33,12 @@ impl std::error::Error for Error {
         }
     }
 }
+
+impl<T> From<T> for Error
+where
+    T: Into<String>,
+{
+    fn from(value: T) -> Self {
+        Error::Generic(value.into())
+    }
+}
