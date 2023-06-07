@@ -1,6 +1,6 @@
 use super::{
     widget::{SizePolicy2D, Widget},
-    widget_builder::PushChild,
+    widget_builder::WidgetBuilder,
 };
 
 pub struct Label {
@@ -14,7 +14,7 @@ impl Label {
 }
 
 impl Widget for Label {
-    fn build(&self, builder: &PushChild, _size: SizePolicy2D) {
-        builder.text(self.text.clone());
+    fn build(&self, builder: &mut WidgetBuilder, size: SizePolicy2D) {
+        builder.child(size).text(self.text.clone());
     }
 }

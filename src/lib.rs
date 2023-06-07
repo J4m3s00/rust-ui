@@ -3,7 +3,7 @@ use std::cell::RefCell;
 use gui::{
     container::Container,
     widget::{SizePolicy, Widget},
-    widget_builder::{PushChild, WidgetBuilder},
+    widget_builder::WidgetBuilder,
 };
 use rust_graphics::{
     app::App,
@@ -50,10 +50,8 @@ impl UIApp {
 
 impl App for UIApp {
     fn on_start(&mut self) {
-        self.main_container.build(
-            &mut PushChild::new(RefCell::new(&mut self.builder)),
-            SizePolicy::Fill.into(),
-        );
+        self.main_container
+            .build(&mut self.builder, SizePolicy::Percentage(1.0).into());
     }
 
     fn on_draw(&mut self) {
@@ -70,7 +68,31 @@ impl App for UIApp {
             }),
         });
 
-        for interaction in self.builder.interactions() {
+        for node in self.builder.iter() {
+            let area = node.content_area;
+            if let Some(_) = &node.interaction {
+                run_draw_command(&DrawCommand::Rect {
+                    left: area.left,
+                    top: area.top,
+                    width: area.width(),
+                    height: area.height(),
+                    fill: Some(Fill {
+                        color: Color::new(55, 55, 55, 255),
+                    }),
+                    stroke: None,
+                });
+            }
+
+            if let Some(text) = &node.text {
+                run_draw_command(&DrawCommand::Text {
+                    text: text.clone(),
+                    position: area.top_left() + Vec2::new(0., 20.),
+                    color: COLOR_BLACK,
+                });
+            }
+        }
+
+        /*for interaction in self.builder.interactions() {
             let area = interaction.interaction_rect;
             run_draw_command(&DrawCommand::Rect {
                 left: area.left,
@@ -82,14 +104,14 @@ impl App for UIApp {
                 }),
                 stroke: None,
             })
-        }
+        }*/
 
-        for (text, pos) in self.builder.texts() {
+        /*for (text, pos) in self.builder.texts() {
             run_draw_command(&DrawCommand::Text {
                 text: text.clone(),
                 position: *pos + Vec2::new(0., 16.),
                 color: COLOR_BLACK,
             });
-        }
+        }*/
     }
 }

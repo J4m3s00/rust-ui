@@ -1,35 +1,60 @@
-use std::{cell::RefCell, collections::HashMap};
+use std::collections::HashMap;
 
 use rust_graphics::{rect::Rect, vec::Vec2};
 
 use crate::error::Result;
 
-use super::widget::{SizePolicy, SizePolicy2D, Widget};
+use super::widget::{SizePolicy, SizePolicy2D};
 
 type WidgetNodeId = usize;
 const ROOT_NODE_ID: WidgetNodeId = 1;
 
 /// Represents a child widget. Used to group widgets together.
-struct WidgetNode {
-    pub(self) id: WidgetNodeId,
-    pub(self) parent: Option<WidgetNodeId>,
-    pub(self) children: Vec<WidgetNodeId>,
+pub struct WidgetNode {
+    pub id: WidgetNodeId,
+    pub parent: Option<WidgetNodeId>,
+    pub children: Vec<WidgetNodeId>,
 
-    pub(self) content_area: Rect,
+    pub text: Option<String>,
+    pub interaction: Option<WidgetInteractionType>,
+    pub content_area: Rect,
+}
+
+pub struct WidgetNodeIterator<'a> {
+    current: WidgetNodeId,
+    builder: &'a WidgetBuilder,
+}
+
+impl<'a> Iterator for WidgetNodeIterator<'a> {
+    type Item = &'a WidgetNode;
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.builder.has_children(self.current) {
+            self.current = self.builder.get_node(self.current)?.children[0];
+            Some(self.builder.get_node(self.current)?)
+        } else {
+            while let Some(parent) = self.builder.get_node(self.current)?.parent {
+                let parent_node = self.builder.get_node(parent)?;
+                if let Some(next_sibling) = parent_node
+                    .children
+                    .iter()
+                    .skip_while(|&&x| x != self.current)
+                    .nth(1)
+                {
+                    self.current = *next_sibling;
+                    return Some(self.builder.get_node(self.current)?);
+                } else {
+                    self.current = parent;
+                }
+            }
+            None
+        }
+    }
 }
 
 pub enum WidgetInteractionType {
     Click,
 }
-
-pub struct WidgetInteraction {
-    pub interaction_type: WidgetInteractionType,
-    pub interaction_rect: Rect,
-}
-
 pub struct WidgetBuilder {
-    texts: Vec<(String, Vec2)>,
-    interactions: Vec<WidgetInteraction>,
     cursor_pos: Vec2,
     widget_nodes: HashMap<WidgetNodeId, WidgetNode>,
     node_ptr: WidgetNodeId,
@@ -42,71 +67,77 @@ impl WidgetBuilder {
             children: Vec::new(),
             content_area,
             parent: None,
+            text: None,
+            interaction: None,
             id: ROOT_NODE_ID,
         };
         widget_nodes.insert(root_node.id, root_node);
 
         Self {
-            texts: Vec::new(),
-            interactions: Vec::new(),
             cursor_pos: content_area.top_left(),
             widget_nodes,
             node_ptr: ROOT_NODE_ID,
         }
     }
-}
 
-pub struct PushChild<'a> {
-    builder: RefCell<&'a mut WidgetBuilder>,
-}
-
-impl<'a> PushChild<'a> {
-    pub fn new(builder: RefCell<&'a mut WidgetBuilder>) -> Self {
-        Self { builder }
+    pub fn root_node(&self) -> &WidgetNode {
+        self.get_node(ROOT_NODE_ID).expect("Root node not found!")
     }
 
-    pub fn text(&self, text: impl Into<String>) -> &Self {
-        let pos = self.builder.borrow().cursor_pos;
-        self.builder.borrow_mut().texts.push((text.into(), pos));
+    pub fn iter(&self) -> WidgetNodeIterator {
+        WidgetNodeIterator {
+            current: ROOT_NODE_ID,
+            builder: self,
+        }
+    }
+}
+
+pub struct WidgetComposer<'a> {
+    builder: &'a mut WidgetBuilder,
+    current_node: WidgetNodeId,
+}
+
+impl<'a> WidgetComposer<'a> {
+    pub fn new(builder: &'a mut WidgetBuilder, current_node: WidgetNodeId) -> Self {
+        Self {
+            builder,
+            current_node,
+        }
+    }
+
+    pub fn text(mut self, text: impl Into<String>) -> Self {
+        self.current_node().text = Some(text.into());
         self
     }
 
-    pub fn interaction(&self, interaction: WidgetInteractionType) -> &Self {
-        let builder = self.builder.borrow();
-        let widget_node: &WidgetNode = builder
-            .get_node(self.builder.borrow().node_ptr)
-            .expect("No widget node found");
-        self.builder
-            .borrow_mut()
-            .interactions
-            .push(WidgetInteraction {
-                interaction_type: interaction,
-                interaction_rect: widget_node.content_area,
-            });
+    pub fn interaction(mut self, interaction: WidgetInteractionType) -> Self {
+        self.current_node().interaction = Some(interaction);
         self
     }
 
-    pub fn widget<T>(&self, widget: &T, size: SizePolicy2D) -> &Self
+    pub fn widget<Widget>(self, widget: &Widget, size: SizePolicy2D) -> Self
     where
-        T: Widget + ?Sized,
+        Widget: super::widget::Widget + ?Sized,
     {
-        widget.build(&self, size);
+        widget.build(self.builder, size);
         self
     }
 
-    pub fn push_child(&self, content_area: SizePolicy2D) -> &Self {
-        self.builder.borrow_mut().push_child(content_area);
-        self
+    pub fn current_node(&mut self) -> &mut WidgetNode {
+        self.builder
+            .get_node_mut(self.current_node)
+            .expect("Failed to get current node!")
     }
+}
 
-    pub fn pop_child(&self) -> &Self {
-        self.builder.borrow_mut().pop_child();
-        self
+impl Drop for WidgetComposer<'_> {
+    fn drop(&mut self) {
+        self.builder.pop_child();
     }
 }
 
 impl<'a> WidgetBuilder {
-    fn push_child(&'a mut self, content_area: SizePolicy2D) {
+    pub fn child(&'a mut self, size: SizePolicy2D) -> WidgetComposer<'a> {
         let current_node = self
             .get_node(self.node_ptr)
             .expect("Failed to push child. The node pointer was not found!");
@@ -114,15 +145,13 @@ impl<'a> WidgetBuilder {
         let content_area = Rect::new_from_xy(
             self.cursor_pos.x,
             self.cursor_pos.y,
-            match content_area.horizontal {
-                SizePolicy::Fill => current_node.content_area.width(),
+            match size.horizontal {
                 SizePolicy::Percentage(percentage) => {
                     current_node.content_area.width() * percentage
                 }
                 SizePolicy::Fixed(width) => width,
             },
-            match content_area.vertical {
-                SizePolicy::Fill => current_node.content_area.height(),
+            match size.vertical {
                 SizePolicy::Percentage(percentage) => {
                     current_node.content_area.height() * percentage
                 }
@@ -134,6 +163,8 @@ impl<'a> WidgetBuilder {
             println!("Failed to push child: {}", err);
         }
         self.node_ptr = node_id;
+
+        WidgetComposer::new(self, node_id)
     }
 
     pub fn pop_child(&mut self) {
@@ -143,6 +174,7 @@ impl<'a> WidgetBuilder {
             .parent
         {
             self.node_ptr = parent;
+            self.advance();
         }
     }
 
@@ -155,26 +187,20 @@ impl<'a> WidgetBuilder {
     }
 
     pub fn advance(&mut self) {
-        self.cursor_pos.y += 20.;
-    }
-
-    pub fn texts(&self) -> &Vec<(String, Vec2)> {
-        &self.texts
-    }
-
-    pub fn interactions(&self) -> &Vec<WidgetInteraction> {
-        &self.interactions
+        self.cursor_pos.y += 32.;
     }
 }
 
 // Private functions
-impl WidgetBuilder {
-    fn new_node(&mut self, content_area: Rect, parent: Option<WidgetNodeId>) -> &WidgetNode {
+impl<'a> WidgetBuilder {
+    fn new_node(&'a mut self, content_area: Rect, parent: Option<WidgetNodeId>) -> &'a WidgetNode {
         let node = WidgetNode {
             id: self.new_node_id(),
             parent: Some(parent.unwrap_or(ROOT_NODE_ID)),
             children: Vec::new(),
             content_area,
+            text: None,
+            interaction: None,
         };
         let id = node.id;
         self.widget_nodes.insert(id, node);
@@ -194,12 +220,18 @@ impl WidgetBuilder {
         }
     }
 
-    fn get_node(&self, id: WidgetNodeId) -> Option<&WidgetNode> {
+    fn get_node(&'a self, id: WidgetNodeId) -> Option<&'a WidgetNode> {
         self.widget_nodes.get(&id)
     }
 
-    fn get_node_mut(&mut self, id: WidgetNodeId) -> Option<&mut WidgetNode> {
+    fn get_node_mut(&'a mut self, id: WidgetNodeId) -> Option<&'a mut WidgetNode> {
         self.widget_nodes.get_mut(&id)
+    }
+
+    fn has_children(&self, id: WidgetNodeId) -> bool {
+        self.get_node(id)
+            .map(|node| !node.children.is_empty())
+            .unwrap_or(false)
     }
 
     fn add_child(&mut self, parent: WidgetNodeId, child: WidgetNodeId) -> Result<()> {

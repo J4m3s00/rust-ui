@@ -1,6 +1,6 @@
 use super::{
     widget::{SizePolicy, SizePolicy2D, Widget},
-    widget_builder::PushChild,
+    widget_builder::WidgetBuilder,
 };
 
 pub struct ContainerItem {
@@ -27,20 +27,18 @@ impl Container {
     {
         self.children.push(ContainerItem {
             widget: Box::new(child),
-            size: SizePolicy::Fill.into(),
+            size: SizePolicy::Percentage(1.0).into(),
         });
         self.children.last_mut().expect("Failed to add child")
     }
 }
 
 impl Widget for Container {
-    fn build(&self, push_child: &PushChild, size: SizePolicy2D) {
-        push_child.push_child(size);
-        {
-            for item in self.children.iter() {
-                push_child.widget(item.widget.as_ref(), item.size);
-            }
+    fn build(&self, push_child: &mut WidgetBuilder, size: SizePolicy2D) {
+        let mut composer = push_child.child(size);
+
+        for item in self.children.iter() {
+            composer = composer.widget(item.widget.as_ref(), item.size);
         }
-        push_child.pop_child();
     }
 }

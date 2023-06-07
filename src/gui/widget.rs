@@ -1,10 +1,9 @@
-use super::widget_builder::PushChild;
+use super::widget_builder::WidgetBuilder;
 
 #[derive(Debug, Clone, Copy)]
 pub enum SizePolicy {
     Fixed(f32),
     Percentage(f32),
-    Fill,
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -32,5 +31,5 @@ impl From<(SizePolicy, SizePolicy)> for SizePolicy2D {
 }
 
 pub trait Widget {
-    fn build(&self, build: &PushChild, size: SizePolicy2D);
+    fn build(&self, build: &mut WidgetBuilder, size: SizePolicy2D);
 }
