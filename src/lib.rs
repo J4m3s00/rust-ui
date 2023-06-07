@@ -71,10 +71,7 @@ impl App for UIApp {
         });
 
         for interaction in self.builder.interactions() {
-            let area = self
-                .builder
-                .child_content_area(interaction.widget_id)
-                .unwrap();
+            let area = interaction.interaction_rect;
             run_draw_command(&DrawCommand::Rect {
                 left: area.left,
                 top: area.top,

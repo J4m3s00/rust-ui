@@ -1,5 +1,5 @@
 use super::{
-    widget::{self, SizePolicy, SizePolicy2D, Widget},
+    widget::{SizePolicy, SizePolicy2D, Widget},
     widget_builder::PushChild,
 };
 

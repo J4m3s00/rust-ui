@@ -24,7 +24,7 @@ pub enum WidgetInteractionType {
 
 pub struct WidgetInteraction {
     pub interaction_type: WidgetInteractionType,
-    pub widget_id: WidgetNodeId,
+    pub interaction_rect: Rect,
 }
 
 pub struct WidgetBuilder {
@@ -72,13 +72,16 @@ impl<'a> PushChild<'a> {
     }
 
     pub fn interaction(&self, interaction: WidgetInteractionType) -> &Self {
-        let widget_id = self.builder.borrow().node_ptr;
+        let builder = self.builder.borrow();
+        let widget_node: &WidgetNode = builder
+            .get_node(self.builder.borrow().node_ptr)
+            .expect("No widget node found");
         self.builder
             .borrow_mut()
             .interactions
             .push(WidgetInteraction {
                 interaction_type: interaction,
-                widget_id,
+                interaction_rect: widget_node.content_area,
             });
         self
     }
