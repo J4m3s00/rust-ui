@@ -1,5 +1,3 @@
-use std::cell::RefCell;
-
 use gui::{
     container::Container,
     widget::{SizePolicy, Widget},
@@ -86,32 +84,10 @@ impl App for UIApp {
             if let Some(text) = &node.text {
                 run_draw_command(&DrawCommand::Text {
                     text: text.clone(),
-                    position: area.top_left() + Vec2::new(0., 20.),
+                    position: area.top_left() + Vec2::new(0., 16.),
                     color: COLOR_BLACK,
                 });
             }
         }
-
-        /*for interaction in self.builder.interactions() {
-            let area = interaction.interaction_rect;
-            run_draw_command(&DrawCommand::Rect {
-                left: area.left,
-                top: area.top,
-                width: area.width(),
-                height: area.height(),
-                fill: Some(Fill {
-                    color: Color::new(55, 55, 55, 255),
-                }),
-                stroke: None,
-            })
-        }*/
-
-        /*for (text, pos) in self.builder.texts() {
-            run_draw_command(&DrawCommand::Text {
-                text: text.clone(),
-                position: *pos + Vec2::new(0., 16.),
-                color: COLOR_BLACK,
-            });
-        }*/
     }
 }
