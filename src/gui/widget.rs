@@ -1,13 +1,14 @@
-#[derive(Debug)]
+use super::widget_builder::WidgetBuilder;
+
+#[derive(Debug, Clone, Copy)]
 pub enum SizePolicy {
     Fixed(f32),
     Percentage(f32),
     Fill,
 }
 
-pub type WidgetSize = (SizePolicy, SizePolicy);
+pub type SizePolicy2D = (SizePolicy, SizePolicy);
 
-#[derive(Debug)]
-pub struct Widget {
-    pub size: WidgetSize,
+pub trait Widget {
+    fn build(&self, build: &mut WidgetBuilder, size: SizePolicy2D);
 }
