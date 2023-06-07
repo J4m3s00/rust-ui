@@ -4,7 +4,7 @@ use crate::error::{Error, Result};
 
 use super::{
     widget::{SizePolicy2D, Widget},
-    widget_builder::WidgetBuilder,
+    widget_builder::PushChild,
 };
 
 pub struct Container {
@@ -36,9 +36,9 @@ impl Container {
 }
 
 impl Widget for Container {
-    fn build(&self, builder: &mut WidgetBuilder, size: SizePolicy2D) {
+    fn build(&self, push_child: &PushChild, size: SizePolicy2D) {
         for child in self.children.iter() {
-            child.build(builder, size.clone());
+            child.build(push_child, size.clone());
         }
     }
 }

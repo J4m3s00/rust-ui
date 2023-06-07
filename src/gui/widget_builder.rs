@@ -1,10 +1,10 @@
-use std::collections::HashMap;
+use std::{cell::RefCell, collections::HashMap};
 
 use rust_graphics::{rect::Rect, vec::Vec2};
 
 use crate::error::Result;
 
-use super::widget::{SizePolicy, SizePolicy2D};
+use super::widget::{SizePolicy, SizePolicy2D, Widget};
 
 type WidgetNodeId = usize;
 const ROOT_NODE_ID: WidgetNodeId = 1;
@@ -56,29 +56,57 @@ impl WidgetBuilder {
     }
 }
 
-pub struct PushChild<'a> {
-    builder: &'a mut WidgetBuilder,
-    node_ptr: WidgetNodeId,
+pub struct PushChild<'a>(RefCell<&'a mut WidgetBuilder>);
+
+impl<'a> PushChild<'a> {
+    pub fn new(builder: RefCell<&'a mut WidgetBuilder>) -> Self {
+        Self(builder)
+    }
+
+    pub fn text(&self, text: impl Into<String>) -> &Self {
+        let pos = self.0.borrow().cursor_pos;
+        self.0.borrow_mut().texts.push((text.into(), pos));
+        self
+    }
+
+    pub fn interaction(&self, interaction: WidgetInteractionType) -> &Self {
+        let widget_id = self.0.borrow().node_ptr;
+        self.0.borrow_mut().interactions.push(WidgetInteraction {
+            interaction_type: interaction,
+            widget_id,
+        });
+        self
+    }
+
+    pub fn widget<T>(&self, widget: &T, size: SizePolicy2D) -> &Self
+    where
+        T: Widget,
+    {
+        widget.build(&self, size);
+        self
+    }
+
+    pub fn child<Func>(&'a self, content_area: SizePolicy2D, nest: Func) -> &Self
+    where
+        Func: FnOnce(&Self),
+    {
+        let mut builder = self.0.borrow_mut();
+        let child = builder.push_child(content_area);
+
+        //nest(&child);
+        builder.pop_child();
+        self
+    }
 }
 
 impl<'a> Drop for PushChild<'a> {
-    fn drop(&mut self) {}
+    fn drop(&mut self) {
+        self.0.borrow_mut().pop_child();
+    }
 }
 
-impl WidgetBuilder {
-    pub fn text(&mut self, text: impl Into<String>) {
-        self.texts.push((text.into(), self.cursor_pos));
-    }
-
-    pub fn interaction(&mut self, interaction: WidgetInteractionType) {
-        self.interactions.push(WidgetInteraction {
-            interaction_type: interaction,
-            widget_id: self.node_ptr,
-        });
-    }
-
-    #[must_use = "PushChild will pop when its dropped. So all operations need to be done while it is in scope."]
-    pub fn push_child(&mut self, content_area: SizePolicy2D) -> PushChild {
+impl<'a> WidgetBuilder {
+    fn push_child(&'a mut self, content_area: SizePolicy2D) -> PushChild {
         let current_node = self
             .get_node(self.node_ptr)
             .expect("Failed to push child. The node pointer was not found!");
@@ -106,11 +134,7 @@ impl WidgetBuilder {
             println!("Failed to push child: {}", err);
         }
         self.node_ptr = node_id;
-        //node_id
-        PushChild {
-            builder: self,
-            node_ptr: node_id,
-        }
+        PushChild::new(RefCell::new(self))
     }
 
     pub fn pop_child(&mut self) {

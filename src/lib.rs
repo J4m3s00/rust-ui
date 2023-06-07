@@ -1,7 +1,9 @@
+use std::cell::RefCell;
+
 use gui::{
     container::Container,
     widget::{SizePolicy, Widget},
-    widget_builder::WidgetBuilder,
+    widget_builder::{PushChild, WidgetBuilder},
 };
 use rust_graphics::{
     app::App,
@@ -49,7 +51,7 @@ impl UIApp {
 impl App for UIApp {
     fn on_start(&mut self) {
         self.main_container.build(
-            &mut self.builder,
+            &mut PushChild::new(RefCell::new(&mut self.builder)),
             (SizePolicy::Fill, SizePolicy::Fixed(20.)).into(),
         );
     }

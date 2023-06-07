@@ -1,7 +1,7 @@
 use super::{
     label::Label,
     widget::{SizePolicy, SizePolicy2D, Widget},
-    widget_builder::{WidgetBuilder, WidgetInteractionType},
+    widget_builder::{PushChild, WidgetInteractionType},
 };
 
 pub struct Button {
@@ -17,10 +17,11 @@ impl Button {
 }
 
 impl Widget for Button {
-    fn build(&self, builder: &mut WidgetBuilder, size: SizePolicy2D) {
-        let _ = builder.push_child(size);
-        self.label.build(builder, SizePolicy::Fill.into()); // Probaly change sizing policy here
-        builder.interaction(WidgetInteractionType::Click);
-        println!("Pop Child");
+    fn build(&self, builder: &PushChild, size: SizePolicy2D) {
+        builder.child(size, |child| {
+            child
+                .widget(&self.label, SizePolicy::Fill.into())
+                .interaction(WidgetInteractionType::Click);
+        });
     }
 }
