@@ -52,7 +52,7 @@ impl App for UIApp {
     fn on_start(&mut self) {
         self.main_container.build(
             &mut PushChild::new(RefCell::new(&mut self.builder)),
-            (SizePolicy::Fill, SizePolicy::Fixed(20.)).into(),
+            SizePolicy::Fill.into(),
         );
     }
 
