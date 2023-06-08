@@ -1,5 +1,4 @@
 use gui::{
-    container::Container,
     widget::{SizePolicy, Widget},
     widget_builder::WidgetBuilder,
 };
@@ -18,25 +17,24 @@ pub mod gui;
 use error::Result;
 
 pub struct UIApp {
-    main_container: Container,
+    main_container: Option<Box<dyn Widget>>,
     builder: WidgetBuilder,
 }
 
 impl UIApp {
     pub fn new() -> Self {
         Self {
-            main_container: Container::default(),
+            main_container: None,
             builder: WidgetBuilder::new(Rect::new_from_xy(100., 100., 800., 600.)),
         }
     }
 
-    pub fn main_container<T>(mut self, builder: T) -> Self
+    pub fn main_container<T, W>(mut self, builder: T) -> Self
     where
-        T: FnOnce(&mut Container) -> Result<()>,
+        T: FnOnce() -> W,
+        W: Widget + 'static,
     {
-        if let Err(err) = builder(&mut self.main_container) {
-            println!("Error Creating main container: {}", err);
-        }
+        self.main_container = Some(Box::new(builder()));
         self
     }
 
@@ -48,8 +46,9 @@ impl UIApp {
 
 impl App for UIApp {
     fn on_start(&mut self) {
-        self.main_container
-            .build(&mut self.builder, SizePolicy::Percentage(1.0).into());
+        if let Some(container) = &self.main_container {
+            container.build(&mut self.builder, SizePolicy::Percentage(1.0).into());
+        }
     }
 
     fn on_draw(&mut self) {

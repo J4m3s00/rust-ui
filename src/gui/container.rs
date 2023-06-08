@@ -9,7 +9,17 @@ pub struct ContainerItem {
 }
 
 impl ContainerItem {
-    pub fn set_size(&mut self, size: SizePolicy2D) -> &mut Self {
+    pub fn new<T>(widget: T) -> Self
+    where
+        T: Widget + 'static,
+    {
+        Self {
+            widget: Box::new(widget),
+            size: SizePolicy::Percentage(1.).into(),
+        }
+    }
+
+    pub fn set_size(mut self, size: SizePolicy2D) -> Self {
         self.size = size;
         self
     }
@@ -17,7 +27,7 @@ impl ContainerItem {
 
 #[derive(Default)]
 pub struct Container {
-    children: Vec<ContainerItem>,
+    pub children: Vec<ContainerItem>,
 }
 
 impl Container {
