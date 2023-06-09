@@ -2,9 +2,9 @@ use rust_ui::{
     error::Result,
     gui::{
         button::Button,
-        container::ContainerItem,
+        container::{ContainerItem, ContainerWidgetItem},
         label::Label,
-        vstack::{ContainerWidgetItem, VStack},
+        vstack::VStack,
         widget::SizePolicy,
     },
     UIApp,
