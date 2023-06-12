@@ -6,11 +6,11 @@ use super::{
     widget_builder::{CursorDirection, WidgetBuilder},
 };
 
-pub struct VStack {
+pub struct HStack {
     children: Vec<ContainerItem>,
 }
 
-impl VStack {
+impl HStack {
     pub fn new(children: Vec<ContainerItem>) -> Self {
         Self { children }
     }
@@ -20,17 +20,17 @@ impl VStack {
     }
 }
 
-impl Widget for VStack {
+impl Widget for HStack {
     fn build(&self, builder: &mut WidgetBuilder, content_area: Vec2) {
-        let mut remaining_height = content_area.y;
+        let mut remaining_width = content_area.x;
         let mut total_frac = 0.;
         for item in self.children().iter() {
-            match item.size().vertical {
+            match item.size().horizontal {
                 SizePolicy::Fixed(pixels) => {
-                    remaining_height -= pixels;
+                    remaining_width -= pixels;
                 }
                 SizePolicy::Percentage(percent) => {
-                    remaining_height -= percent * content_area.y;
+                    remaining_width -= percent * content_area.x;
                 }
                 SizePolicy::Fraction(frac) => {
                     total_frac += frac;
@@ -38,18 +38,18 @@ impl Widget for VStack {
             }
         }
 
-        let frac_height = remaining_height / total_frac;
+        let frac_width = remaining_width / total_frac;
 
         let mut child = builder
             .new_child(content_area)
-            .set_cursor_direction(CursorDirection::Vertical);
+            .set_cursor_direction(CursorDirection::Horizontal);
         for item in self.children().iter() {
-            let height = match item.size().vertical {
+            let width = match item.size().horizontal {
                 SizePolicy::Fixed(pixels) => pixels,
-                SizePolicy::Percentage(percent) => percent * content_area.y,
-                SizePolicy::Fraction(frac) => frac * frac_height,
+                SizePolicy::Percentage(percent) => percent * content_area.x,
+                SizePolicy::Fraction(frac) => frac * frac_width,
             };
-            child = child.widget(item.widget(), (content_area.x, height).into());
+            child = child.widget(item.widget(), (width, content_area.y).into());
         }
     }
 

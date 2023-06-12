@@ -1,11 +1,11 @@
+use rust_graphics::vec::Vec2;
 use rust_ui::{
     error::Result,
     gui::{
         button::Button,
-        container::{ContainerItem, ContainerWidgetItem},
-        label::Label,
+        hstack::HStack,
         vstack::VStack,
-        widget::{SizePolicy, SizePolicy2D, Widget},
+        widget::{SizePolicy, SizePolicy2D, ToItem, Widget},
         widget_builder::WidgetBuilder,
     },
     UIApp,
@@ -14,17 +14,37 @@ use rust_ui::{
 struct EmptyWidget;
 
 impl Widget for EmptyWidget {
-    fn build(&self, build: &mut WidgetBuilder, size: SizePolicy2D) {
-        build.child(size);
+    fn build(&self, build: &mut WidgetBuilder, size: Vec2) {
+        build.new_child(size);
+    }
+
+    fn calc_min_size(&self, _size: SizePolicy2D) -> Vec2 {
+        Vec2::zero()
     }
 }
 
 fn main_container() -> VStack {
     VStack::new(vec![
-        ContainerWidgetItem::new(EmptyWidget)
-            .set_size((SizePolicy::Percentage(1.0), SizePolicy::Fixed(40.)).into()),
-        ContainerWidgetItem::new(EmptyWidget)
-            .set_size((SizePolicy::Percentage(1.0), SizePolicy::Fixed(40.)).into()),
+        EmptyWidget
+            .into_item()
+            .set_size((Default::default(), Default::default()).into()),
+        HStack::new(vec![
+            EmptyWidget
+                .into_item()
+                .set_size((SizePolicy::Fraction(1.), SizePolicy::default()).into()),
+            VStack::new(vec![
+                EmptyWidget
+                    .into_item()
+                    .set_size((SizePolicy::default(), SizePolicy::Fraction(1.)).into()),
+                EmptyWidget
+                    .into_item()
+                    .set_size((SizePolicy::default(), SizePolicy::Fixed(20.)).into()),
+            ])
+            .into_item()
+            .set_size((SizePolicy::Fraction(2.), SizePolicy::default()).into()),
+        ])
+        .into_item()
+        .set_size((Default::default(), SizePolicy::Fixed(250.)).into()),
     ])
 }
 

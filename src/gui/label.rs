@@ -13,8 +13,8 @@ impl Label {
     }
 }
 
-impl Widget for Label {
+/*impl Widget for Label {
     fn build(&self, builder: &mut WidgetBuilder, size: SizePolicy2D) {
         builder.child(size).text(self.text.clone());
     }
-}
+}*/

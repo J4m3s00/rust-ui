@@ -6,7 +6,7 @@ use crate::error::Result;
 
 use super::widget::{SizePolicy, SizePolicy2D};
 
-type WidgetNodeId = usize;
+type WidgetNodeId = u64;
 const ROOT_NODE_ID: WidgetNodeId = 1;
 
 /// Represents a child widget. Used to group widgets together.
@@ -54,9 +54,18 @@ impl<'a> Iterator for WidgetNodeIterator<'a> {
 pub enum WidgetInteractionType {
     Click,
 }
+
+#[derive(Clone)]
+struct Cursor {
+    position: Vec2,
+    direction: CursorDirection,
+}
+
 pub struct WidgetBuilder {
-    cursor_pos: Vec2,
+    cursor: Cursor,
+
     widget_nodes: HashMap<WidgetNodeId, WidgetNode>,
+
     node_ptr: WidgetNodeId,
 }
 
@@ -74,7 +83,10 @@ impl WidgetBuilder {
         widget_nodes.insert(root_node.id, root_node);
 
         Self {
-            cursor_pos: content_area.top_left(),
+            cursor: Cursor {
+                position: content_area.top_left(),
+                direction: CursorDirection::Vertical,
+            },
             widget_nodes,
             node_ptr: ROOT_NODE_ID,
         }
@@ -92,17 +104,31 @@ impl WidgetBuilder {
     }
 }
 
-pub struct WidgetComposer<'a> {
-    builder: &'a mut WidgetBuilder,
-    current_node: WidgetNodeId,
+#[derive(Debug, Clone, Copy)]
+pub enum CursorDirection {
+    Horizontal,
+    Vertical,
 }
 
-impl<'a> WidgetComposer<'a> {
+pub struct ChildComposer<'a> {
+    builder: &'a mut WidgetBuilder,
+    current_node: WidgetNodeId,
+    last_cursor: Cursor,
+}
+
+impl<'a> ChildComposer<'a> {
     pub fn new(builder: &'a mut WidgetBuilder, current_node: WidgetNodeId) -> Self {
+        let last_cursor = builder.cursor.clone();
         Self {
             builder,
             current_node,
+            last_cursor,
         }
+    }
+
+    pub fn set_cursor_direction(mut self, direction: CursorDirection) -> Self {
+        self.builder.cursor.direction = direction;
+        self
     }
 
     pub fn text(mut self, text: impl Into<String>) -> Self {
@@ -115,7 +141,7 @@ impl<'a> WidgetComposer<'a> {
         self
     }
 
-    pub fn widget<Widget>(self, widget: &Widget, size: SizePolicy2D) -> Self
+    pub fn widget<Widget>(self, widget: &Widget, size: Vec2) -> Self
     where
         Widget: super::widget::Widget + ?Sized,
     {
@@ -130,48 +156,38 @@ impl<'a> WidgetComposer<'a> {
     }
 }
 
-impl Drop for WidgetComposer<'_> {
+impl Drop for ChildComposer<'_> {
     fn drop(&mut self) {
-        self.builder.pop_child();
+        self.builder.pop_child(self.last_cursor.clone());
     }
 }
 
 impl<'a> WidgetBuilder {
     // Request new space for a child. Nested children will be placed at cursor of parent
-    pub fn child(&'a mut self, size: SizePolicy2D) -> WidgetComposer<'a> {
-        let current_node = self
-            .get_node(self.node_ptr)
-            .expect("Failed to push child. The node pointer was not found!");
+    pub fn new_child(&'a mut self, size: Vec2) -> ChildComposer<'a> {
         // TODO: Add padding and margin
         let content_area = Rect::new_from_xy(
-            self.cursor_pos.x,
-            self.cursor_pos.y,
-            match size.horizontal {
-                SizePolicy::Percentage(percentage) => {
-                    current_node.content_area.width() * percentage
-                }
-                SizePolicy::Fixed(width) => width,
-            },
-            match size.vertical {
-                SizePolicy::Percentage(percentage) => {
-                    current_node.content_area.height() * percentage
-                }
-                SizePolicy::Fixed(height) => height,
-            },
+            self.cursor.position.x,
+            self.cursor.position.y,
+            size.x,
+            size.y,
         );
         let node_id = self.new_node(content_area, Some(self.node_ptr)).id;
-        if let Err(err) = self.add_child(self.node_ptr, node_id) {
+        if let Err(err) = self.set_child(self.node_ptr, node_id) {
             println!("Failed to push child: {}", err);
         }
         self.node_ptr = node_id;
 
-        WidgetComposer::new(self, node_id)
+        ChildComposer::new(self, node_id)
     }
 
-    pub(self) fn pop_child(&mut self) {
+    pub(self) fn pop_child(&mut self, last_cursor: Cursor) {
         let current_node = self.get_node(self.node_ptr).unwrap();
         if let Some(parent) = current_node.parent {
-            let advance = (0., current_node.content_area.height()).into();
+            let advance = match self.cursor.direction {
+                CursorDirection::Horizontal => (current_node.content_area.width(), 0.).into(),
+                CursorDirection::Vertical => (0., current_node.content_area.height()).into(),
+            };
             self.node_ptr = parent;
             self.advance(advance);
         }
@@ -186,7 +202,7 @@ impl<'a> WidgetBuilder {
     }
 
     pub fn advance(&mut self, direction: Vec2) {
-        self.cursor_pos += direction;
+        self.cursor.position += direction;
     }
 }
 
@@ -233,7 +249,7 @@ impl<'a> WidgetBuilder {
             .unwrap_or(false)
     }
 
-    fn add_child(&mut self, parent: WidgetNodeId, child: WidgetNodeId) -> Result<()> {
+    fn set_child(&mut self, parent: WidgetNodeId, child: WidgetNodeId) -> Result<()> {
         // Remove child from old parent
         if let Some(old_parent) = self.get_node_mut(
             self.get_node(child)

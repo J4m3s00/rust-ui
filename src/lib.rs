@@ -6,6 +6,7 @@ use rust_graphics::{
     app::App,
     color::{Color, COLOR_BLACK, COLOR_BLUE},
     draw_command::{DrawCommand, Fill, Stroke},
+    events::app_events::AppEvent,
     rect::Rect,
     run_app, run_draw_command,
     vec::Vec2,
@@ -25,7 +26,7 @@ impl UIApp {
     pub fn new() -> Self {
         Self {
             main_container: None,
-            builder: WidgetBuilder::new(Rect::new_from_xy(100., 100., 800., 600.)),
+            builder: WidgetBuilder::new(Rect::new_from_xy(100., 100., 800., 300.)),
         }
     }
 
@@ -42,13 +43,29 @@ impl UIApp {
         run_app(self);
         Ok(())
     }
+
+    fn build_main_container(&mut self) {
+        if let Some(container) = &self.main_container {
+            let size = self.builder.root_node().content_area.size();
+            container.build(&mut self.builder, size);
+        }
+    }
 }
 
 impl App for UIApp {
     fn on_start(&mut self) {
-        if let Some(container) = &self.main_container {
-            container.build(&mut self.builder, SizePolicy::Percentage(1.0).into());
-        }
+        self.build_main_container();
+    }
+
+    fn on_event(&mut self, event: AppEvent) {
+        match event {
+            AppEvent::WindowResize(width, height) => {
+                self.builder =
+                    WidgetBuilder::new(Rect::new_from_xy(0., 0., width as f32, height as f32));
+                self.build_main_container();
+            }
+            _ => {}
+        };
     }
 
     fn on_draw(&mut self) {
@@ -62,7 +79,12 @@ impl App for UIApp {
                 fill: None,
                 stroke: Some(Stroke {
                     width: 2.,
-                    color: COLOR_BLUE,
+                    color: Color::new(
+                        0, //((node.id & 0xff000000) >> 24) as u8,
+                        0, //((node.id & 0xff0000) >> 16) as u8,
+                        0, //((node.id & 0xff00) >> 8) as u8,
+                        255,
+                    ),
                 }),
             });
             /*if let Some(_) = &node.interaction {
