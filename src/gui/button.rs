@@ -1,3 +1,10 @@
+use rust_graphics::vec::Vec2;
+
+use super::{
+    widget::Widget,
+    widget_builder::{WidgetBuilder, WidgetInteractionType},
+};
+
 pub struct Button {
     label: String,
 }
@@ -10,11 +17,11 @@ impl Button {
     }
 }
 
-/*impl Widget for Button {
-    fn build(&self, builder: &mut WidgetBuilder, size: SizePolicy2D) {
+impl Widget for Button {
+    fn build(&self, builder: &mut WidgetBuilder, size: Vec2) {
         builder
-            .child(size)
+            .new_child(size)
             .text(self.label.clone())
             .interaction(WidgetInteractionType::Click);
     }
-}*/
+}

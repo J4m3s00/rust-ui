@@ -43,7 +43,6 @@ impl From<(SizePolicy, SizePolicy)> for SizePolicy2D {
 
 pub trait Widget {
     fn build(&self, builder: &mut WidgetBuilder, size: Vec2);
-    fn calc_min_size(&self, size: SizePolicy2D) -> Vec2;
 }
 
 pub trait ToItem {

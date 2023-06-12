@@ -52,14 +52,4 @@ impl Widget for VStack {
             child = child.widget(item.widget(), (content_area.x, height).into());
         }
     }
-
-    fn calc_min_size(&self, size: SizePolicy2D) -> Vec2 {
-        let mut min_size = Vec2::zero();
-        for child in self.children() {
-            let child_size_px = child.widget().calc_min_size(child.size());
-            min_size.x = min_size.x.max(child_size_px.x);
-            min_size.y += child_size_px.y;
-        }
-        min_size
-    }
 }

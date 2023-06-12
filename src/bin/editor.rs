@@ -17,10 +17,6 @@ impl Widget for EmptyWidget {
     fn build(&self, build: &mut WidgetBuilder, size: Vec2) {
         build.new_child(size);
     }
-
-    fn calc_min_size(&self, _size: SizePolicy2D) -> Vec2 {
-        Vec2::zero()
-    }
 }
 
 fn main_container() -> VStack {
@@ -36,9 +32,12 @@ fn main_container() -> VStack {
                 EmptyWidget
                     .into_item()
                     .set_size((SizePolicy::default(), SizePolicy::Fraction(1.)).into()),
-                EmptyWidget
-                    .into_item()
-                    .set_size((SizePolicy::default(), SizePolicy::Fixed(20.)).into()),
+                HStack::new(vec![
+                    EmptyWidget.into_item(),
+                    Button::new("My Button").into_item(),
+                ])
+                .into_item()
+                .set_size((SizePolicy::default(), SizePolicy::Fixed(20.)).into()),
             ])
             .into_item()
             .set_size((SizePolicy::Fraction(2.), SizePolicy::default()).into()),

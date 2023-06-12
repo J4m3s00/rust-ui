@@ -87,7 +87,7 @@ impl App for UIApp {
                     ),
                 }),
             });
-            /*if let Some(_) = &node.interaction {
+            if let Some(_) = &node.interaction {
                 run_draw_command(&DrawCommand::Rect {
                     left: area.left,
                     top: area.top,
@@ -106,7 +106,7 @@ impl App for UIApp {
                     position: area.top_left() + Vec2::new(0., 16.),
                     color: COLOR_BLACK,
                 });
-            }*/
+            }
         }
     }
 }

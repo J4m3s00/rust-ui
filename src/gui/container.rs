@@ -1,4 +1,4 @@
-use super::widget::{SizePolicy2D, Widget};
+use super::widget::{SizePolicy, SizePolicy2D, Widget};
 
 pub struct ContainerItem {
     widget: Box<dyn Widget>,
@@ -30,6 +30,16 @@ impl ContainerItem {
 
     pub fn set_size(mut self, size: SizePolicy2D) -> Self {
         self.size = size;
+        self
+    }
+
+    pub fn set_width(mut self, width: SizePolicy) -> Self {
+        self.size.horizontal = width;
+        self
+    }
+
+    pub fn set_height(mut self, height: SizePolicy) -> Self {
+        self.size.vertical = height;
         self
     }
 
