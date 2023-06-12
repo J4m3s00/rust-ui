@@ -137,6 +137,7 @@ impl Drop for WidgetComposer<'_> {
 }
 
 impl<'a> WidgetBuilder {
+    // Request new space for a child. Nested children will be placed at cursor of parent
     pub fn child(&'a mut self, size: SizePolicy2D) -> WidgetComposer<'a> {
         let current_node = self
             .get_node(self.node_ptr)
@@ -167,18 +168,16 @@ impl<'a> WidgetBuilder {
         WidgetComposer::new(self, node_id)
     }
 
-    pub fn pop_child(&mut self) {
-        if let Some(parent) = self
-            .get_node(self.node_ptr)
-            .expect("Failed to pop child. The node pointer was not found!")
-            .parent
-        {
+    pub(self) fn pop_child(&mut self) {
+        let current_node = self.get_node(self.node_ptr).unwrap();
+        if let Some(parent) = current_node.parent {
+            let advance = (0., current_node.content_area.height()).into();
             self.node_ptr = parent;
-            self.advance();
+            self.advance(advance);
         }
     }
 
-    pub fn child_content_area(&self, id: WidgetNodeId) -> Result<Rect> {
+    pub fn node_content_area(&self, id: WidgetNodeId) -> Result<Rect> {
         let node = self.get_node(id).ok_or(format!(
             "Failed to get child content area. Node {} not found!",
             id
@@ -186,8 +185,8 @@ impl<'a> WidgetBuilder {
         Ok(node.content_area)
     }
 
-    pub fn advance(&mut self) {
-        self.cursor_pos.y += 32.;
+    pub fn advance(&mut self, direction: Vec2) {
+        self.cursor_pos += direction;
     }
 }
 

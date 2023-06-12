@@ -4,7 +4,7 @@ use gui::{
 };
 use rust_graphics::{
     app::App,
-    color::{Color, COLOR_BLACK},
+    color::{Color, COLOR_BLACK, COLOR_BLUE},
     draw_command::{DrawCommand, Fill, Stroke},
     rect::Rect,
     run_app, run_draw_command,
@@ -52,22 +52,20 @@ impl App for UIApp {
     }
 
     fn on_draw(&mut self) {
-        let main_content = self.builder.child_content_area(1).unwrap();
-        run_draw_command(&DrawCommand::Rect {
-            left: main_content.left,
-            top: main_content.top,
-            width: main_content.width(),
-            height: main_content.height(),
-            fill: None,
-            stroke: Some(Stroke {
-                width: 4.,
-                color: COLOR_BLACK,
-            }),
-        });
-
         for node in self.builder.iter() {
             let area = node.content_area;
-            if let Some(_) = &node.interaction {
+            run_draw_command(&DrawCommand::Rect {
+                left: area.left,
+                top: area.top,
+                width: area.width(),
+                height: area.height(),
+                fill: None,
+                stroke: Some(Stroke {
+                    width: 2.,
+                    color: COLOR_BLUE,
+                }),
+            });
+            /*if let Some(_) = &node.interaction {
                 run_draw_command(&DrawCommand::Rect {
                     left: area.left,
                     top: area.top,
@@ -86,7 +84,7 @@ impl App for UIApp {
                     position: area.top_left() + Vec2::new(0., 16.),
                     color: COLOR_BLACK,
                 });
-            }
+            }*/
         }
     }
 }

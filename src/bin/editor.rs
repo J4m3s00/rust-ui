@@ -5,17 +5,26 @@ use rust_ui::{
         container::{ContainerItem, ContainerWidgetItem},
         label::Label,
         vstack::VStack,
-        widget::SizePolicy,
+        widget::{SizePolicy, SizePolicy2D, Widget},
+        widget_builder::WidgetBuilder,
     },
     UIApp,
 };
 
+struct EmptyWidget;
+
+impl Widget for EmptyWidget {
+    fn build(&self, build: &mut WidgetBuilder, size: SizePolicy2D) {
+        build.child(size);
+    }
+}
+
 fn main_container() -> VStack {
     VStack::new(vec![
-        ContainerWidgetItem::new(Label::new("My Label"))
-            .set_size((SizePolicy::Percentage(1.0), SizePolicy::Fixed(20.)).into()),
-        ContainerWidgetItem::new(Button::new("My Button"))
-            .set_size((SizePolicy::Percentage(1.0), SizePolicy::Fixed(20.)).into()),
+        ContainerWidgetItem::new(EmptyWidget)
+            .set_size((SizePolicy::Percentage(1.0), SizePolicy::Fixed(40.)).into()),
+        ContainerWidgetItem::new(EmptyWidget)
+            .set_size((SizePolicy::Percentage(1.0), SizePolicy::Fixed(40.)).into()),
     ])
 }
 
