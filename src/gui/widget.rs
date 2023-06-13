@@ -1,5 +1,3 @@
-use std::ops::Deref;
-
 use rust_graphics::vec::Vec2;
 
 use super::{container::ContainerItem, widget_builder::WidgetBuilder};
@@ -8,6 +6,8 @@ use super::{container::ContainerItem, widget_builder::WidgetBuilder};
 pub enum SizePolicy {
     Fixed(f32),
     Percentage(f32),
+    PercentageH(f32),
+    PercentageV(f32),
     Fraction(f32),
 }
 

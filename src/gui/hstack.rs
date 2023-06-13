@@ -2,7 +2,7 @@ use rust_graphics::vec::Vec2;
 
 use super::{
     container::ContainerItem,
-    widget::{SizePolicy, SizePolicy2D, Widget},
+    widget::{SizePolicy, Widget},
     widget_builder::{CursorDirection, WidgetBuilder},
 };
 
@@ -32,6 +32,12 @@ impl Widget for HStack {
                 SizePolicy::Percentage(percent) => {
                     remaining_width -= percent * content_area.x;
                 }
+                SizePolicy::PercentageH(percent) => {
+                    remaining_width -= percent * content_area.x;
+                }
+                SizePolicy::PercentageV(percent) => {
+                    remaining_width -= percent * content_area.y;
+                }
                 SizePolicy::Fraction(frac) => {
                     total_frac += frac;
                 }
@@ -47,6 +53,8 @@ impl Widget for HStack {
             let width = match item.size().horizontal {
                 SizePolicy::Fixed(pixels) => pixels,
                 SizePolicy::Percentage(percent) => percent * content_area.x,
+                SizePolicy::PercentageH(percent) => percent * content_area.x,
+                SizePolicy::PercentageV(percent) => percent * content_area.y,
                 SizePolicy::Fraction(frac) => frac * frac_width,
             };
             child = child.widget(item.widget(), (width, content_area.y).into());

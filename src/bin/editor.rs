@@ -2,15 +2,36 @@ use rust_graphics::vec::Vec2;
 use rust_ui::{
     error::Result,
     gui::{
-        button::Button,
         hstack::HStack,
         vstack::VStack,
-        widget::{SizePolicy, SizePolicy2D, ToItem, Widget},
+        widget::{SizePolicy, ToItem, Widget},
         widget_builder::WidgetBuilder,
     },
     UIApp,
 };
 
+struct TestWidget {
+    stack: HStack,
+}
+
+impl TestWidget {
+    fn new() -> Self {
+        Self {
+            stack: HStack::new(vec![
+                EmptyWidget.into_item(),
+                VStack::new(vec![EmptyWidget.into_item(), EmptyWidget.into_item()])
+                    .into_item()
+                    .set_width(SizePolicy::PercentageV(0.5)),
+            ]),
+        }
+    }
+}
+
+impl Widget for TestWidget {
+    fn build(&self, builder: &mut WidgetBuilder, size: Vec2) {
+        builder.new_child(size).widget(&self.stack, size);
+    }
+}
 struct EmptyWidget;
 
 impl Widget for EmptyWidget {
@@ -19,37 +40,20 @@ impl Widget for EmptyWidget {
     }
 }
 
-fn main_container() -> VStack {
-    VStack::new(vec![
-        EmptyWidget
+fn main_container() -> impl Widget {
+    VStack::new(vec![HStack::new(vec![
+        EmptyWidget.into_item(),
+        TestWidget::new()
             .into_item()
-            .set_size((Default::default(), Default::default()).into()),
-        HStack::new(vec![
-            EmptyWidget
-                .into_item()
-                .set_size((SizePolicy::Fraction(1.), SizePolicy::default()).into()),
-            VStack::new(vec![
-                EmptyWidget
-                    .into_item()
-                    .set_size((SizePolicy::default(), SizePolicy::Fraction(1.)).into()),
-                HStack::new(vec![
-                    EmptyWidget.into_item(),
-                    Button::new("My Button").into_item(),
-                ])
-                .into_item()
-                .set_size((SizePolicy::default(), SizePolicy::Fixed(20.)).into()),
-            ])
-            .into_item()
-            .set_size((SizePolicy::Fraction(2.), SizePolicy::default()).into()),
-        ])
-        .into_item()
-        .set_size((Default::default(), SizePolicy::Fixed(250.)).into()),
+            .set_width(SizePolicy::Fixed(128.)),
     ])
+    .into_item()
+    .set_height(SizePolicy::Fixed(32.))])
 }
 
 #[allow(dead_code)]
-fn main_just_button() -> Button {
-    Button::new("My Button")
+fn main_just_button() -> TestWidget {
+    TestWidget::new()
 }
 
 fn main() -> Result<()> {

@@ -1,11 +1,8 @@
-use gui::{
-    widget::{SizePolicy, Widget},
-    widget_builder::WidgetBuilder,
-};
+use gui::{widget::Widget, widget_builder::WidgetBuilder};
 use rust_graphics::{
     app::App,
-    color::{Color, COLOR_BLACK, COLOR_BLUE},
-    draw_command::{DrawCommand, Fill, Stroke},
+    color::{Color, COLOR_BLACK},
+    draw_command::{DrawCommand, Stroke},
     events::app_events::AppEvent,
     rect::Rect,
     run_app, run_draw_command,
@@ -44,7 +41,9 @@ impl UIApp {
         Ok(())
     }
 
-    fn build_main_container(&mut self) {
+    fn rebuild_main_container(&mut self, width: f32, height: f32) {
+        self.builder = WidgetBuilder::new(Rect::new_from_xy(0., 0., width, height));
+
         if let Some(container) = &self.main_container {
             let size = self.builder.root_node().content_area.size();
             container.build(&mut self.builder, size);
@@ -54,15 +53,13 @@ impl UIApp {
 
 impl App for UIApp {
     fn on_start(&mut self) {
-        self.build_main_container();
+        self.rebuild_main_container(800., 600.);
     }
 
     fn on_event(&mut self, event: AppEvent) {
         match event {
             AppEvent::WindowResize(width, height) => {
-                self.builder =
-                    WidgetBuilder::new(Rect::new_from_xy(0., 0., width as f32, height as f32));
-                self.build_main_container();
+                self.rebuild_main_container(width as f32, height as f32);
             }
             _ => {}
         };
@@ -87,7 +84,7 @@ impl App for UIApp {
                     ),
                 }),
             });
-            if let Some(_) = &node.interaction {
+            /*if let Some(_) = &node.interaction {
                 run_draw_command(&DrawCommand::Rect {
                     left: area.left,
                     top: area.top,
@@ -98,7 +95,7 @@ impl App for UIApp {
                     }),
                     stroke: None,
                 });
-            }
+            }*/
 
             if let Some(text) = &node.text {
                 run_draw_command(&DrawCommand::Text {

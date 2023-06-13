@@ -4,8 +4,6 @@ use rust_graphics::{rect::Rect, vec::Vec2};
 
 use crate::error::Result;
 
-use super::widget::{SizePolicy, SizePolicy2D};
-
 type WidgetNodeId = u64;
 const ROOT_NODE_ID: WidgetNodeId = 1;
 
@@ -161,16 +159,17 @@ impl Drop for ChildComposer<'_> {
         self.builder.pop_child(self.last_cursor.clone());
     }
 }
+const PADDING: f32 = 2.;
 
 impl<'a> WidgetBuilder {
     // Request new space for a child. Nested children will be placed at cursor of parent
     pub fn new_child(&'a mut self, size: Vec2) -> ChildComposer<'a> {
         // TODO: Add padding and margin
         let content_area = Rect::new_from_xy(
-            self.cursor.position.x,
-            self.cursor.position.y,
-            size.x,
-            size.y,
+            self.cursor.position.x + PADDING,
+            self.cursor.position.y + PADDING,
+            size.x - (PADDING * 2.),
+            size.y - (PADDING * 2.),
         );
         let node_id = self.new_node(content_area, Some(self.node_ptr)).id;
         if let Err(err) = self.set_child(self.node_ptr, node_id) {
@@ -185,10 +184,15 @@ impl<'a> WidgetBuilder {
         let current_node = self.get_node(self.node_ptr).unwrap();
         if let Some(parent) = current_node.parent {
             let advance = match self.cursor.direction {
-                CursorDirection::Horizontal => (current_node.content_area.width(), 0.).into(),
-                CursorDirection::Vertical => (0., current_node.content_area.height()).into(),
+                CursorDirection::Horizontal => {
+                    (current_node.content_area.width() + (2. * PADDING), 0.).into()
+                }
+                CursorDirection::Vertical => {
+                    (0., current_node.content_area.height() + (2. * PADDING)).into()
+                }
             };
             self.node_ptr = parent;
+            self.cursor = last_cursor;
             self.advance(advance);
         }
     }
