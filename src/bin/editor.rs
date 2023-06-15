@@ -1,62 +1,34 @@
-use rust_graphics::vec::Vec2;
+use rust_graphics::app::App;
 use rust_ui::{
     error::Result,
     gui::{
         hstack::HStack,
+        label::Label,
+        text::{Text, TextAlignH, TextAlignV},
         vstack::VStack,
         widget::{SizePolicy, ToItem, Widget},
-        widget_builder::WidgetBuilder,
     },
     UIApp,
 };
 
-struct TestWidget {
-    stack: HStack,
-}
-
-impl TestWidget {
-    fn new() -> Self {
-        Self {
-            stack: HStack::new(vec![
-                EmptyWidget.into_item(),
-                VStack::new(vec![EmptyWidget.into_item(), EmptyWidget.into_item()])
-                    .into_item()
-                    .set_width(SizePolicy::PercentageV(0.5)),
-            ]),
-        }
-    }
-}
-
-impl Widget for TestWidget {
-    fn build(&self, builder: &mut WidgetBuilder, size: Vec2) {
-        builder.new_child(size).widget(&self.stack, size);
-    }
-}
-struct EmptyWidget;
-
-impl Widget for EmptyWidget {
-    fn build(&self, build: &mut WidgetBuilder, size: Vec2) {
-        build.new_child(size);
-    }
-}
-
-fn main_container() -> impl Widget {
-    VStack::new(vec![HStack::new(vec![
-        EmptyWidget.into_item(),
-        TestWidget::new()
+fn main_screen() -> impl Widget {
+    VStack::new(vec![
+        Label::new("Menu")
             .into_item()
-            .set_width(SizePolicy::Fixed(128.)),
+            .set_height(SizePolicy::Fixed(32.)),
+        HStack::new(vec![
+            Label::new("Sidebar")
+                .hor_align(TextAlignH::Left)
+                .vert_align(TextAlignV::Top)
+                .into_item()
+                .set_width(SizePolicy::Fixed(256.)),
+            VStack::new(vec![]).into_item(),
+        ])
+        .into_item(),
     ])
-    .into_item()
-    .set_height(SizePolicy::Fixed(32.))])
-}
-
-#[allow(dead_code)]
-fn main_just_button() -> TestWidget {
-    TestWidget::new()
 }
 
 fn main() -> Result<()> {
-    UIApp::new().main_container(main_container).start()?;
+    UIApp::new().main_container(main_screen).run();
     Ok(())
 }

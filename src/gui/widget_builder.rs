@@ -4,6 +4,8 @@ use rust_graphics::{rect::Rect, vec::Vec2};
 
 use crate::error::Result;
 
+use super::text::Text;
+
 type WidgetNodeId = u64;
 const ROOT_NODE_ID: WidgetNodeId = 1;
 
@@ -13,7 +15,7 @@ pub struct WidgetNode {
     pub parent: Option<WidgetNodeId>,
     pub children: Vec<WidgetNodeId>,
 
-    pub text: Option<String>,
+    pub text: Option<Text>,
     pub interaction: Option<WidgetInteractionType>,
     pub content_area: Rect,
 }
@@ -129,8 +131,8 @@ impl<'a> ChildComposer<'a> {
         self
     }
 
-    pub fn text(mut self, text: impl Into<String>) -> Self {
-        self.current_node().text = Some(text.into());
+    pub fn text(mut self, text: Text) -> Self {
+        self.current_node().text = Some(text);
         self
     }
 

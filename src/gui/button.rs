@@ -21,7 +21,7 @@ impl Widget for Button {
     fn build(&self, builder: &mut WidgetBuilder, size: Vec2) {
         builder
             .new_child(size)
-            .text(self.label.clone())
+            .text(self.label.clone().into())
             .interaction(WidgetInteractionType::Click);
     }
 }
