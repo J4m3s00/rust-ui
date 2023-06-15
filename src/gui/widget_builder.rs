@@ -144,7 +144,7 @@ impl<'a> ChildComposer<'a> {
 
     pub fn interaction<T, A>(mut self, action: A) -> Self
     where
-        A: Action<T> + 'static,
+        A: Action + 'static,
         T: 'static,
     {
         self.current_node()

@@ -1,12 +1,14 @@
-pub trait Action<T> {
-    fn invoke(&mut self, event: T);
+pub trait ActionRunner {
+    type Event;
+    fn invoke(&mut self, event: Self::Event);
 }
 
-impl<Fn, A> Action<A> for Fn
+impl<Fn, A> ActionRunner for Fn
 where
     Fn: FnMut(A),
 {
-    fn invoke(&mut self, event: A) {
+    type Event = A;
+    fn invoke(&mut self, event: Self::Event) {
         self(event);
     }
 }

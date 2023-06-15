@@ -11,7 +11,7 @@ pub struct ButtonClick;
 
 pub struct Button {
     label: String,
-    on_click: Option<Box<dyn Action<ButtonClick>>>,
+    on_click: Option<Box<dyn Action>>,
 }
 
 impl Button {

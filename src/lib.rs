@@ -1,7 +1,10 @@
+use std::any::TypeId;
+
 use gui::{
+    events::action::Action,
     text::{TextAlignH, TextAlignV},
     widget::Widget,
-    widget_builder::WidgetBuilder,
+    widget_builder::{interactions::Click, WidgetBuilder},
 };
 use rust_graphics::{
     app::App,
@@ -65,6 +68,16 @@ impl App for UIApp {
         match event {
             AppEvent::WindowResize(width, height) => {
                 self.rebuild_main_container(width as f32, height as f32);
+            }
+            AppEvent::MouseDown { key, x, y } => {
+                println!("Mouse down: {} {} {}", key, x, y);
+                for node in self.builder.iter() {
+                    if node.content_area.contains((x, y).into()) {
+                        if let Some(interaction) = &node.interactions.get(&TypeId::of::<Click>()) {
+                            //interaction.on_mouse_down(key, x, y);
+                        }
+                    }
+                }
             }
             _ => {}
         };
