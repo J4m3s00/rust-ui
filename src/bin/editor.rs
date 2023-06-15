@@ -1,16 +1,5 @@
 use rust_graphics::app::App;
-use rust_ui::{
-    error::Result,
-    gui::{
-        button::Button,
-        hstack::HStack,
-        label::Label,
-        text::{TextAlignH, TextAlignV},
-        vstack::VStack,
-        widget::{SizePolicy, ToItem, Widget},
-    },
-    UIApp,
-};
+use rust_ui::prelude::*;
 
 fn main_screen() -> impl Widget {
     VStack::new(vec![

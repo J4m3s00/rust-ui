@@ -16,6 +16,7 @@ use rust_graphics::{
 
 pub mod error;
 pub mod gui;
+pub mod prelude;
 
 pub struct UIApp {
     main_container: Option<Box<dyn Widget>>,
