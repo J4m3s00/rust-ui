@@ -11,8 +11,7 @@ use rust_graphics::{
     font::Font,
     init_app,
     rect::Rect,
-    run_app, run_draw_command,
-    vec::Vec2,
+    run_draw_command,
 };
 
 pub mod error;

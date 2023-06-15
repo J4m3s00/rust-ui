@@ -7,10 +7,7 @@ use rust_graphics::{rect::Rect, vec::Vec2};
 
 use crate::error::Result;
 
-use super::{
-    events::{action::Action, event_manager::EventManager},
-    text::Text,
-};
+use super::{events::action::Action, text::Text};
 
 type WidgetNodeId = u64;
 const ROOT_NODE_ID: WidgetNodeId = 1;
