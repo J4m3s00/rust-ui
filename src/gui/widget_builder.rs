@@ -1,10 +1,16 @@
-use std::collections::HashMap;
+use std::{
+    any::{Any, TypeId},
+    collections::HashMap,
+};
 
 use rust_graphics::{rect::Rect, vec::Vec2};
 
 use crate::error::Result;
 
-use super::text::Text;
+use super::{
+    events::{action::Action, event_manager::EventManager},
+    text::Text,
+};
 
 type WidgetNodeId = u64;
 const ROOT_NODE_ID: WidgetNodeId = 1;
@@ -16,8 +22,9 @@ pub struct WidgetNode {
     pub children: Vec<WidgetNodeId>,
 
     pub text: Option<Text>,
-    pub interaction: Option<WidgetInteractionType>,
+    pub interactions: HashMap<TypeId, Box<dyn Any>>,
     pub content_area: Rect,
+    // Event handler
 }
 
 pub struct WidgetNodeIterator<'a> {
@@ -51,8 +58,10 @@ impl<'a> Iterator for WidgetNodeIterator<'a> {
     }
 }
 
-pub enum WidgetInteractionType {
-    Click,
+pub mod interactions {
+
+    #[derive(Debug, Clone, Copy)]
+    pub struct Click;
 }
 
 #[derive(Clone)]
@@ -77,7 +86,7 @@ impl WidgetBuilder {
             content_area,
             parent: None,
             text: None,
-            interaction: None,
+            interactions: HashMap::new(),
             id: ROOT_NODE_ID,
         };
         widget_nodes.insert(root_node.id, root_node);
@@ -136,8 +145,14 @@ impl<'a> ChildComposer<'a> {
         self
     }
 
-    pub fn interaction(mut self, interaction: WidgetInteractionType) -> Self {
-        self.current_node().interaction = Some(interaction);
+    pub fn interaction<T, A>(mut self, action: A) -> Self
+    where
+        A: Action<T> + 'static,
+        T: 'static,
+    {
+        self.current_node()
+            .interactions
+            .insert(TypeId::of::<T>(), Box::new(action));
         self
     }
 
@@ -221,7 +236,7 @@ impl<'a> WidgetBuilder {
             children: Vec::new(),
             content_area,
             text: None,
-            interaction: None,
+            interactions: HashMap::new(),
         };
         let id = node.id;
         self.widget_nodes.insert(id, node);

@@ -49,3 +49,15 @@ where
         }
     }
 }
+
+impl Text {
+    pub fn vert_align(mut self, alignment: TextAlignV) -> Self {
+        self.alignment_v = alignment;
+        self
+    }
+
+    pub fn hor_align(mut self, alignment: TextAlignH) -> Self {
+        self.alignment_h = alignment;
+        self
+    }
+}

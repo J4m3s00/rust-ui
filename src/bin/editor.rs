@@ -2,9 +2,10 @@ use rust_graphics::app::App;
 use rust_ui::{
     error::Result,
     gui::{
+        button::Button,
         hstack::HStack,
         label::Label,
-        text::{Text, TextAlignH, TextAlignV},
+        text::{TextAlignH, TextAlignV},
         vstack::VStack,
         widget::{SizePolicy, ToItem, Widget},
     },
@@ -13,9 +14,14 @@ use rust_ui::{
 
 fn main_screen() -> impl Widget {
     VStack::new(vec![
-        Label::new("Menu")
-            .into_item()
-            .set_height(SizePolicy::Fixed(32.)),
+        HStack::new(vec![
+            Label::new("Header").into_item(),
+            Button::new("Click")
+                .into_item()
+                .set_width(SizePolicy::Fixed(64.)),
+        ])
+        .into_item()
+        .set_height(SizePolicy::Fixed(32.)),
         HStack::new(vec![
             Label::new("Sidebar")
                 .hor_align(TextAlignH::Left)

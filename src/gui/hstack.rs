@@ -57,7 +57,9 @@ impl Widget for HStack {
                 SizePolicy::PercentageV(percent) => percent * content_area.y,
                 SizePolicy::Fraction(frac) => frac * frac_width,
             };
-            child = child.widget(item.widget(), (width, content_area.y).into());
+            child = child
+                .widget(item.widget(), (width, content_area.y).into())
+                .set_cursor_direction(CursorDirection::Vertical); // Reset if children changed them;
         }
     }
 }
