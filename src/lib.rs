@@ -119,17 +119,6 @@ impl App for UIApp {
                     TextAlignH::Right => area.right - text_width,
                 };
 
-                run_draw_command(&DrawCommand::Rect {
-                    left: text_left,
-                    top: text_base_line - line_top,
-                    width: text_width,
-                    height: text_height,
-                    fill: None,
-                    stroke: Some(Stroke {
-                        width: 1.,
-                        color: COLOR_BLACK,
-                    }),
-                });
                 run_draw_command(&DrawCommand::Text {
                     font: self.default_font,
                     text: text.text.clone(),

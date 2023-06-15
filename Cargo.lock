@@ -234,7 +234,7 @@ checksum = "436b050e76ed2903236f032a59761c1eb99e1b0aead2c257922771dab1fc8c78"
 [[package]]
 name = "rust-graphics"
 version = "0.1.0"
-source = "git+https://github.com/J4m3s00/rust-graphics.git#1c21df17eb572995f96b90f8f377bb53e43d7dbf"
+source = "git+https://github.com/J4m3s00/rust-graphics.git#1e3c5dff9883670370b52e66a306ec5bdcb375f0"
 dependencies = [
  "bindgen",
  "cmake",
