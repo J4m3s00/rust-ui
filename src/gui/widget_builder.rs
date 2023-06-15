@@ -1,5 +1,6 @@
 use std::{
     any::{Any, TypeId},
+    boxed::ThinBox,
     collections::HashMap,
 };
 
@@ -19,7 +20,7 @@ pub struct WidgetNode {
     pub children: Vec<WidgetNodeId>,
 
     pub text: Option<Text>,
-    pub interactions: HashMap<TypeId, Box<dyn Any>>,
+    pub interactions: HashMap<TypeId, ThinBox<dyn Action>>,
     pub content_area: Rect,
     // Event handler
 }
@@ -144,12 +145,12 @@ impl<'a> ChildComposer<'a> {
 
     pub fn interaction<T, A>(mut self, action: A) -> Self
     where
-        A: Action + 'static,
+        A: Action + ?Sized + 'static,
         T: 'static,
     {
         self.current_node()
             .interactions
-            .insert(TypeId::of::<T>(), Box::new(action));
+            .insert(TypeId::of::<T>(), ThinBox::new(action));
         self
     }
 

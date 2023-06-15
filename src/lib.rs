@@ -1,7 +1,7 @@
+#![feature(thin_box)]
 use std::any::TypeId;
 
 use gui::{
-    events::action::Action,
     text::{TextAlignH, TextAlignV},
     widget::Widget,
     widget_builder::{interactions::Click, WidgetBuilder},
