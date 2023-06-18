@@ -1,17 +1,18 @@
 use rust_graphics::vec::Vec2;
 
 use super::{
-    events::action::Action,
+    events::{event::Event, signal::Sig},
     text::Text,
     widget::Widget,
     widget_builder::{interactions::Click, WidgetBuilder},
 };
 
 pub struct ButtonClick;
+impl Event for ButtonClick {}
 
 pub struct Button {
     label: String,
-    on_click: Option<Box<dyn Action>>,
+    on_click: Option<Box<dyn Sig<Event = ButtonClick>>>,
 }
 
 impl Button {
@@ -24,7 +25,7 @@ impl Button {
 
     pub fn on_click<T>(mut self, action: T) -> Self
     where
-        T: Action + 'static,
+        T: Sig<Event = ButtonClick> + 'static,
     {
         self.on_click = Some(Box::new(action));
         self
@@ -36,6 +37,6 @@ impl Widget for Button {
         builder
             .new_child(size)
             .text(Text::from(self.label.clone()))
-            .interaction::<Click, _>(|c| println!("Got click event on some Button!"));
+            .interaction();
     }
 }

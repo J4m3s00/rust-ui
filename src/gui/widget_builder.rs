@@ -1,14 +1,13 @@
-use std::{
-    any::{Any, TypeId},
-    boxed::ThinBox,
-    collections::HashMap,
-};
+use std::{any::TypeId, boxed::ThinBox, collections::HashMap};
 
-use rust_graphics::{rect::Rect, vec::Vec2};
+use rust_graphics::{events::app_events::AppEvent, rect::Rect, vec::Vec2};
 
 use crate::error::Result;
 
-use super::{events::action::Action, text::Text};
+use super::{
+    events::{receiver::Rec, signal::Sig},
+    text::Text,
+};
 
 type WidgetNodeId = u64;
 const ROOT_NODE_ID: WidgetNodeId = 1;
@@ -20,7 +19,7 @@ pub struct WidgetNode {
     pub children: Vec<WidgetNodeId>,
 
     pub text: Option<Text>,
-    pub interactions: HashMap<TypeId, ThinBox<dyn Action>>,
+    pub interactions: HashMap<TypeId, ThinBox<dyn Sig<Event = AppEvent>>>,
     pub content_area: Rect,
     // Event handler
 }
@@ -143,14 +142,12 @@ impl<'a> ChildComposer<'a> {
         self
     }
 
-    pub fn interaction<T, A>(mut self, action: A) -> Self
+    pub fn interaction<T, R>(mut self, signal: R) -> Self
     where
-        A: Action + ?Sized + 'static,
+        R: Rec + Sized + 'static,
         T: 'static,
     {
-        self.current_node()
-            .interactions
-            .insert(TypeId::of::<T>(), ThinBox::new(action));
+        todo!();
         self
     }
 
@@ -198,7 +195,7 @@ impl<'a> WidgetBuilder {
     pub(self) fn pop_child(&mut self, last_cursor: Cursor) {
         let current_node = self.get_node(self.node_ptr).unwrap();
         if let Some(parent) = current_node.parent {
-            let advance = match self.cursor.direction {
+            let advance = match last_cursor.direction {
                 CursorDirection::Horizontal => {
                     (current_node.content_area.width() + (2. * PADDING), 0.).into()
                 }

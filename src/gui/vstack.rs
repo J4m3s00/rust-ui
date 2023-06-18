@@ -57,9 +57,8 @@ impl Widget for VStack {
                 SizePolicy::PercentageV(percent) => percent * content_area.y,
                 SizePolicy::Fraction(frac) => frac * frac_height,
             };
-            child = child
-                .widget(item.widget(), (content_area.x, height).into())
-                .set_cursor_direction(CursorDirection::Vertical); // Reset if children changed them
+            child = child.widget(item.widget(), (content_area.x, height).into());
+            //.set_cursor_direction(CursorDirection::Vertical); // Reset if children changed them
         }
     }
 }
