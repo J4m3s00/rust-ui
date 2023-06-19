@@ -58,7 +58,6 @@ impl Widget for HStack {
                 SizePolicy::Fraction(frac) => frac * frac_width,
             };
             child = child.widget(item.widget(), (width, content_area.y).into());
-            //.set_cursor_direction(CursorDirection::Horizontal); // Reset if children changed them;
         }
     }
 }

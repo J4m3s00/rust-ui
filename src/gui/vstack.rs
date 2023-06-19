@@ -58,7 +58,6 @@ impl Widget for VStack {
                 SizePolicy::Fraction(frac) => frac * frac_height,
             };
             child = child.widget(item.widget(), (content_area.x, height).into());
-            //.set_cursor_direction(CursorDirection::Vertical); // Reset if children changed them
         }
     }
 }
