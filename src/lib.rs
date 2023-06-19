@@ -1,30 +1,32 @@
-use gui::{widget::Widget, widget_builder::WidgetBuilder};
+use gui::{
+    text::{TextAlignH, TextAlignV},
+    widget::Widget,
+    widget_builder::WidgetBuilder,
+};
 use rust_graphics::{
     app::App,
     color::{Color, COLOR_BLACK},
     draw_command::{DrawCommand, Stroke},
     events::app_events::AppEvent,
+    font::Font,
+    init_app,
     rect::Rect,
-    run_app, run_draw_command,
-    vec::Vec2,
+    run_draw_command,
 };
 
 pub mod error;
 pub mod gui;
-
-use error::Result;
+pub mod prelude;
 
 pub struct UIApp {
     main_container: Option<Box<dyn Widget>>,
     builder: WidgetBuilder,
+    default_font: Font,
 }
 
 impl UIApp {
     pub fn new() -> Self {
-        Self {
-            main_container: None,
-            builder: WidgetBuilder::new(Rect::new_from_xy(100., 100., 800., 300.)),
-        }
+        init_app::<Self>().expect("Failed to initialize app")
     }
 
     pub fn main_container<T, W>(mut self, builder: T) -> Self
@@ -34,11 +36,6 @@ impl UIApp {
     {
         self.main_container = Some(Box::new(builder()));
         self
-    }
-
-    pub fn start(self) -> Result<()> {
-        run_app(self);
-        Ok(())
     }
 
     fn rebuild_main_container(&mut self, width: f32, height: f32) {
@@ -52,6 +49,14 @@ impl UIApp {
 }
 
 impl App for UIApp {
+    fn init() -> Self {
+        Self {
+            main_container: None,
+            builder: WidgetBuilder::new(Rect::new_from_xy(100., 100., 800., 300.)),
+            default_font: Font::from_file("Roboto.ttf", 16),
+        }
+    }
+
     fn on_start(&mut self) {
         self.rebuild_main_container(800., 600.);
     }
@@ -98,9 +103,26 @@ impl App for UIApp {
             }*/
 
             if let Some(text) = &node.text {
+                let line_top = self.default_font.get_line_top() as f32;
+                let line_bottom = self.default_font.get_line_bottom() as f32;
+                let text_width = self.default_font.get_text_width(&text.text) as f32;
+                let text_height = self.default_font.get_text_height(&text.text) as f32;
+
+                let text_base_line = match text.alignment_v {
+                    TextAlignV::Top => area.top + line_top,
+                    TextAlignV::Center => area.center().y + line_bottom + (text_height / 2.),
+                    TextAlignV::Bottom => area.bottom + line_bottom,
+                };
+                let text_left = match text.alignment_h {
+                    TextAlignH::Left => area.left,
+                    TextAlignH::Center => area.center().x - (text_width / 2.),
+                    TextAlignH::Right => area.right - text_width,
+                };
+
                 run_draw_command(&DrawCommand::Text {
-                    text: text.clone(),
-                    position: area.top_left() + Vec2::new(0., 16.),
+                    font: self.default_font,
+                    text: text.text.clone(),
+                    position: (text_left, text_base_line).into(),
                     color: COLOR_BLACK,
                 });
             }

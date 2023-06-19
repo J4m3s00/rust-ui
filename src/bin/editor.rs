@@ -3,9 +3,10 @@ use rust_ui::{
     error::Result,
     gui::{
         hstack::HStack,
+        label::Label,
         vstack::VStack,
         widget::{SizePolicy, ToItem, Widget},
-        widget_builder::WidgetBuilder, label::Label,
+        widget_builder::WidgetBuilder,
     },
     UIApp,
 };
@@ -62,6 +63,6 @@ fn main_just_button() -> TestWidget {
 }
 
 fn main() -> Result<()> {
-    UIApp::new().main_container(main_container).start()?;
+    UIApp::new().main_container(main_screen).run();
     Ok(())
 }

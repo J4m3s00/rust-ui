@@ -1,14 +1,30 @@
 use rust_graphics::vec::Vec2;
 
-use super::{widget::Widget, widget_builder::WidgetBuilder};
+use super::{
+    text::{Text, TextAlignH, TextAlignV},
+    widget::Widget,
+    widget_builder::WidgetBuilder,
+};
 
 pub struct Label {
-    text: String,
+    text: Text,
 }
 
 impl Label {
     pub fn new(text: impl Into<String>) -> Self {
-        Self { text: text.into() }
+        Self {
+            text: Text::from(text.into()),
+        }
+    }
+
+    pub fn vert_align(mut self, alignment: TextAlignV) -> Self {
+        self.text.alignment_v = alignment;
+        self
+    }
+
+    pub fn hor_align(mut self, alignment: TextAlignH) -> Self {
+        self.text.alignment_h = alignment;
+        self
     }
 }
 
