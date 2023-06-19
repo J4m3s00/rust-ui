@@ -1,4 +1,4 @@
-use rust_graphics::vec::Vec2;
+use rust_graphics::{app::App, vec::Vec2};
 use rust_ui::{
     error::Result,
     gui::{
@@ -63,6 +63,6 @@ fn main_just_button() -> TestWidget {
 }
 
 fn main() -> Result<()> {
-    UIApp::new().main_container(main_screen).run();
+    UIApp::new().main_container(main_container).run();
     Ok(())
 }
