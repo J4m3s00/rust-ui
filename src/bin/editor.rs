@@ -5,7 +5,7 @@ use rust_ui::{
         hstack::HStack,
         vstack::VStack,
         widget::{SizePolicy, ToItem, Widget},
-        widget_builder::WidgetBuilder,
+        widget_builder::WidgetBuilder, label::Label,
     },
     UIApp,
 };
@@ -18,7 +18,7 @@ impl TestWidget {
     fn new() -> Self {
         Self {
             stack: HStack::new(vec![
-                EmptyWidget.into_item(),
+                Label::new("Text").into_item(),
                 VStack::new(vec![EmptyWidget.into_item(), EmptyWidget.into_item()])
                     .into_item()
                     .set_width(SizePolicy::PercentageV(0.5)),
@@ -41,14 +41,19 @@ impl Widget for EmptyWidget {
 }
 
 fn main_container() -> impl Widget {
-    VStack::new(vec![HStack::new(vec![
+    VStack::new(vec![
         EmptyWidget.into_item(),
-        TestWidget::new()
-            .into_item()
-            .set_width(SizePolicy::Fixed(128.)),
+        HStack::new(vec![
+            EmptyWidget.into_item(),
+            TestWidget::new()
+                .into_item()
+                .set_width(SizePolicy::Fixed(128.)),
+            EmptyWidget.into_item(),
+        ])
+        .into_item()
+        .set_height(SizePolicy::Fixed(32.)),
+        EmptyWidget.into_item(),
     ])
-    .into_item()
-    .set_height(SizePolicy::Fixed(32.))])
 }
 
 #[allow(dead_code)]

@@ -183,7 +183,7 @@ impl<'a> WidgetBuilder {
     pub(self) fn pop_child(&mut self, last_cursor: Cursor) {
         let current_node = self.get_node(self.node_ptr).unwrap();
         if let Some(parent) = current_node.parent {
-            let advance = match self.cursor.direction {
+            let advance = match last_cursor.direction {
                 CursorDirection::Horizontal => {
                     (current_node.content_area.width() + (2. * PADDING), 0.).into()
                 }
