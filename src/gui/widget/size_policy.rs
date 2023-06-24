@@ -1,7 +1,3 @@
-use rust_graphics::vec::Vec2;
-
-use super::{container::ContainerItem, widget_builder::WidgetBuilder};
-
 #[derive(Debug, Clone, Copy)]
 pub enum SizePolicy {
     Fixed(f32),
@@ -38,22 +34,5 @@ impl From<(SizePolicy, SizePolicy)> for SizePolicy2D {
             horizontal,
             vertical,
         }
-    }
-}
-
-pub trait Widget {
-    fn build(&self, builder: &mut WidgetBuilder, size: Vec2);
-}
-
-pub trait ToItem {
-    fn into_item(self) -> ContainerItem;
-}
-
-impl<T> ToItem for T
-where
-    T: Widget + 'static,
-{
-    fn into_item(self) -> ContainerItem {
-        ContainerItem::new(self)
     }
 }

@@ -1,68 +1,53 @@
-use rust_graphics::{app::App, vec::Vec2};
-use rust_ui::{
-    error::Result,
-    gui::{
-        hstack::HStack,
-        label::Label,
-        vstack::VStack,
-        widget::{SizePolicy, ToItem, Widget},
-        widget_builder::WidgetBuilder,
-    },
-    UIApp,
-};
+use rust_ui::prelude::*;
+
+struct EmptyWidget;
+impl Widget for EmptyWidget {
+    fn build(&self, size: Vec2) {}
+}
+
+fn main_container() -> impl Widget {
+    // Center a label in the middle of the screen.
+    VStack::new(vec![
+        EmptyWidget.into_item(),
+        HStack::new(vec![
+            EmptyWidget.into_item(),
+            Button::new("Click me!")
+                .into_item()
+                .set_width(SizePolicy::Fixed(128.)),
+            TestWidget::new().into_item(),
+        ])
+        .into_item()
+        .set_height(SizePolicy::Fixed(64.)),
+        EmptyWidget.into_item(),
+    ])
+}
 
 struct TestWidget {
-    stack: HStack,
+    state: u32,
+    container: VStack,
 }
 
 impl TestWidget {
     fn new() -> Self {
         Self {
-            stack: HStack::new(vec![
-                Label::new("Text").into_item(),
-                VStack::new(vec![EmptyWidget.into_item(), EmptyWidget.into_item()])
+            state: 0,
+            container: VStack::new(vec![
+                Label::new("Hello, world!").into_item(),
+                Button::new("Click me!")
                     .into_item()
-                    .set_width(SizePolicy::PercentageV(0.5)),
+                    .set_width(SizePolicy::Fixed(128.)),
+                Label::new("Hello, world!").into_item(),
             ]),
         }
     }
 }
 
 impl Widget for TestWidget {
-    fn build(&self, builder: &mut WidgetBuilder, size: Vec2) {
-        builder.new_child(size).widget(&self.stack, size);
-    }
-}
-struct EmptyWidget;
-
-impl Widget for EmptyWidget {
-    fn build(&self, build: &mut WidgetBuilder, size: Vec2) {
-        build.new_child(size);
+    fn build(&self, size: Vec2) {
+        self.container.build(size);
     }
 }
 
-fn main_container() -> impl Widget {
-    VStack::new(vec![
-        EmptyWidget.into_item(),
-        HStack::new(vec![
-            EmptyWidget.into_item(),
-            TestWidget::new()
-                .into_item()
-                .set_width(SizePolicy::Fixed(128.)),
-            EmptyWidget.into_item(),
-        ])
-        .into_item()
-        .set_height(SizePolicy::Fixed(32.)),
-        EmptyWidget.into_item(),
-    ])
-}
-
-#[allow(dead_code)]
-fn main_just_button() -> TestWidget {
-    TestWidget::new()
-}
-
-fn main() -> Result<()> {
-    UIApp::new().main_container(main_container).run();
-    Ok(())
+fn main() {
+    UIApp::new().run();
 }

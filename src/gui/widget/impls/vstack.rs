@@ -1,27 +1,26 @@
 use rust_graphics::vec::Vec2;
 
-use super::{
-    container::ContainerItem,
-    widget::{SizePolicy, Widget},
-    widget_builder::{CursorDirection, WidgetBuilder},
+use crate::{
+    gui::widget::size_policy::SizePolicy,
+    prelude::{Widget, WidgetInstance},
 };
 
 pub struct VStack {
-    children: Vec<ContainerItem>,
+    children: Vec<WidgetInstance>,
 }
 
 impl VStack {
-    pub fn new(children: Vec<ContainerItem>) -> Self {
+    pub fn new(children: Vec<WidgetInstance>) -> Self {
         Self { children }
     }
 
-    fn children(&self) -> &[ContainerItem] {
+    fn children(&self) -> &[WidgetInstance] {
         &self.children
     }
 }
 
 impl Widget for VStack {
-    fn build(&self, builder: &mut WidgetBuilder, content_area: Vec2) {
+    fn build(&self, content_area: Vec2) {
         let mut remaining_height = content_area.y;
         let mut total_frac = 0.;
         for item in self.children().iter() {
@@ -46,7 +45,7 @@ impl Widget for VStack {
 
         let frac_height = remaining_height / total_frac;
 
-        let mut child = builder
+        /*let mut child = builder
             .new_child(content_area)
             .set_cursor_direction(CursorDirection::Vertical);
         for item in self.children().iter() {
@@ -58,6 +57,10 @@ impl Widget for VStack {
                 SizePolicy::Fraction(frac) => frac * frac_height,
             };
             child = child.widget(item.widget(), (content_area.x, height).into());
-        }
+        }*/
+    }
+
+    fn children(&self) -> &[WidgetInstance] {
+        &self.children
     }
 }
