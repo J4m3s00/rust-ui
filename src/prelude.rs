@@ -1,4 +1,4 @@
-pub use crate::UIApp;
+pub use crate::gui::app::ui_app::UIApp;
 pub use crate::{
     actions::receiver::Receiver,
     error::Result,

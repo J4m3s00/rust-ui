@@ -35,4 +35,12 @@ impl Widget for Button {
     fn on_click(&self) {
         self.click_callback.action(ButtonClick)
     }
+
+    fn on_mouse_enter(&self) {
+        println!("Mouse enter");
+    }
+
+    fn on_mouse_leave(&self) {
+        println!("Mouse leave");
+    }
 }

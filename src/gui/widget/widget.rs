@@ -9,6 +9,8 @@ pub trait Widget {
     }
 
     fn on_click(&self) {}
+    fn on_mouse_enter(&self) {}
+    fn on_mouse_leave(&self) {}
 }
 
 pub trait ToInstance {

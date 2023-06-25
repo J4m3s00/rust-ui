@@ -20,10 +20,10 @@ impl Widget for ZStack {
         // Update context cursor direction for the children
         ctx.set_cursor_direction(CursorDirection::Stacked);
 
-        let mut ctx = ctx.clone();
+        //let mut ctx = ctx.clone();
         for item in self.children.iter_mut() {
             if let Some(mut child_context) = ctx.allocate_space(ctx.get_content_rect().size()) {
-                ctx = child_context.clone();
+                //ctx = child_context.clone();
                 item.build(&mut child_context);
             }
         }

@@ -21,6 +21,8 @@ fn main_container() -> WidgetInstance {
                 EmptyWidget.instance(),
                 EmptyWidget.instance(),
                 EmptyWidget.instance(),
+                EmptyWidget.instance(),
+                EmptyWidget.instance(),
             ]),
             Button::new("Click me!", |_| {
                 println!("Clicked a button on the Screen! YEAHHHH")
