@@ -3,21 +3,21 @@ use rust_graphics::{
     font::Font,
 };
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub enum AlignH {
     Left,
     Center,
     Right,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub enum AlignV {
     Top,
     Center,
     Bottom,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Text {
     pub text: String,
     pub font: Option<Font>,

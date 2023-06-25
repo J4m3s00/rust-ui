@@ -1,8 +1,18 @@
-use rust_graphics::rect::Rect;
+use crate::gui::text::Text;
 
 #[derive(Debug, Clone, Default)]
 pub struct BuildResult {
-    content_area: Rect,
-    text: Option<String>,
+    text: Option<Text>,
     // Add render commands here as well in the future. need to work with scissor test
+}
+
+impl BuildResult {
+    pub fn with_text(mut self, text: impl Into<Text>) -> Self {
+        self.text = Some(text.into());
+        self
+    }
+
+    pub fn text(&self) -> Option<&Text> {
+        self.text.as_ref()
+    }
 }

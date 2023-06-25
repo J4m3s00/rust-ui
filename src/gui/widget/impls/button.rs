@@ -1,7 +1,11 @@
-use rust_graphics::vec::Vec2;
+use rust_graphics::rect::Rect;
 
 use crate::{
     actions::{receiver::Receiver, signal::Signal},
+    gui::widget::{
+        build_context::BuildContext, build_results::BuildResult, widget::ToInstance,
+        widget_instance::WidgetInstance,
+    },
     prelude::Widget,
 };
 
@@ -13,25 +17,21 @@ pub struct Button {
 }
 
 impl Button {
-    pub fn new(label: impl Into<String>) -> Self {
-        Self {
+    pub fn new(label: impl Into<String> /*, receiver: Box<T> */) -> WidgetInstance
+/*where
+        T: Receiver + 'static,*/ {
+        let mut res = Self {
             label: label.into(),
             on_click: Signal::default(),
-        }
-    }
-
-    pub fn on_click<T>(mut self, receiver: Box<T>) -> Self
-    where
-        T: Receiver + 'static,
-    {
-        self.on_click.connect(receiver);
-        self
+        };
+        //res.on_click.connect(receiver);
+        res.instance()
     }
 }
 
 impl Widget for Button {
-    fn build(&self, size: Vec2) {
-        unimplemented!()
+    fn build(&mut self, ctx: &mut BuildContext) -> BuildResult {
+        BuildResult::default().with_text(self.label.clone())
     }
 }
 
