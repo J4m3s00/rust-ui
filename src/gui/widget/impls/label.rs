@@ -1,5 +1,3 @@
-use rust_graphics::rect::Rect;
-
 use crate::{
     gui::{
         text::Text,
@@ -48,7 +46,7 @@ impl Label {
 }
 
 impl Widget for Label {
-    fn build(&mut self, size: &mut BuildContext) -> BuildResult {
+    fn build(&mut self, _ctx: &mut BuildContext) -> BuildResult {
         BuildResult::default().with_text(self.text.clone())
     }
 }

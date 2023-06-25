@@ -1,7 +1,5 @@
-use rust_graphics::rect::Rect;
-
 use crate::{
-    actions::{receiver::Receiver, signal::Signal},
+    actions::receiver::Receiver,
     gui::widget::{
         build_context::BuildContext, build_results::BuildResult, widget::ToInstance,
         widget_instance::WidgetInstance,
@@ -13,32 +11,28 @@ pub struct ButtonClick;
 
 pub struct Button {
     label: String,
-    on_click: Signal<ButtonClick>,
+    click_callback: Box<dyn Receiver<ButtonClick>>,
 }
 
 impl Button {
-    pub fn new(label: impl Into<String> /*, receiver: Box<T> */) -> WidgetInstance
-/*where
-        T: Receiver + 'static,*/ {
-        let mut res = Self {
+    pub fn new<T>(label: impl Into<String>, on_click: T) -> WidgetInstance
+    where
+        T: Receiver<ButtonClick> + 'static,
+    {
+        Self {
             label: label.into(),
-            on_click: Signal::default(),
-        };
-        //res.on_click.connect(receiver);
-        res.instance()
+            click_callback: Box::new(on_click),
+        }
+        .instance()
     }
 }
 
 impl Widget for Button {
-    fn build(&mut self, ctx: &mut BuildContext) -> BuildResult {
+    fn build(&mut self, _ctx: &mut BuildContext) -> BuildResult {
         BuildResult::default().with_text(self.label.clone())
     }
-}
 
-impl Receiver for Button {
-    //type Action = ButtonClick;
-
-    fn action(self) {
-        println!("Clicked!");
+    fn on_click(&self) {
+        self.click_callback.action(ButtonClick)
     }
 }

@@ -9,11 +9,13 @@ pub enum CursorDirection {
     Stacked,
 }
 
+#[derive(Clone, Debug)]
 struct Cursor {
     pos: Vec2,
     direction: CursorDirection,
 }
 
+#[derive(Clone, Debug)]
 pub struct BuildContext {
     content_rect: Rect,
     cursor: Cursor,

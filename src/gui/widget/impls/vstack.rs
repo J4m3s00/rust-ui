@@ -62,20 +62,6 @@ impl Widget for VStack {
                 item.build(&mut child_context);
             }
         }
-
-        /*let mut child = builder
-            .new_child(content_area)
-            .set_cursor_direction(CursorDirection::Vertical);
-        for item in self.children().iter() {
-            let height = match item.size().vertical {
-                SizePolicy::Fixed(pixels) => pixels,
-                SizePolicy::Percentage(percent) => percent * content_area.y,
-                SizePolicy::PercentageH(percent) => percent * content_area.x,
-                SizePolicy::PercentageV(percent) => percent * content_area.y,
-                SizePolicy::Fraction(frac) => frac * frac_height,
-            };
-            child = child.widget(item.widget(), (content_area.x, height).into());
-        }*/
         BuildResult::default()
     }
 

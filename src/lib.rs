@@ -75,6 +75,14 @@ impl App for UIApp {
             AppEvent::MouseDown { key, x, y } => {
                 println!("Mouse down: {} {} {}", key, x, y);
                 //unimplemented!()
+                if let Some(container) = &self.main_container {
+                    for item in container.iter() {
+                        let (_, area) = item.build_result();
+                        if area.contains((x as f32, y as f32).into()) {
+                            item.widget().on_click();
+                        }
+                    }
+                }
             }
             _ => {}
         };

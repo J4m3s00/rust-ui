@@ -57,7 +57,6 @@ impl<'a> Iterator for WidgetIter<'a> {
 
 #[cfg(test)]
 mod tests {
-    use rust_graphics::rect::Rect;
 
     use crate::prelude::{Label, VStack};
 

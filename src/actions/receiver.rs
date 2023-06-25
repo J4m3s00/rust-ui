@@ -1,12 +1,12 @@
-pub trait Receiver {
-    fn action(self);
+pub trait Receiver<T> {
+    fn action(&self, data: T);
 }
 
-impl<T> Receiver for T
+impl<T, F> Receiver<T> for F
 where
-    T: FnOnce(),
+    F: Fn(T),
 {
-    fn action(self) {
-        self();
+    fn action(&self, data: T) {
+        self(data)
     }
 }

@@ -3,10 +3,12 @@ use super::{
 };
 
 pub trait Widget {
-    fn build(&mut self, content_rect: &mut BuildContext) -> BuildResult;
+    fn build(&mut self, ctx: &mut BuildContext) -> BuildResult;
     fn children(&self) -> &[WidgetInstance] {
         &[]
     }
+
+    fn on_click(&self) {}
 }
 
 pub trait ToInstance {

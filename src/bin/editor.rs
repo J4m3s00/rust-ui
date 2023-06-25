@@ -1,13 +1,13 @@
 use std::slice::from_ref;
 
 use rust_ui::{
-    gui::widget::{build_context::BuildContext, build_results::BuildResult},
+    gui::widget::{build_context::BuildContext, build_results::BuildResult, impls::zstack::ZStack},
     prelude::*,
 };
 
 struct EmptyWidget;
 impl Widget for EmptyWidget {
-    fn build(&mut self, size: &mut BuildContext) -> BuildResult {
+    fn build(&mut self, _ctx: &mut BuildContext) -> BuildResult {
         BuildResult::default()
     }
 }
@@ -17,8 +17,15 @@ fn main_container() -> WidgetInstance {
     VStack::new(vec![
         EmptyWidget.instance(),
         HStack::new(vec![
-            EmptyWidget.instance(),
-            //Button::new("Click me!").set_width(SizePolicy::Fixed(128.)),
+            ZStack::new(vec![
+                EmptyWidget.instance(),
+                EmptyWidget.instance(),
+                EmptyWidget.instance(),
+            ]),
+            Button::new("Click me!", |_| {
+                println!("Clicked a button on the Screen! YEAHHHH")
+            })
+            .set_width(SizePolicy::Fixed(128.)),
             TestWidget::new(),
         ])
         .set_height(SizePolicy::Fixed(256.)),
@@ -27,17 +34,14 @@ fn main_container() -> WidgetInstance {
 }
 
 struct TestWidget {
-    state: u32,
     container: WidgetInstance,
 }
 
 impl TestWidget {
     fn new() -> WidgetInstance {
         Self {
-            state: 0,
             container: VStack::new(vec![
                 Label::new("Hello, world!"),
-                Button::new("Click me!").set_width(SizePolicy::Fixed(128.)),
                 Label::new("Hello, world!"),
             ]),
         }
