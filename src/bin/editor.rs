@@ -4,7 +4,7 @@ use rust_ui::{
     gui::widget::{
         builder::{build_context::BuildContext, build_results::BuildResult},
         impls::zstack::ZStack,
-        state::{observable::Observer, state::State},
+        state::state::State,
     },
     prelude::*,
 };
@@ -40,7 +40,6 @@ fn main_container() -> WidgetInstance {
 
 struct StepperWidget {
     container: WidgetInstance,
-    value: State<i32>,
 }
 
 impl StepperWidget {
@@ -49,11 +48,9 @@ impl StepperWidget {
         let changer_a = val.clone();
         let changer_b = val.clone();
 
-        let observer = val.map(|v| Text::from(format!("Value: {}", v)));
-
         Self {
             container: HStack::new(vec![
-                Label::new_observe(observer),
+                Label::new_observe(val.map(|v| Text::from(format!("Value: {}", v)))),
                 VStack::new(vec![
                     Button::new("+", move |_| {
                         let cur = changer_b.get();
@@ -67,7 +64,6 @@ impl StepperWidget {
                     }),
                 ]),
             ]),
-            value: val.clone(),
         }
         .instance()
     }

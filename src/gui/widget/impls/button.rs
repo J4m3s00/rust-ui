@@ -40,7 +40,11 @@ impl Widget for Button {
         self.click_callback.action(ButtonClick)
     }
 
-    fn on_mouse_enter(&self) {}
+    fn on_mouse_enter(&self) {
+        self.hovered.set(true);
+    }
 
-    fn on_mouse_leave(&self) {}
+    fn on_mouse_leave(&self) {
+        self.hovered.set(false);
+    }
 }
