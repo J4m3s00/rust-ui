@@ -3,19 +3,7 @@ use rust_graphics::{
     font::Font,
 };
 
-#[derive(Clone, Debug)]
-pub enum AlignH {
-    Left,
-    Center,
-    Right,
-}
-
-#[derive(Clone, Debug)]
-pub enum AlignV {
-    Top,
-    Center,
-    Bottom,
-}
+use super::align::{AlignH, AlignV};
 
 #[derive(Clone, Debug)]
 pub struct Text {
@@ -59,5 +47,9 @@ impl Text {
     pub fn hor_align(mut self, alignment: AlignH) -> Self {
         self.alignment_h = alignment;
         self
+    }
+
+    pub fn set_text(&mut self, text: impl Into<String>) {
+        self.text = text.into();
     }
 }

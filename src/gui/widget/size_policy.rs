@@ -1,9 +1,9 @@
+use super::builder::relative_size::RelativeSize;
+
 #[derive(Debug, Clone, Copy)]
 pub enum SizePolicy {
     Fixed(f32),
-    Percentage(f32),
-    PercentageH(f32),
-    PercentageV(f32),
+    Relative(RelativeSize),
     Fraction(f32),
 }
 

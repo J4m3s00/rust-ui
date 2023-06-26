@@ -1,7 +1,10 @@
 use crate::{
     gui::widget::{
-        build_context::{BuildContext, CursorDirection},
-        build_results::BuildResult,
+        builder::{
+            build_context::{BuildContext, CursorDirection},
+            build_results::BuildResult,
+            relative_size::RelativeSize,
+        },
         size_policy::SizePolicy,
         widget::ToInstance,
     },
@@ -30,15 +33,14 @@ impl Widget for VStack {
                 SizePolicy::Fixed(pixels) => {
                     remaining_height -= pixels;
                 }
-                SizePolicy::Percentage(percent) => {
-                    remaining_height -= percent * content_area.height();
-                }
-                SizePolicy::PercentageH(percent) => {
-                    remaining_height -= percent * content_area.width();
-                }
-                SizePolicy::PercentageV(percent) => {
-                    remaining_height -= percent * content_area.height();
-                }
+                SizePolicy::Relative(rel) => match rel {
+                    RelativeSize::Percent(x) | RelativeSize::PercentageV(x) => {
+                        remaining_height -= x * content_area.width();
+                    }
+                    RelativeSize::PercentageH(p) => {
+                        remaining_height -= p * content_area.height();
+                    }
+                },
                 SizePolicy::Fraction(frac) => {
                     total_frac += frac;
                 }
@@ -50,9 +52,12 @@ impl Widget for VStack {
         for item in self.children.iter_mut() {
             let height = match item.size().vertical {
                 SizePolicy::Fixed(pixels) => pixels,
-                SizePolicy::Percentage(percent) => percent * content_area.height(),
-                SizePolicy::PercentageH(percent) => percent * content_area.width(),
-                SizePolicy::PercentageV(percent) => percent * content_area.height(),
+                SizePolicy::Relative(rel) => match rel {
+                    RelativeSize::Percent(x) | RelativeSize::PercentageH(x) => {
+                        x * content_area.width()
+                    }
+                    RelativeSize::PercentageV(p) => p * content_area.height(),
+                },
                 SizePolicy::Fraction(frac) => frac * frac_height,
             };
 

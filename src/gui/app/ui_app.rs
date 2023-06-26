@@ -10,7 +10,7 @@ use rust_graphics::{
 };
 
 use crate::{
-    gui::widget::build_context::{BuildContext, CursorDirection},
+    gui::widget::builder::build_context::{BuildContext, CursorDirection},
     prelude::{AlignH, AlignV, WidgetInstance},
     print_widget_tree,
 };
@@ -82,7 +82,7 @@ impl App for UIApp {
                 }
                 self.input_state.mouse_pos = (x as f32, y as f32).into();
             }
-            AppEvent::MouseDown { key, x, y } => {
+            AppEvent::MouseDown { x, y, .. } => {
                 if let Some(container) = &self.main_container {
                     for item in container.iter() {
                         let (_, area) = item.build_result();
@@ -100,6 +100,7 @@ impl App for UIApp {
         if let Some(container) = &self.main_container {
             for item in container.iter() {
                 let (result, area) = item.build_result();
+
                 run_draw_command(&DrawCommand::Rect {
                     left: area.left,
                     top: area.top,
@@ -107,7 +108,7 @@ impl App for UIApp {
                     height: area.height(),
                     fill: None,
                     stroke: Some(Stroke {
-                        width: 2.,
+                        width: 1.,
                         color: Color::new(
                             0, //((node.id & 0xff000000) >> 24) as u8,
                             0, //((node.id & 0xff0000) >> 16) as u8,
@@ -117,7 +118,7 @@ impl App for UIApp {
                     }),
                 });
 
-                if let Some(text) = &result.text() {
+                if let Some(text) = result.text() {
                     let line_top = self.default_font.get_line_top() as f32;
                     let line_bottom = self.default_font.get_line_bottom() as f32;
                     let text_width = self.default_font.get_text_width(&text.text) as f32;

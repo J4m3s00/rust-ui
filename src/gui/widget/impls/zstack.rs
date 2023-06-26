@@ -1,6 +1,8 @@
 use crate::gui::widget::{
-    build_context::{BuildContext, CursorDirection},
-    build_results::BuildResult,
+    builder::{
+        build_context::{BuildContext, CursorDirection},
+        build_results::BuildResult,
+    },
     widget::{ToInstance, Widget},
     widget_instance::WidgetInstance,
 };

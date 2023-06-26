@@ -1,7 +1,10 @@
 use crate::{
     gui::widget::{
-        build_context::{BuildContext, CursorDirection},
-        build_results::BuildResult,
+        builder::{
+            build_context::{BuildContext, CursorDirection},
+            build_results::BuildResult,
+            relative_size::RelativeSize,
+        },
         widget::ToInstance,
     },
     prelude::{SizePolicy, Widget, WidgetInstance},
@@ -30,15 +33,14 @@ impl Widget for HStack {
                 SizePolicy::Fixed(pixels) => {
                     remaining_width -= pixels;
                 }
-                SizePolicy::Percentage(percent) => {
-                    remaining_width -= percent * content_area.width();
-                }
-                SizePolicy::PercentageH(percent) => {
-                    remaining_width -= percent * content_area.width();
-                }
-                SizePolicy::PercentageV(percent) => {
-                    remaining_width -= percent * content_area.height();
-                }
+                SizePolicy::Relative(rel) => match rel {
+                    RelativeSize::Percent(x) | RelativeSize::PercentageH(x) => {
+                        remaining_width -= x * content_area.width();
+                    }
+                    RelativeSize::PercentageV(p) => {
+                        remaining_width -= p * content_area.height();
+                    }
+                },
                 SizePolicy::Fraction(frac) => {
                     total_frac += frac;
                 }
@@ -50,9 +52,12 @@ impl Widget for HStack {
         for item in self.children.iter_mut() {
             let width = match item.size().horizontal {
                 SizePolicy::Fixed(pixels) => pixels,
-                SizePolicy::Percentage(percent) => percent * content_area.width(),
-                SizePolicy::PercentageH(percent) => percent * content_area.width(),
-                SizePolicy::PercentageV(percent) => percent * content_area.height(),
+                SizePolicy::Relative(rel) => match rel {
+                    RelativeSize::Percent(x) | RelativeSize::PercentageH(x) => {
+                        x * content_area.width()
+                    }
+                    RelativeSize::PercentageV(p) => p * content_area.height(),
+                },
                 SizePolicy::Fraction(frac) => frac * frac_width,
             };
             if let Some(mut child_context) =

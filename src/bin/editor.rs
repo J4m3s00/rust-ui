@@ -1,7 +1,10 @@
 use std::slice::from_ref;
 
 use rust_ui::{
-    gui::widget::{build_context::BuildContext, build_results::BuildResult, impls::zstack::ZStack},
+    gui::widget::{
+        builder::{build_context::BuildContext, build_results::BuildResult},
+        impls::zstack::ZStack,
+    },
     prelude::*,
 };
 

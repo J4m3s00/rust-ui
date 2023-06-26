@@ -15,6 +15,9 @@ struct Cursor {
     direction: CursorDirection,
 }
 
+/// The BuildContext is passed to each widget's build function. It contains information about the
+/// current container's size and position, and provides a way to allocate space for child widgets.
+/// It also contains a cursor, which is used to track the current position of the childs in the container.
 #[derive(Clone, Debug)]
 pub struct BuildContext {
     content_rect: Rect,
@@ -32,6 +35,10 @@ impl BuildContext {
         }
     }
 
+    /// This allocates space in the current container. If the container is full, it will return None.
+    /// Otherwise, it will return a new BuildContext with the allocated space. The new BuildContext
+    /// will have the same cursor direction as the parent. The cursor will be advanced by the size
+    /// of the allocated space.
     pub fn allocate_space(&mut self, size: Vec2) -> Option<BuildContext> {
         let content_area = Rect::new_from_xy(
             self.cursor.pos.x + PADDING,

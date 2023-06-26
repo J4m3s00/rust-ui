@@ -5,7 +5,8 @@ use rust_graphics::rect::Rect;
 use crate::prelude::{SizePolicy, Widget};
 
 use super::{
-    build_context::BuildContext, build_results::BuildResult, iterator::WidgetIter,
+    builder::{build_context::BuildContext, build_results::BuildResult},
+    iterator::WidgetIter,
     size_policy::SizePolicy2D,
 };
 

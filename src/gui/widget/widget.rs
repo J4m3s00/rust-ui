@@ -1,5 +1,6 @@
 use super::{
-    build_context::BuildContext, build_results::BuildResult, widget_instance::WidgetInstance,
+    builder::{build_context::BuildContext, build_results::BuildResult},
+    widget_instance::WidgetInstance,
 };
 
 pub trait Widget {

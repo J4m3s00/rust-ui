@@ -1,17 +1,22 @@
+use rand::seq::SliceRandom;
+
 use crate::{
     actions::receiver::Receiver,
     gui::widget::{
-        build_context::BuildContext, build_results::BuildResult, widget::ToInstance,
+        builder::{build_context::BuildContext, build_results::BuildResult},
+        state::State,
+        widget::ToInstance,
         widget_instance::WidgetInstance,
     },
-    prelude::Widget,
+    prelude::{Text, Widget},
 };
 
 pub struct ButtonClick;
 
 pub struct Button {
-    label: String,
+    label: State<Text>,
     click_callback: Box<dyn Receiver<ButtonClick>>,
+    hovered: State<bool>,
 }
 
 impl Button {
@@ -20,19 +25,35 @@ impl Button {
         T: Receiver<ButtonClick> + 'static,
     {
         Self {
-            label: label.into(),
+            label: State::new(Text::from(label)),
             click_callback: Box::new(on_click),
+            hovered: State::new(false),
         }
         .instance()
     }
 }
 
+const RANDOM_STRINGS: [&str; 5] = [
+    "Hallo Feli.",
+    "Ich Liebe Dich.",
+    "Hier und Da",
+    "Sogar Richtig",
+    "Oder Nichtig",
+];
+
 impl Widget for Button {
     fn build(&mut self, _ctx: &mut BuildContext) -> BuildResult {
-        BuildResult::default().with_text(self.label.clone())
+        BuildResult::default().with_text(self.label.observe())
     }
 
     fn on_click(&self) {
+        let random_string = RANDOM_STRINGS
+            .choose(&mut rand::thread_rng())
+            .unwrap()
+            .to_string();
+        let mut new_text = self.label.get();
+        new_text.set_text(random_string);
+        self.label.set(new_text);
         self.click_callback.action(ButtonClick)
     }
 
