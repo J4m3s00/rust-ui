@@ -9,7 +9,8 @@ pub trait Widget {
         &[]
     }
 
-    fn on_click(&self) {}
+    fn on_mouse_down(&self) {}
+    fn on_mouse_up(&self) {}
     fn on_mouse_enter(&self) {}
     fn on_mouse_leave(&self) {}
 }

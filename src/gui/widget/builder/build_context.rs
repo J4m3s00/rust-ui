@@ -1,6 +1,6 @@
 use rust_graphics::{rect::Rect, vec::Vec2};
 
-const PADDING: f32 = 5.;
+const PADDING: f32 = 2.;
 
 #[derive(Copy, Clone, Debug)]
 pub enum CursorDirection {

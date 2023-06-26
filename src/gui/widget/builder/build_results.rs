@@ -1,20 +1,38 @@
+use rust_graphics::draw_command::{Fill, Stroke};
+
 use crate::gui::widget::state::observable::Observer;
 
-use super::text::Text;
+use super::{relative_size::RelativeSize, text::Text};
+
+pub struct WidgetRenderRect {
+    pub width: Observer<RelativeSize>,
+    pub height: Observer<RelativeSize>,
+    pub fill: Observer<Option<Fill>>,
+    pub stroke: Observer<Option<Stroke>>,
+}
+
+pub enum WidgetRenderItem {
+    Text(Observer<Text>),
+    Rect(WidgetRenderRect),
+}
 
 #[derive(Default)]
 pub struct BuildResult {
-    text: Option<Observer<Text>>,
-    // Add render commands here as well in the future. need to work with scissor test
+    render_items: Vec<WidgetRenderItem>,
 }
 
 impl BuildResult {
     pub fn with_text(mut self, text: Observer<Text>) -> Self {
-        self.text = Some(text);
+        self.render_items.push(WidgetRenderItem::Text(text));
         self
     }
 
-    pub fn text(&self) -> Option<Text> {
-        self.text.as_ref()?.get()
+    pub fn with_render_item(mut self, item: WidgetRenderItem) -> Self {
+        self.render_items.push(item);
+        self
+    }
+
+    pub fn render_items(&self) -> &[WidgetRenderItem] {
+        &self.render_items
     }
 }

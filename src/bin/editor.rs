@@ -2,7 +2,9 @@ use std::slice::from_ref;
 
 use rust_ui::{
     gui::widget::{
-        builder::{build_context::BuildContext, build_results::BuildResult},
+        builder::{
+            build_context::BuildContext, build_results::BuildResult, relative_size::RelativeSize,
+        },
         impls::zstack::ZStack,
         state::state::State,
     },
@@ -33,7 +35,7 @@ fn main_container() -> WidgetInstance {
             .set_width(SizePolicy::Fixed(128.)),
             StepperWidget::new(),
         ])
-        .set_height(SizePolicy::Fixed(256.)),
+        .set_height(SizePolicy::Fixed(72.)),
         EmptyWidget.instance(),
     ])
 }
@@ -62,7 +64,8 @@ impl StepperWidget {
                         changer_a.set(cur - 1);
                         println!("Value: {}", changer_a.get());
                     }),
-                ]),
+                ])
+                .set_width(SizePolicy::Relative(RelativeSize::PercentageV(0.5))),
             ]),
         }
         .instance()

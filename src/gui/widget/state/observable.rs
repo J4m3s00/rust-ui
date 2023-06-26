@@ -34,6 +34,13 @@ where
         Self::new(Rc::new(ObserveValue::new(val)))
     }
 
+    pub fn value_default() -> Self
+    where
+        T: Default,
+    {
+        Self::value(T::default())
+    }
+
     pub fn reference(other: &Observer<T>) -> Self {
         Self::new(Rc::new(ObserveObserver {
             observer: Rc::downgrade(&other.state),
