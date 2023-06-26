@@ -4,6 +4,7 @@ use rust_ui::{
     gui::widget::{
         builder::{build_context::BuildContext, build_results::BuildResult},
         impls::zstack::ZStack,
+        state::{observable::Observer, state::State},
     },
     prelude::*,
 };
@@ -16,7 +17,6 @@ impl Widget for EmptyWidget {
 }
 
 fn main_container() -> WidgetInstance {
-    // Center a label in the middle of the screen.
     VStack::new(vec![
         EmptyWidget.instance(),
         HStack::new(vec![
@@ -31,30 +31,49 @@ fn main_container() -> WidgetInstance {
                 println!("Clicked a button on the Screen! YEAHHHH")
             })
             .set_width(SizePolicy::Fixed(128.)),
-            TestWidget::new(),
+            StepperWidget::new(),
         ])
         .set_height(SizePolicy::Fixed(256.)),
         EmptyWidget.instance(),
     ])
 }
 
-struct TestWidget {
+struct StepperWidget {
     container: WidgetInstance,
+    value: State<i32>,
 }
 
-impl TestWidget {
+impl StepperWidget {
     fn new() -> WidgetInstance {
+        let val = State::new(0);
+        let changer_a = val.clone();
+        let changer_b = val.clone();
+
+        let observer = val.map(|v| Text::from(format!("Value: {}", v)));
+
         Self {
-            container: VStack::new(vec![
-                Label::new("Hello, world!"),
-                Label::new("Hello, world!"),
+            container: HStack::new(vec![
+                Label::new_observe(observer),
+                VStack::new(vec![
+                    Button::new("+", move |_| {
+                        let cur = changer_b.get();
+                        changer_b.set(cur + 1);
+                        println!("Value: {}", changer_b.get());
+                    }),
+                    Button::new("-", move |_| {
+                        let cur = changer_a.get();
+                        changer_a.set(cur - 1);
+                        println!("Value: {}", changer_a.get());
+                    }),
+                ]),
             ]),
+            value: val.clone(),
         }
         .instance()
     }
 }
 
-impl Widget for TestWidget {
+impl Widget for StepperWidget {
     fn build(&mut self, size: &mut BuildContext) -> BuildResult {
         //self.container.build(BuildContext::new(content_rect));
         self.container.build(size);

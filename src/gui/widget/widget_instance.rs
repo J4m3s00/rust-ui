@@ -24,7 +24,6 @@ impl Debug for WidgetInstance {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("WidgetInstance")
             .field("size", &self.size)
-            .field("build_result", &self.build_result)
             .field("build_rect", &self.build_rect)
             .finish()
     }

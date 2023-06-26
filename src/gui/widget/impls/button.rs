@@ -1,10 +1,8 @@
-use rand::seq::SliceRandom;
-
 use crate::{
     actions::receiver::Receiver,
     gui::widget::{
         builder::{build_context::BuildContext, build_results::BuildResult},
-        state::State,
+        state::state::State,
         widget::ToInstance,
         widget_instance::WidgetInstance,
     },
@@ -33,35 +31,16 @@ impl Button {
     }
 }
 
-const RANDOM_STRINGS: [&str; 5] = [
-    "Hallo Feli.",
-    "Ich Liebe Dich.",
-    "Hier und Da",
-    "Sogar Richtig",
-    "Oder Nichtig",
-];
-
 impl Widget for Button {
     fn build(&mut self, _ctx: &mut BuildContext) -> BuildResult {
         BuildResult::default().with_text(self.label.observe())
     }
 
     fn on_click(&self) {
-        let random_string = RANDOM_STRINGS
-            .choose(&mut rand::thread_rng())
-            .unwrap()
-            .to_string();
-        let mut new_text = self.label.get();
-        new_text.set_text(random_string);
-        self.label.set(new_text);
         self.click_callback.action(ButtonClick)
     }
 
-    fn on_mouse_enter(&self) {
-        println!("Mouse enter");
-    }
+    fn on_mouse_enter(&self) {}
 
-    fn on_mouse_leave(&self) {
-        println!("Mouse leave");
-    }
+    fn on_mouse_leave(&self) {}
 }
