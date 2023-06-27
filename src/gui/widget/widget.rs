@@ -4,7 +4,9 @@ use super::{
 };
 
 pub trait Widget {
-    fn build(&mut self, ctx: &mut BuildContext) -> BuildResult;
+    fn build(&mut self, _ctx: &mut BuildContext) -> BuildResult {
+        BuildResult::default()
+    }
     fn children(&self) -> &[WidgetInstance] {
         &[]
     }

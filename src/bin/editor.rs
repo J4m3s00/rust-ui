@@ -1,20 +1,12 @@
 use rust_ui::{
     gui::widget::{
-        builder::{
-            build_context::BuildContext, build_results::BuildResult, relative_size::RelativeSize,
-        },
-        impls::zstack::ZStack,
-        state::state::State,
+        builder::relative_size::RelativeSize, impls::zstack::ZStack, state::state::State,
     },
     prelude::*,
 };
 
 struct EmptyWidget;
-impl Widget for EmptyWidget {
-    fn build(&mut self, _ctx: &mut BuildContext) -> BuildResult {
-        BuildResult::default()
-    }
-}
+impl Widget for EmptyWidget {}
 
 fn main_container() -> WidgetInstance {
     VStack::new(vec![
@@ -42,7 +34,7 @@ struct StepperWidget;
 
 impl StepperWidget {
     fn new() -> WidgetInstance {
-        let val: State<i128> = State::new(1); // I dont like this. It should default clone when it is pushed into a closure
+        let val: State<i128> = State::new(1);
         HStack::new(vec![
             Label::new_observe(val.map(|v| Text::from(format!("Value: {}", v)))),
             VStack::new(vec![
@@ -50,14 +42,14 @@ impl StepperWidget {
                     let val = val.clone();
                     move |_| {
                         let cur: i128 = val.get();
-                        val.set(cur.checked_mul(10).unwrap_or(cur));
+                        val.set(cur.checked_add(1).unwrap_or(cur));
                     }
                 }),
                 Button::new("-", {
                     let val = val.clone();
                     move |_| {
                         let cur = val.get();
-                        val.set(cur.checked_div(-3).unwrap_or(cur));
+                        val.set(cur.checked_sub(1).unwrap_or(cur));
                     }
                 }),
             ])
