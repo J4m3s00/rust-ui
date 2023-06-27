@@ -1,13 +1,20 @@
-pub use crate::gui::widget::Widget;
-pub use crate::UIApp;
+pub use crate::gui::app::ui_app::UIApp;
 pub use crate::{
+    actions::receiver::Receiver,
     error::Result,
-    gui::{
-        button::Button,
-        hstack::HStack,
-        label::Label,
-        text::{TextAlignH, TextAlignV},
-        vstack::VStack,
-        widget::{SizePolicy, ToItem},
+    gui::widget::{
+        builder::{
+            align::{AlignH, AlignV},
+            text::Text,
+        },
+        impls::button::Button,
+        impls::hstack::HStack,
+        impls::label::Label,
+        impls::vstack::VStack,
+        size_policy::SizePolicy,
+        widget::{ToInstance, Widget},
+        widget_instance::WidgetInstance,
     },
 };
+pub use rust_graphics::app::App;
+pub use rust_graphics::vec::*;

@@ -1,68 +1,63 @@
-use rust_graphics::{app::App, vec::Vec2};
 use rust_ui::{
-    error::Result,
-    gui::{
-        hstack::HStack,
-        label::Label,
-        vstack::VStack,
-        widget::{SizePolicy, ToItem, Widget},
-        widget_builder::WidgetBuilder,
+    gui::widget::{
+        builder::relative_size::RelativeSize, impls::zstack::ZStack, state::state::State,
     },
-    UIApp,
+    prelude::*,
 };
 
-struct TestWidget {
-    stack: HStack,
-}
-
-impl TestWidget {
-    fn new() -> Self {
-        Self {
-            stack: HStack::new(vec![
-                Label::new("Text").into_item(),
-                VStack::new(vec![EmptyWidget.into_item(), EmptyWidget.into_item()])
-                    .into_item()
-                    .set_width(SizePolicy::PercentageV(0.5)),
-            ]),
-        }
-    }
-}
-
-impl Widget for TestWidget {
-    fn build(&self, builder: &mut WidgetBuilder, size: Vec2) {
-        builder.new_child(size).widget(&self.stack, size);
-    }
-}
 struct EmptyWidget;
+impl Widget for EmptyWidget {}
 
-impl Widget for EmptyWidget {
-    fn build(&self, build: &mut WidgetBuilder, size: Vec2) {
-        build.new_child(size);
-    }
-}
-
-fn main_container() -> impl Widget {
+fn main_container() -> WidgetInstance {
     VStack::new(vec![
-        EmptyWidget.into_item(),
+        EmptyWidget.instance(),
         HStack::new(vec![
-            EmptyWidget.into_item(),
-            TestWidget::new()
-                .into_item()
-                .set_width(SizePolicy::Fixed(128.)),
-            EmptyWidget.into_item(),
+            ZStack::new(vec![
+                EmptyWidget.instance(),
+                EmptyWidget.instance(),
+                EmptyWidget.instance(),
+                EmptyWidget.instance(),
+                EmptyWidget.instance(),
+            ]),
+            Button::new("Click me!", |_| {
+                println!("Clicked a button on the Screen! YEAHHHH")
+            })
+            .set_width(SizePolicy::Fixed(128.)),
+            StepperWidget::new(),
         ])
-        .into_item()
-        .set_height(SizePolicy::Fixed(32.)),
-        EmptyWidget.into_item(),
+        .set_height(SizePolicy::Fixed(72.)),
+        EmptyWidget.instance(),
     ])
 }
 
-#[allow(dead_code)]
-fn main_just_button() -> TestWidget {
-    TestWidget::new()
+struct StepperWidget;
+
+impl StepperWidget {
+    fn new() -> WidgetInstance {
+        let val: State<i128> = State::new(1);
+        HStack::new(vec![
+            Label::new_observe(val.map(|v| Text::from(format!("Value: {}", v)))),
+            VStack::new(vec![
+                Button::new("+", {
+                    let val = val.clone();
+                    move |_| {
+                        let cur: i128 = val.get();
+                        val.set(cur.checked_add(1).unwrap_or(cur));
+                    }
+                }),
+                Button::new("-", {
+                    let val = val.clone();
+                    move |_| {
+                        let cur = val.get();
+                        val.set(cur.checked_sub(1).unwrap_or(cur));
+                    }
+                }),
+            ])
+            .set_width(SizePolicy::Relative(RelativeSize::PercentageV(0.5))),
+        ])
+    }
 }
 
-fn main() -> Result<()> {
-    UIApp::new().main_container(main_container).run();
-    Ok(())
+fn main() {
+    UIApp::new().main_container(main_container()).run();
 }

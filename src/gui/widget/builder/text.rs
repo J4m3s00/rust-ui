@@ -3,27 +3,15 @@ use rust_graphics::{
     font::Font,
 };
 
-#[derive(Clone)]
-pub enum TextAlignV {
-    Top,
-    Center,
-    Bottom,
-}
+use super::align::{AlignH, AlignV};
 
-#[derive(Clone)]
-pub enum TextAlignH {
-    Left,
-    Center,
-    Right,
-}
-
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Text {
     pub text: String,
     pub font: Option<Font>,
     pub color: Color,
-    pub alignment_h: TextAlignH,
-    pub alignment_v: TextAlignV,
+    pub alignment_h: AlignH,
+    pub alignment_v: AlignV,
 }
 
 impl Default for Text {
@@ -32,8 +20,8 @@ impl Default for Text {
             text: String::new(),
             font: None,
             color: COLOR_BLACK,
-            alignment_h: TextAlignH::Center,
-            alignment_v: TextAlignV::Center,
+            alignment_h: AlignH::Center,
+            alignment_v: AlignV::Center,
         }
     }
 }
@@ -51,13 +39,17 @@ where
 }
 
 impl Text {
-    pub fn vert_align(mut self, alignment: TextAlignV) -> Self {
+    pub fn vert_align(mut self, alignment: AlignV) -> Self {
         self.alignment_v = alignment;
         self
     }
 
-    pub fn hor_align(mut self, alignment: TextAlignH) -> Self {
+    pub fn hor_align(mut self, alignment: AlignH) -> Self {
         self.alignment_h = alignment;
         self
+    }
+
+    pub fn set_text(&mut self, text: impl Into<String>) {
+        self.text = text.into();
     }
 }
