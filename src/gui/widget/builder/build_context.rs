@@ -1,6 +1,6 @@
 use rust_graphics::{rect::Rect, vec::Vec2};
 
-const PADDING: f32 = 2.;
+use crate::gui::widget::style::Style;
 
 #[derive(Copy, Clone, Debug)]
 pub enum CursorDirection {
@@ -22,6 +22,7 @@ struct Cursor {
 pub struct BuildContext {
     content_rect: Rect,
     cursor: Cursor,
+    current_style: Style,
 }
 
 impl BuildContext {
@@ -32,6 +33,7 @@ impl BuildContext {
                 direction: cursor_direction,
                 pos: content_rect.top_left(),
             },
+            current_style: Style::default(),
         }
     }
 
@@ -42,10 +44,10 @@ impl BuildContext {
     pub fn allocate_space(&mut self, size: impl Into<Vec2>) -> Option<BuildContext> {
         let size = size.into();
         let content_area = Rect::new_from_xy(
-            self.cursor.pos.x + PADDING,
-            self.cursor.pos.y + PADDING,
-            size.x - (PADDING * 2.),
-            size.y - (PADDING * 2.),
+            self.cursor.pos.x + self.current_style.padding.left,
+            self.cursor.pos.y + self.current_style.padding.top,
+            size.x - (self.current_style.padding.left + self.current_style.padding.right),
+            size.y - (self.current_style.padding.top + self.current_style.padding.bottom),
         );
         let advance = match self.cursor.direction {
             CursorDirection::Horizontal => (size.x, 0.).into(),
@@ -54,6 +56,10 @@ impl BuildContext {
         };
         self.cursor.pos += advance;
         Some(Self::new(content_area, self.cursor.direction))
+    }
+
+    pub fn set_style(&mut self, style: Style) {
+        self.current_style = style;
     }
 
     pub fn get_content_size(&self) -> Vec2 {

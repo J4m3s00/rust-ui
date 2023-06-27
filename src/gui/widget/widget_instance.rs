@@ -8,14 +8,18 @@ use super::{
     builder::{build_context::BuildContext, build_results::BuildResult},
     iterator::WidgetIter,
     size_policy::SizePolicy2D,
+    style::{Padding, Style},
 };
 
 pub struct WidgetInstance {
     type_name: &'static str,
 
     widget: Box<dyn Widget>,
-    size: SizePolicy2D,
     // Stlying
+    size: SizePolicy2D,
+    style: Style,
+
+    // Build Results
     build_result: BuildResult,
     build_rect: Rect,
 }
@@ -49,6 +53,7 @@ impl WidgetInstance {
         Self {
             widget: Box::new(widget),
             size: SizePolicy2D::default(),
+            style: Style::default(),
             build_result: BuildResult::default(),
             build_rect: Rect::default(),
             type_name: std::any::type_name::<T>(),
@@ -58,6 +63,7 @@ impl WidgetInstance {
     pub fn build(&mut self, context: &mut BuildContext) {
         //context.allocate_space(self.size);
         self.build_rect = context.get_content_rect().clone();
+        context.set_style(self.style.clone());
         self.build_result = self.widget.build(context);
     }
 
@@ -73,6 +79,11 @@ impl WidgetInstance {
 
     pub fn set_height(mut self, height: SizePolicy) -> Self {
         self.size.vertical = height;
+        self
+    }
+
+    pub fn set_padding(mut self, padding: Padding) -> Self {
+        self.style.padding = padding;
         self
     }
 

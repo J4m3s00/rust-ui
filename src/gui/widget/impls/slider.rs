@@ -11,6 +11,8 @@ use crate::{
     MapScalar,
 };
 
+const KNOB_WIDTH: f32 = 16.;
+
 pub struct Slider {
     knob: State<KnobState>,
     value: State<f32>,
@@ -44,25 +46,36 @@ impl Slider {
 
     fn get_value_from_piexels(&self, pixels: f32) -> f32 {
         let slider_pixel_scale = self.slider_pixel_scale.get().unwrap();
-        pixels / slider_pixel_scale
+        (pixels - (KNOB_WIDTH / 2.)) / slider_pixel_scale
+    }
+
+    fn min(&self) -> f32 {
+        self.min.get().unwrap_or(0.)
+    }
+
+    fn max(&self) -> f32 {
+        self.max.get().unwrap_or(100.)
+    }
+
+    fn set_value(&self, value: f32) {
+        self.value.set(value.clamp(self.min(), self.max()));
     }
 }
 
 impl Widget for Slider {
     fn build(&mut self, ctx: &mut BuildContext) -> BuildResult {
         let content_area = ctx.get_content_rect().clone();
-        let width = content_area.width();
-        self.slider_pixel_scale = Observer::map(self.max.reference(), move |v| width / v);
 
-        let knob_width = 20.;
+        let width = content_area.width() - KNOB_WIDTH;
+        self.slider_pixel_scale = Observer::map(self.max.reference(), move |v| width / v);
 
         let knob_left = self.value.map({
             let min = self.min.reference();
             let max = self.max.reference();
             move |v| {
                 SizePolicy::Fixed(
-                    v.map(min.get().unwrap_or(0.), max.get().unwrap_or(100.), 0., 1.)
-                        * content_area.width(),
+                    (KNOB_WIDTH / 2.)
+                        + v.map(min.get().unwrap_or(0.), max.get().unwrap_or(100.), 0., 1.) * width,
                 )
             }
         });
@@ -71,7 +84,7 @@ impl Widget for Slider {
         res.draw_rect(DrawRect::fill(Observer::value(Some(Fill {
             color: COLOR_CYAN,
         }))))
-        .set_width(SizePolicy::Fixed(knob_width))
+        .set_width(SizePolicy::Fixed(KNOB_WIDTH))
         .set_alignment_h(AlignH::Left)
         .set_offset_x(knob_left);
         res
@@ -80,8 +93,7 @@ impl Widget for Slider {
     fn on_mouse_down(&self, event: MouseEvent, _interface: AppInterface) {
         if event.inside {
             self.knob.set(KnobState::Dragging);
-            self.value
-                .set(self.get_value_from_piexels(event.relative_pos.x));
+            self.set_value(self.get_value_from_piexels(event.relative_pos.x));
         }
     }
 
@@ -91,8 +103,7 @@ impl Widget for Slider {
 
     fn on_mouse_move(&self, event: MouseEvent, _interface: AppInterface) {
         if let KnobState::Dragging = self.knob.get() {
-            self.value
-                .set(self.get_value_from_piexels(event.relative_pos.x));
+            self.set_value(self.get_value_from_piexels(event.relative_pos.x));
         }
     }
 }

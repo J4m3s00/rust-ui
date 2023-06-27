@@ -1,6 +1,6 @@
 use crate::{
     actions::receiver::Receiver,
-    gui::widget::{state::observable::Observer, widget_instance::WidgetInstance},
+    gui::widget::{state::observable::Observer, style::Padding, widget_instance::WidgetInstance},
     prelude::{AlignH, AlignV, Label, Text},
 };
 
@@ -24,5 +24,6 @@ impl Button {
                     .vert_align(AlignV::Center),
             )),
         ])
+        .set_padding(Padding::zero())
     }
 }
