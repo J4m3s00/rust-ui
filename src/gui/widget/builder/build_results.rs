@@ -4,6 +4,7 @@ use crate::gui::widget::state::observable::Observer;
 
 use super::{relative_size::RelativeSize, text::Text};
 
+#[derive(Default)]
 pub struct WidgetRenderRect {
     pub width: Observer<RelativeSize>,
     pub height: Observer<RelativeSize>,

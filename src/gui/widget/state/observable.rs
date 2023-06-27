@@ -22,6 +22,15 @@ pub struct Observer<T> {
     state: Rc<dyn Observable<Value = T>>,
 }
 
+impl<T> Default for Observer<T>
+where
+    T: Default + Clone + 'static,
+{
+    fn default() -> Self {
+        Self::value_default()
+    }
+}
+
 impl<T> Observer<T>
 where
     T: Clone + 'static,
@@ -41,9 +50,9 @@ where
         Self::value(T::default())
     }
 
-    pub fn reference(other: &Observer<T>) -> Self {
+    pub fn reference(&self) -> Self {
         Self::new(Rc::new(ObserveObserver {
-            observer: Rc::downgrade(&other.state),
+            observer: Rc::downgrade(&self.state),
         }))
     }
 

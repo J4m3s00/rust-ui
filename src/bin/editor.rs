@@ -1,5 +1,3 @@
-use std::slice::from_ref;
-
 use rust_ui::{
     gui::widget::{
         builder::{
@@ -40,47 +38,31 @@ fn main_container() -> WidgetInstance {
     ])
 }
 
-struct StepperWidget {
-    container: WidgetInstance,
-}
+struct StepperWidget;
 
 impl StepperWidget {
     fn new() -> WidgetInstance {
-        let val = State::new(0);
-        let changer_a = val.clone();
-        let changer_b = val.clone();
-
-        Self {
-            container: HStack::new(vec![
-                Label::new_observe(val.map(|v| Text::from(format!("Value: {}", v)))),
-                VStack::new(vec![
-                    Button::new("+", move |_| {
-                        let cur = changer_b.get();
-                        changer_b.set(cur + 1);
-                        println!("Value: {}", changer_b.get());
-                    }),
-                    Button::new("-", move |_| {
-                        let cur = changer_a.get();
-                        changer_a.set(cur - 1);
-                        println!("Value: {}", changer_a.get());
-                    }),
-                ])
-                .set_width(SizePolicy::Relative(RelativeSize::PercentageV(0.5))),
-            ]),
-        }
-        .instance()
-    }
-}
-
-impl Widget for StepperWidget {
-    fn build(&mut self, size: &mut BuildContext) -> BuildResult {
-        //self.container.build(BuildContext::new(content_rect));
-        self.container.build(size);
-        BuildResult::default()
-    }
-
-    fn children(&self) -> &[WidgetInstance] {
-        from_ref(&self.container)
+        let val: State<i128> = State::new(1); // I dont like this. It should default clone when it is pushed into a closure
+        HStack::new(vec![
+            Label::new_observe(val.map(|v| Text::from(format!("Value: {}", v)))),
+            VStack::new(vec![
+                Button::new("+", {
+                    let val = val.clone();
+                    move |_| {
+                        let cur: i128 = val.get();
+                        val.set(cur.checked_mul(10).unwrap_or(cur));
+                    }
+                }),
+                Button::new("-", {
+                    let val = val.clone();
+                    move |_| {
+                        let cur = val.get();
+                        val.set(cur.checked_div(-3).unwrap_or(cur));
+                    }
+                }),
+            ])
+            .set_width(SizePolicy::Relative(RelativeSize::PercentageV(0.5))),
+        ])
     }
 }
 

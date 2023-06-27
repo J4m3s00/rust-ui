@@ -5,6 +5,7 @@ use rust_graphics::{
     events::app_events::AppEvent,
     font::Font,
     init_app,
+    keycodes::KeyCode,
     rect::Rect,
     run_draw_command,
 };
@@ -25,6 +26,7 @@ pub struct UIApp {
     main_container: Option<WidgetInstance>,
     default_font: Font,
     input_state: InputState,
+    quit: bool,
 }
 
 impl UIApp {
@@ -49,6 +51,10 @@ impl UIApp {
             container.build(&mut build_context);
         }
     }
+
+    pub fn quit(&mut self) {
+        self.quit = true;
+    }
 }
 
 impl App for UIApp {
@@ -57,6 +63,7 @@ impl App for UIApp {
             main_container: None,
             default_font: Font::from_file("Roboto.ttf", 16),
             input_state: InputState::default(),
+            quit: false,
         }
     }
 
@@ -106,7 +113,8 @@ impl App for UIApp {
                     }
                 }
             }
-            _ => {}
+            AppEvent::KeyDown(KeyCode::Escape, _) => self.quit(),
+            _ => (),
         };
     }
 
@@ -190,5 +198,8 @@ impl App for UIApp {
                 });
             }
         }
+    }
+    fn should_quit(&self) -> bool {
+        self.quit
     }
 }
