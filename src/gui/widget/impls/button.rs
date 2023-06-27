@@ -1,7 +1,7 @@
 use crate::{
     actions::receiver::Receiver,
     gui::widget::{state::observable::Observer, widget_instance::WidgetInstance},
-    prelude::{Label, Text},
+    prelude::{AlignH, AlignV, Label, Text},
 };
 
 use super::{
@@ -18,7 +18,11 @@ impl Button {
     {
         ZStack::new(vec![
             Clickable::new(on_click),
-            Label::new_observe(Observer::from(Text::from(label))),
+            Label::new_observe(Observer::from(
+                Text::from(label)
+                    .hor_align(AlignH::Center)
+                    .vert_align(AlignV::Center),
+            )),
         ])
     }
 }

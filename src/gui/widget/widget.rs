@@ -1,3 +1,5 @@
+use crate::gui::app::interface::AppInterface;
+
 use super::{
     builder::{build_context::BuildContext, build_results::BuildResult},
     widget_instance::WidgetInstance,
@@ -11,10 +13,10 @@ pub trait Widget {
         &[]
     }
 
-    fn on_mouse_down(&self) {}
-    fn on_mouse_up(&self) {}
-    fn on_mouse_enter(&self) {}
-    fn on_mouse_leave(&self) {}
+    fn on_mouse_down(&self, _interface: AppInterface) {}
+    fn on_mouse_up(&self, _interface: AppInterface) {}
+    fn on_mouse_enter(&self, _interface: AppInterface) {}
+    fn on_mouse_leave(&self, _interface: AppInterface) {}
 }
 
 pub trait ToInstance {

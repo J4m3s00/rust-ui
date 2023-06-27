@@ -1,12 +1,15 @@
 use rust_graphics::{color::Color, draw_command::Fill};
 
 use crate::{
-    gui::widget::{
-        builder::{
-            build_context::BuildContext,
-            build_results::{BuildResult, WidgetRenderItem, WidgetRenderRect},
+    gui::{
+        app::interface::AppInterface,
+        widget::{
+            builder::{
+                build_context::BuildContext,
+                build_results::{BuildResult, WidgetRenderItem, WidgetRenderRect},
+            },
+            state::state::State,
         },
-        state::state::State,
     },
     prelude::{Receiver, ToInstance, Widget, WidgetInstance},
 };
@@ -56,22 +59,22 @@ impl Widget for Clickable {
         }))
     }
 
-    fn on_mouse_down(&self) {
+    fn on_mouse_down(&self, _interface: AppInterface) {
         self.mouse_state.set(MouseState::Pressed);
     }
 
-    fn on_mouse_up(&self) {
+    fn on_mouse_up(&self, interface: AppInterface) {
         if let MouseState::Pressed = self.mouse_state.get() {
             self.mouse_state.set(MouseState::Hovered);
-            self.on_click.action(Clicked);
+            self.on_click.action(Clicked, interface);
         }
     }
 
-    fn on_mouse_enter(&self) {
+    fn on_mouse_enter(&self, _interface: AppInterface) {
         self.mouse_state.set(MouseState::Hovered);
     }
 
-    fn on_mouse_leave(&self) {
+    fn on_mouse_leave(&self, _interface: AppInterface) {
         self.mouse_state.set(MouseState::Normal);
     }
 }

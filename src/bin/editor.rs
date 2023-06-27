@@ -1,61 +1,20 @@
-use rust_ui::{
-    gui::widget::{
-        builder::relative_size::RelativeSize, impls::zstack::ZStack, state::state::State,
-    },
-    prelude::*,
-};
+use rust_ui::prelude::*;
 
-struct EmptyWidget;
-impl Widget for EmptyWidget {}
-
-fn main_container() -> WidgetInstance {
-    VStack::new(vec![
-        EmptyWidget.instance(),
-        HStack::new(vec![
-            ZStack::new(vec![
-                EmptyWidget.instance(),
-                EmptyWidget.instance(),
-                EmptyWidget.instance(),
-                EmptyWidget.instance(),
-                EmptyWidget.instance(),
-            ]),
-            Button::new("Click me!", |_| {
-                println!("Clicked a button on the Screen! YEAHHHH")
-            })
-            .set_width(SizePolicy::Fixed(128.)),
-            StepperWidget::new(),
-        ])
-        .set_height(SizePolicy::Fixed(72.)),
-        EmptyWidget.instance(),
-    ])
+// Functional component
+fn menubar() -> WidgetInstance {
+    HStack::new(vec![Button::new("x", |_, inter: AppInterface| {
+        inter.quit()
+    })
+    .set_width(SizePolicy::Relative(RelativeSize::PercentageV(1.)))])
+    .set_height(SizePolicy::Fixed(30.0))
 }
 
-struct StepperWidget;
+fn sidebar() -> WidgetInstance {
+    Spacer::new().set_width(SizePolicy::Fixed(250.0))
+}
 
-impl StepperWidget {
-    fn new() -> WidgetInstance {
-        let val: State<i128> = State::new(1);
-        HStack::new(vec![
-            Label::new_observe(val.map(|v| Text::from(format!("Value: {}", v)))),
-            VStack::new(vec![
-                Button::new("+", {
-                    let val = val.clone();
-                    move |_| {
-                        let cur: i128 = val.get();
-                        val.set(cur.checked_add(1).unwrap_or(cur));
-                    }
-                }),
-                Button::new("-", {
-                    let val = val.clone();
-                    move |_| {
-                        let cur = val.get();
-                        val.set(cur.checked_sub(1).unwrap_or(cur));
-                    }
-                }),
-            ])
-            .set_width(SizePolicy::Relative(RelativeSize::PercentageV(0.5))),
-        ])
-    }
+fn main_container() -> WidgetInstance {
+    VStack::new(vec![menubar(), HStack::new(vec![sidebar()])])
 }
 
 fn main() {

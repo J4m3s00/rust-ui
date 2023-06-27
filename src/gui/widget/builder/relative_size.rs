@@ -7,6 +7,6 @@ pub enum RelativeSize {
 
 impl Default for RelativeSize {
     fn default() -> Self {
-        Self::Percent(100.)
+        Self::Percent(1.)
     }
 }

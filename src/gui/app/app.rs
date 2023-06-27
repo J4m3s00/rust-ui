@@ -20,7 +20,7 @@ use crate::{
     print_widget_tree,
 };
 
-use super::input::InputState;
+use super::{input::InputState, interface::AppInterface};
 
 pub struct UIApp {
     main_container: Option<WidgetInstance>,
@@ -72,6 +72,7 @@ impl App for UIApp {
     }
 
     fn on_event(&mut self, event: AppEvent) {
+        let interface = AppInterface::new();
         match event {
             AppEvent::WindowResize(width, height) => {
                 self.rebuild_main_container(width as f32, height as f32);
@@ -83,11 +84,11 @@ impl App for UIApp {
                         if area.contains((x as f32, y as f32).into())
                             && !area.contains(self.input_state.mouse_pos)
                         {
-                            item.widget().on_mouse_enter();
+                            item.widget().on_mouse_enter(interface.clone());
                         } else if area.contains(self.input_state.mouse_pos)
                             && !area.contains((x, y).into())
                         {
-                            item.widget().on_mouse_leave();
+                            item.widget().on_mouse_leave(interface.clone());
                         }
                     }
                 }
@@ -98,7 +99,7 @@ impl App for UIApp {
                     for item in container.iter() {
                         let (_, area) = item.build_result();
                         if area.contains((x as f32, y as f32).into()) {
-                            item.widget().on_mouse_down();
+                            item.widget().on_mouse_down(interface.clone());
                         }
                     }
                 }
@@ -108,7 +109,7 @@ impl App for UIApp {
                     for item in container.iter() {
                         let (_, area) = item.build_result();
                         if area.contains((x as f32, y as f32).into()) {
-                            item.widget().on_mouse_up();
+                            item.widget().on_mouse_up(interface.clone());
                         }
                     }
                 }
@@ -116,6 +117,10 @@ impl App for UIApp {
             AppEvent::KeyDown(KeyCode::Escape, _) => self.quit(),
             _ => (),
         };
+
+        if interface.inner.borrow().should_quit {
+            self.quit();
+        }
     }
 
     fn on_draw(&mut self) {
@@ -154,15 +159,15 @@ impl App for UIApp {
                         }
                         WidgetRenderItem::Rect(rect) => {
                             let width = match rect.width.get().unwrap() {
-                                RelativeSize::Percent(percent) => area.width() * percent / 100.,
-                                RelativeSize::PercentageH(percent) => area.width() * percent / 100.,
+                                RelativeSize::Percent(percent) => area.width() * percent,
+                                RelativeSize::PercentageH(percent) => area.width() * percent,
                                 RelativeSize::PercentageV(percent) => {
                                     area.height() * percent / 100.
                                 }
                             };
                             let height = match rect.height.get().unwrap() {
-                                RelativeSize::Percent(percent) => area.height() * percent / 100.,
-                                RelativeSize::PercentageH(percent) => area.width() * percent / 100.,
+                                RelativeSize::Percent(percent) => area.height() * percent,
+                                RelativeSize::PercentageH(percent) => area.width() * percent,
                                 RelativeSize::PercentageV(percent) => {
                                     area.height() * percent / 100.
                                 }

@@ -1,2 +1,3 @@
+pub mod app;
 pub mod input;
-pub mod ui_app;
+pub mod interface;
