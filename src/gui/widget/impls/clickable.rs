@@ -39,7 +39,7 @@ impl Clickable {
 }
 
 impl Widget for Clickable {
-    fn build(&mut self, ctx: &mut BuildContext) -> BuildResult {
+    fn build(&mut self, _ctx: &mut BuildContext) -> BuildResult {
         BuildResult::default().with_render_item(WidgetRenderItem::Rect(WidgetRenderRect {
             fill: self.mouse_state.map(|v| match v {
                 MouseState::Normal => Some(Fill {
