@@ -12,11 +12,12 @@ use crate::{
 
 use super::Drawable;
 
-#[derive(Clone, Debug)]
+#[derive(Clone)]
 pub struct Text {
     pub text: String,
     pub font: Option<Font>,
     pub color: Color,
+    pub outline: Option<Stroke>,
     pub alignment_h: AlignH,
     pub alignment_v: AlignV,
 }
@@ -29,6 +30,7 @@ impl Default for Text {
             color: COLOR_BLACK,
             alignment_h: AlignH::Center,
             alignment_v: AlignV::Center,
+            outline: None,
         }
     }
 }
@@ -88,7 +90,8 @@ impl Drawable for DrawText {
             font: font_manager.default_font().clone(),
             text: text.text.clone(),
             position: (text_left, text_base_line).into(),
-            color: COLOR_BLACK,
+            color: text.color,
+            stroke: None,
         }
     }
 }

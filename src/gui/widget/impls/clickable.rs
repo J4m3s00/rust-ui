@@ -44,17 +44,21 @@ impl Clickable {
 }
 
 impl Widget for Clickable {
-    fn build(&mut self, _ctx: &mut BuildContext) -> BuildResult {
+    fn build(&mut self, ctx: &mut BuildContext) -> BuildResult {
         let mut res = BuildResult::default();
-        res.draw_rect(DrawRect::fill(self.mouse_state.map(|v| match v {
+        let normal_color = ctx.theme().primary_color;
+        let hoverd_color = ctx.theme().primary_color_variant;
+        let clicked_color = ctx.theme().secondary_color;
+
+        res.draw_rect(DrawRect::fill(self.mouse_state.map(move |v| match v {
             MouseState::Normal => Some(Fill {
-                color: Color::new(64, 64, 64, 255),
+                color: normal_color,
             }),
             MouseState::Hovered => Some(Fill {
-                color: Color::new(128, 128, 128, 255),
+                color: hoverd_color,
             }),
             MouseState::Pressed => Some(Fill {
-                color: Color::new(255, 255, 255, 255),
+                color: clicked_color,
             }),
         })));
         res
@@ -66,18 +70,18 @@ impl Widget for Clickable {
         }
     }
 
-    fn on_mouse_up(&self, event: MouseEvent, interface: AppInterface) {
+    fn on_mouse_up(&self, _event: MouseEvent, interface: AppInterface) {
         if let MouseState::Pressed = self.mouse_state.get() {
             self.mouse_state.set(MouseState::Hovered);
             self.on_click.action(Clicked, interface);
         }
     }
 
-    fn on_mouse_enter(&self, event: MouseEvent, _interface: AppInterface) {
+    fn on_mouse_enter(&self, _event: MouseEvent, _interface: AppInterface) {
         self.mouse_state.set(MouseState::Hovered);
     }
 
-    fn on_mouse_leave(&self, event: MouseEvent, _interface: AppInterface) {
+    fn on_mouse_leave(&self, _event: MouseEvent, _interface: AppInterface) {
         self.mouse_state.set(MouseState::Normal);
     }
 }

@@ -1,4 +1,4 @@
-use rust_graphics::{color::COLOR_CYAN, draw_command::Fill};
+use rust_graphics::draw_command::Fill;
 
 use crate::{
     gui::widget::{
@@ -82,7 +82,7 @@ impl Widget for Slider {
 
         let mut res = BuildResult::default();
         res.draw_rect(DrawRect::fill(Observer::value(Some(Fill {
-            color: COLOR_CYAN,
+            color: ctx.theme().primary_color,
         }))))
         .set_width(SizePolicy::Fixed(KNOB_WIDTH))
         .set_alignment_h(AlignH::Left)

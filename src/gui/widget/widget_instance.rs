@@ -9,6 +9,7 @@ use super::{
     iterator::WidgetIter,
     size_policy::SizePolicy2D,
     style::{Padding, Style},
+    theme::Theme,
 };
 
 pub struct WidgetInstance {
