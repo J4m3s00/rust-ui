@@ -5,12 +5,21 @@ fn menubar() -> WidgetInstance {
     HStack::new(vec![Button::new("x", |_, inter: AppInterface| {
         inter.quit()
     })
-    .set_width(SizePolicy::Relative(RelativeSize::PercentageV(1.)))])
+    .set_width(SizePolicy::PercentageV(1.))])
     .set_height(SizePolicy::Fixed(30.0))
 }
 
+fn slider() -> WidgetInstance {
+    let slider_value = State::new(0.0);
+    HStack::new(vec![
+        Label::new_observe(slider_value.map(|v| Text::from(format!("{:.0}", v))))
+            .set_width(SizePolicy::Fixed(50.)),
+        Slider::new(slider_value.clone()),
+    ])
+}
+
 fn sidebar() -> WidgetInstance {
-    VStack::new(vec![Slider::new(10.).set_height(SizePolicy::Fixed(32.))])
+    VStack::new(vec![slider().set_height(SizePolicy::Fixed(32.))])
         .set_width(SizePolicy::Fixed(250.0))
 }
 

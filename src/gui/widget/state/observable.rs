@@ -3,10 +3,7 @@ use std::{
     rc::{Rc, Weak},
 };
 
-use super::{
-    state::{State, StateInner},
-    state_ref::StateRef,
-};
+use super::state::{State, StateInner};
 
 /// This is used to have a weak reference to a state
 /// In essence this is just a wrapper to get a value
@@ -21,7 +18,10 @@ pub(super) trait Observable {
     fn get(&self) -> Option<Self::Value>;
 }
 
-pub struct Observer<T> {
+pub struct Observer<T>
+where
+    T: Clone + 'static,
+{
     state: Rc<dyn Observable<Value = T>>,
 }
 
@@ -62,12 +62,6 @@ where
     pub fn state(state: &State<T>) -> Self {
         Self::new(Rc::new(ObserveState {
             state: Rc::downgrade(&state.value),
-        }))
-    }
-
-    pub fn state_ref(state: &StateRef<T>) -> Self {
-        Self::new(Rc::new(ObserveState {
-            state: state.value.clone(),
         }))
     }
 
@@ -138,7 +132,10 @@ where
     }
 }
 
-pub struct ObserveMap<T, M> {
+pub struct ObserveMap<T, M>
+where
+    T: Clone + 'static,
+{
     state: Observer<T>,
     map: Box<dyn Fn(&T) -> M>,
 }

@@ -1,13 +1,17 @@
 use rust_graphics::draw_command::{Fill, Stroke};
 
-use crate::gui::widget::state::observable::Observer;
-
-use super::{relative_size::RelativeSize, text::Text};
+use crate::{
+    gui::widget::{
+        rendering::drawable::{item::DrawItem, rectangle::DrawRect, text::DrawText},
+        state::observable::Observer,
+    },
+    prelude::{SizePolicy, Text},
+};
 
 #[derive(Default)]
 pub struct WidgetRenderRect {
-    pub width: Observer<RelativeSize>,
-    pub height: Observer<RelativeSize>,
+    pub width: Observer<SizePolicy>,
+    pub height: Observer<SizePolicy>,
     pub fill: Observer<Option<Fill>>,
     pub stroke: Observer<Option<Stroke>>,
 }
@@ -19,21 +23,24 @@ pub enum WidgetRenderItem {
 
 #[derive(Default)]
 pub struct BuildResult {
-    render_items: Vec<WidgetRenderItem>,
+    render_items: Vec<DrawItem>,
 }
 
 impl BuildResult {
-    pub fn with_text(mut self, text: Observer<Text>) -> Self {
-        self.render_items.push(WidgetRenderItem::Text(text));
-        self
+    pub fn draw_text(&mut self, text: DrawText) -> &mut DrawItem {
+        self.push_item(DrawItem::new(text))
     }
 
-    pub fn with_render_item(mut self, item: WidgetRenderItem) -> Self {
+    pub fn draw_rect(&mut self, rect: DrawRect) -> &mut DrawItem {
+        self.push_item(DrawItem::new(rect))
+    }
+
+    fn push_item(&mut self, item: DrawItem) -> &mut DrawItem {
         self.render_items.push(item);
-        self
+        self.render_items.last_mut().unwrap()
     }
 
-    pub fn render_items(&self) -> &[WidgetRenderItem] {
+    pub fn render_items(&self) -> &[DrawItem] {
         &self.render_items
     }
 }

@@ -3,7 +3,6 @@ use crate::{
         builder::{
             build_context::{BuildContext, CursorDirection},
             build_results::BuildResult,
-            relative_size::RelativeSize,
         },
         widget::ToInstance,
     },
@@ -33,14 +32,12 @@ impl Widget for HStack {
                 SizePolicy::Fixed(pixels) => {
                     remaining_width -= pixels;
                 }
-                SizePolicy::Relative(rel) => match rel {
-                    RelativeSize::Percent(x) | RelativeSize::PercentageH(x) => {
-                        remaining_width -= x * content_area.width();
-                    }
-                    RelativeSize::PercentageV(p) => {
-                        remaining_width -= p * content_area.height();
-                    }
-                },
+                SizePolicy::Percent(x) | SizePolicy::PercentageH(x) => {
+                    remaining_width -= x * content_area.width();
+                }
+                SizePolicy::PercentageV(p) => {
+                    remaining_width -= p * content_area.height();
+                }
                 SizePolicy::Fraction(frac) => {
                     total_frac += frac;
                 }
@@ -52,12 +49,8 @@ impl Widget for HStack {
         for item in self.children.iter_mut() {
             let width = match item.size().horizontal {
                 SizePolicy::Fixed(pixels) => pixels,
-                SizePolicy::Relative(rel) => match rel {
-                    RelativeSize::Percent(x) | RelativeSize::PercentageH(x) => {
-                        x * content_area.width()
-                    }
-                    RelativeSize::PercentageV(p) => p * content_area.height(),
-                },
+                SizePolicy::Percent(x) | SizePolicy::PercentageH(x) => x * content_area.width(),
+                SizePolicy::PercentageV(p) => p * content_area.height(),
                 SizePolicy::Fraction(frac) => frac * frac_width,
             };
             if let Some(mut child_context) = ctx.allocate_space((width, content_area.height())) {

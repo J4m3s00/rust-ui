@@ -1,6 +1,6 @@
 use rust_graphics::{
     app::App,
-    color::{Color, COLOR_BLACK},
+    color::Color,
     draw_command::{DrawCommand, Stroke},
     events::app_events::AppEvent,
     font::Font,
@@ -8,23 +8,33 @@ use rust_graphics::{
     keycodes::KeyCode,
     rect::Rect,
     run_draw_command,
+    vec::Vec2,
 };
 
 use crate::{
-    gui::widget::builder::{
-        build_context::{BuildContext, CursorDirection},
-        build_results::WidgetRenderItem,
-        relative_size::RelativeSize,
+    gui::widget::{
+        builder::build_context::{BuildContext, CursorDirection},
+        widget::MouseEvent,
     },
-    prelude::{AlignH, AlignV, WidgetInstance},
+    prelude::WidgetInstance,
     print_widget_tree,
 };
 
 use super::{input::InputState, interface::AppInterface};
 
+pub struct FontManager {
+    default_font: Font,
+}
+
+impl FontManager {
+    pub fn default_font(&self) -> &Font {
+        &self.default_font
+    }
+}
+
 pub struct UIApp {
     main_container: Option<WidgetInstance>,
-    default_font: Font,
+    font_manager: FontManager,
     input_state: InputState,
     quit: bool,
 }
@@ -61,7 +71,9 @@ impl App for UIApp {
     fn init() -> Self {
         Self {
             main_container: None,
-            default_font: Font::from_file("Roboto.ttf", 16),
+            font_manager: FontManager {
+                default_font: Font::from_file("Roboto.ttf", 16),
+            },
             input_state: InputState::default(),
             quit: false,
         }
@@ -81,14 +93,42 @@ impl App for UIApp {
                 if let Some(container) = &self.main_container {
                     for item in container.iter() {
                         let (_, area) = item.build_result();
-                        if area.contains((x as f32, y as f32).into())
-                            && !area.contains(self.input_state.mouse_pos)
-                        {
-                            item.widget().on_mouse_enter(interface.clone());
+                        if area.contains((x as f32, y as f32).into()) {
+                            if !area.contains(self.input_state.mouse_pos) {
+                                item.widget().on_mouse_enter(
+                                    MouseEvent {
+                                        relative_pos: (x as f32 - area.left, y as f32 - area.top)
+                                            .into(),
+                                        absolute_pos: (x as f32, y as f32).into(),
+                                        delta: Vec2::default(),
+                                        button: 0,
+                                    },
+                                    interface.clone(),
+                                );
+                            }
+                            item.widget().on_mouse_move(
+                                MouseEvent {
+                                    relative_pos: (x as f32 - area.left, y as f32 - area.top)
+                                        .into(),
+                                    absolute_pos: (x as f32, y as f32).into(),
+                                    delta: Vec2::default(),
+                                    button: 0,
+                                },
+                                interface.clone(),
+                            );
                         } else if area.contains(self.input_state.mouse_pos)
                             && !area.contains((x, y).into())
                         {
-                            item.widget().on_mouse_leave(interface.clone());
+                            item.widget().on_mouse_leave(
+                                MouseEvent {
+                                    relative_pos: (x as f32 - area.left, y as f32 - area.top)
+                                        .into(),
+                                    absolute_pos: (x as f32, y as f32).into(),
+                                    delta: Vec2::default(),
+                                    button: 0,
+                                },
+                                interface.clone(),
+                            );
                         }
                     }
                 }
@@ -99,7 +139,16 @@ impl App for UIApp {
                     for item in container.iter() {
                         let (_, area) = item.build_result();
                         if area.contains((x as f32, y as f32).into()) {
-                            item.widget().on_mouse_down(interface.clone());
+                            item.widget().on_mouse_down(
+                                MouseEvent {
+                                    relative_pos: (x as f32 - area.left, y as f32 - area.top)
+                                        .into(),
+                                    absolute_pos: (x as f32, y as f32).into(),
+                                    delta: Vec2::default(),
+                                    button: 0,
+                                },
+                                interface.clone(),
+                            );
                         }
                     }
                 }
@@ -109,7 +158,16 @@ impl App for UIApp {
                     for item in container.iter() {
                         let (_, area) = item.build_result();
                         if area.contains((x as f32, y as f32).into()) {
-                            item.widget().on_mouse_up(interface.clone());
+                            item.widget().on_mouse_up(
+                                MouseEvent {
+                                    relative_pos: (x as f32 - area.left, y as f32 - area.top)
+                                        .into(),
+                                    absolute_pos: (x as f32, y as f32).into(),
+                                    delta: Vec2::default(),
+                                    button: 0,
+                                },
+                                interface.clone(),
+                            );
                         }
                     }
                 }
@@ -129,7 +187,8 @@ impl App for UIApp {
                 let (result, area) = item.build_result();
 
                 for item in result.render_items().iter() {
-                    match item {
+                    run_draw_command(&item.get_draw_command(area, &self.font_manager));
+                    /*match item {
                         WidgetRenderItem::Text(text) => {
                             let text = text.get().unwrap_or_default();
                             let line_top = self.default_font.get_line_top() as f32;
@@ -159,18 +218,18 @@ impl App for UIApp {
                         }
                         WidgetRenderItem::Rect(rect) => {
                             let width = match rect.width.get().unwrap() {
-                                RelativeSize::Percent(percent) => area.width() * percent,
-                                RelativeSize::PercentageH(percent) => area.width() * percent,
-                                RelativeSize::PercentageV(percent) => {
-                                    area.height() * percent / 100.
-                                }
+                                SizePolicy::Fixed(width) => width,
+                                SizePolicy::Percent(percent) => area.width() * percent,
+                                SizePolicy::PercentageH(percent) => area.width() * percent,
+                                SizePolicy::PercentageV(percent) => area.height() * percent,
+                                SizePolicy::Fraction(fraction) => area.width() / fraction,
                             };
                             let height = match rect.height.get().unwrap() {
-                                RelativeSize::Percent(percent) => area.height() * percent,
-                                RelativeSize::PercentageH(percent) => area.width() * percent,
-                                RelativeSize::PercentageV(percent) => {
-                                    area.height() * percent / 100.
-                                }
+                                SizePolicy::Fixed(height) => height,
+                                SizePolicy::Percent(percent) => area.height() * percent,
+                                SizePolicy::PercentageH(percent) => area.width() * percent,
+                                SizePolicy::PercentageV(percent) => area.height() * percent,
+                                SizePolicy::Fraction(fraction) => area.height() / fraction,
                             };
 
                             run_draw_command(&DrawCommand::Rect {
@@ -182,7 +241,7 @@ impl App for UIApp {
                                 stroke: rect.stroke.get().unwrap_or(None),
                             });
                         }
-                    }
+                    }*/
                 }
 
                 run_draw_command(&DrawCommand::Rect {

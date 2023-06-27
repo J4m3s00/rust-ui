@@ -1,11 +1,12 @@
 use crate::{
     gui::widget::{
-        builder::{build_context::BuildContext, build_results::BuildResult, text::Text},
+        builder::{build_context::BuildContext, build_results::BuildResult},
+        rendering::drawable::text::DrawText,
         state::observable::Observer,
         widget::ToInstance,
         widget_instance::WidgetInstance,
     },
-    prelude::Widget,
+    prelude::{Text, Widget},
 };
 
 pub struct Label {
@@ -27,6 +28,8 @@ impl Label {
 
 impl Widget for Label {
     fn build(&mut self, _ctx: &mut BuildContext) -> BuildResult {
-        BuildResult::default().with_text(Observer::reference(&self.text))
+        let mut res = BuildResult::default();
+        res.draw_text(DrawText(Observer::reference(&self.text)));
+        res
     }
 }

@@ -8,7 +8,9 @@ use crate::{
                 build_context::BuildContext,
                 build_results::{BuildResult, WidgetRenderItem, WidgetRenderRect},
             },
+            rendering::drawable::rectangle::DrawRect,
             state::state::State,
+            widget::MouseEvent,
         },
     },
     prelude::{Receiver, ToInstance, Widget, WidgetInstance},
@@ -43,38 +45,37 @@ impl Clickable {
 
 impl Widget for Clickable {
     fn build(&mut self, _ctx: &mut BuildContext) -> BuildResult {
-        BuildResult::default().with_render_item(WidgetRenderItem::Rect(WidgetRenderRect {
-            fill: self.mouse_state.map(|v| match v {
-                MouseState::Normal => Some(Fill {
-                    color: Color::new(64, 64, 64, 255),
-                }),
-                MouseState::Hovered => Some(Fill {
-                    color: Color::new(128, 128, 128, 255),
-                }),
-                MouseState::Pressed => Some(Fill {
-                    color: Color::new(255, 255, 255, 255),
-                }),
+        let mut res = BuildResult::default();
+        res.draw_rect(DrawRect::fill(self.mouse_state.map(|v| match v {
+            MouseState::Normal => Some(Fill {
+                color: Color::new(64, 64, 64, 255),
             }),
-            ..Default::default()
-        }))
+            MouseState::Hovered => Some(Fill {
+                color: Color::new(128, 128, 128, 255),
+            }),
+            MouseState::Pressed => Some(Fill {
+                color: Color::new(255, 255, 255, 255),
+            }),
+        })));
+        res
     }
 
-    fn on_mouse_down(&self, _interface: AppInterface) {
+    fn on_mouse_down(&self, event: MouseEvent, _interface: AppInterface) {
         self.mouse_state.set(MouseState::Pressed);
     }
 
-    fn on_mouse_up(&self, interface: AppInterface) {
+    fn on_mouse_up(&self, event: MouseEvent, interface: AppInterface) {
         if let MouseState::Pressed = self.mouse_state.get() {
             self.mouse_state.set(MouseState::Hovered);
             self.on_click.action(Clicked, interface);
         }
     }
 
-    fn on_mouse_enter(&self, _interface: AppInterface) {
+    fn on_mouse_enter(&self, event: MouseEvent, _interface: AppInterface) {
         self.mouse_state.set(MouseState::Hovered);
     }
 
-    fn on_mouse_leave(&self, _interface: AppInterface) {
+    fn on_mouse_leave(&self, event: MouseEvent, _interface: AppInterface) {
         self.mouse_state.set(MouseState::Normal);
     }
 }
