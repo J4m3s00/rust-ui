@@ -10,7 +10,8 @@ fn menubar() -> WidgetInstance {
 }
 
 fn sidebar() -> WidgetInstance {
-    Spacer::new().set_width(SizePolicy::Fixed(250.0))
+    VStack::new(vec![Slider::new(10.).set_height(SizePolicy::Fixed(32.))])
+        .set_width(SizePolicy::Fixed(250.0))
 }
 
 fn main_container() -> WidgetInstance {

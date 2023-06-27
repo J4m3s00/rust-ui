@@ -1,6 +1,6 @@
 use std::{cell::RefCell, rc::Rc};
 
-use super::observable::Observer;
+use super::{observable::Observer, state_ref::StateRef};
 
 pub(super) type StateInner<T> = RefCell<T>;
 
@@ -31,6 +31,12 @@ where
 
     pub fn observe(&self) -> Observer<T> {
         Observer::state(self)
+    }
+
+    pub fn get_ref(&self) -> StateRef<T> {
+        StateRef {
+            value: Rc::downgrade(&self.value),
+        }
     }
 
     pub fn map<M, F>(&self, func: F) -> Observer<M>

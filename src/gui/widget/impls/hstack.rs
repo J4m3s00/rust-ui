@@ -60,9 +60,7 @@ impl Widget for HStack {
                 },
                 SizePolicy::Fraction(frac) => frac * frac_width,
             };
-            if let Some(mut child_context) =
-                ctx.allocate_space((width, content_area.height()).into())
-            {
+            if let Some(mut child_context) = ctx.allocate_space((width, content_area.height())) {
                 item.build(&mut child_context);
             }
         }

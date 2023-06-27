@@ -61,9 +61,7 @@ impl Widget for VStack {
                 SizePolicy::Fraction(frac) => frac * frac_height,
             };
 
-            if let Some(mut child_context) =
-                ctx.allocate_space((content_area.width(), height).into())
-            {
+            if let Some(mut child_context) = ctx.allocate_space((content_area.width(), height)) {
                 item.build(&mut child_context);
             }
         }

@@ -3,7 +3,10 @@ use std::{
     rc::{Rc, Weak},
 };
 
-use super::state::{State, StateInner};
+use super::{
+    state::{State, StateInner},
+    state_ref::StateRef,
+};
 
 /// This is used to have a weak reference to a state
 /// In essence this is just a wrapper to get a value
@@ -59,6 +62,12 @@ where
     pub fn state(state: &State<T>) -> Self {
         Self::new(Rc::new(ObserveState {
             state: Rc::downgrade(&state.value),
+        }))
+    }
+
+    pub fn state_ref(state: &StateRef<T>) -> Self {
+        Self::new(Rc::new(ObserveState {
+            state: state.value.clone(),
         }))
     }
 

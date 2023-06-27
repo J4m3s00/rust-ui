@@ -39,7 +39,8 @@ impl BuildContext {
     /// Otherwise, it will return a new BuildContext with the allocated space. The new BuildContext
     /// will have the same cursor direction as the parent. The cursor will be advanced by the size
     /// of the allocated space.
-    pub fn allocate_space(&mut self, size: Vec2) -> Option<BuildContext> {
+    pub fn allocate_space(&mut self, size: impl Into<Vec2>) -> Option<BuildContext> {
+        let size = size.into();
         let content_area = Rect::new_from_xy(
             self.cursor.pos.x + PADDING,
             self.cursor.pos.y + PADDING,
