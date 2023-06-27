@@ -55,7 +55,7 @@ impl Widget for Slider {
         self.slider_pixel_scale = Observer::map(self.max.reference(), move |v| width / v);
 
         let knob_width = 20.;
-        let knob_height = content_area.height();
+
         let knob_left = self.value.map({
             let min = self.min.reference();
             let max = self.max.reference();
@@ -72,19 +72,20 @@ impl Widget for Slider {
             color: COLOR_CYAN,
         }))))
         .set_width(SizePolicy::Fixed(knob_width))
-        .set_height(SizePolicy::Percent(1.))
         .set_alignment_h(AlignH::Left)
         .set_offset_x(knob_left);
         res
     }
 
     fn on_mouse_down(&self, event: MouseEvent, _interface: AppInterface) {
-        self.knob.set(KnobState::Dragging);
-        self.value
-            .set(self.get_value_from_piexels(event.relative_pos.x));
+        if event.inside {
+            self.knob.set(KnobState::Dragging);
+            self.value
+                .set(self.get_value_from_piexels(event.relative_pos.x));
+        }
     }
 
-    fn on_mouse_up(&self, event: MouseEvent, _interface: AppInterface) {
+    fn on_mouse_up(&self, _event: MouseEvent, _interface: AppInterface) {
         self.knob.set(KnobState::Idle);
     }
 

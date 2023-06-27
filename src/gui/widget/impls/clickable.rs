@@ -61,7 +61,9 @@ impl Widget for Clickable {
     }
 
     fn on_mouse_down(&self, event: MouseEvent, _interface: AppInterface) {
-        self.mouse_state.set(MouseState::Pressed);
+        if event.inside {
+            self.mouse_state.set(MouseState::Pressed);
+        }
     }
 
     fn on_mouse_up(&self, event: MouseEvent, interface: AppInterface) {

@@ -7,12 +7,13 @@ use super::{
     widget_instance::WidgetInstance,
 };
 
-#[derive(Default)]
+#[derive(Default, Clone)]
 pub struct MouseEvent {
     pub relative_pos: Vec2,
     pub absolute_pos: Vec2,
     pub delta: Vec2,
     pub button: u8,
+    pub inside: bool,
 }
 
 pub trait Widget {

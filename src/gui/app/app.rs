@@ -90,46 +90,33 @@ impl App for UIApp {
                 self.rebuild_main_container(width as f32, height as f32);
             }
             AppEvent::MouseMove { x, y } => {
+                let mouse_pos: Vec2 = (x as f32, y as f32).into();
+                let event = MouseEvent {
+                    absolute_pos: (x as f32, y as f32).into(),
+                    delta: mouse_pos - self.input_state.mouse_pos,
+                    ..Default::default()
+                };
+
                 if let Some(container) = &self.main_container {
                     for item in container.iter() {
                         let (_, area) = item.build_result();
-                        if area.contains((x as f32, y as f32).into()) {
-                            if !area.contains(self.input_state.mouse_pos) {
-                                item.widget().on_mouse_enter(
-                                    MouseEvent {
-                                        relative_pos: (x as f32 - area.left, y as f32 - area.top)
-                                            .into(),
-                                        absolute_pos: (x as f32, y as f32).into(),
-                                        delta: Vec2::default(),
-                                        button: 0,
-                                    },
-                                    interface.clone(),
-                                );
-                            }
-                            item.widget().on_mouse_move(
-                                MouseEvent {
-                                    relative_pos: (x as f32 - area.left, y as f32 - area.top)
-                                        .into(),
-                                    absolute_pos: (x as f32, y as f32).into(),
-                                    delta: Vec2::default(),
-                                    button: 0,
-                                },
-                                interface.clone(),
-                            );
-                        } else if area.contains(self.input_state.mouse_pos)
-                            && !area.contains((x, y).into())
-                        {
-                            item.widget().on_mouse_leave(
-                                MouseEvent {
-                                    relative_pos: (x as f32 - area.left, y as f32 - area.top)
-                                        .into(),
-                                    absolute_pos: (x as f32, y as f32).into(),
-                                    delta: Vec2::default(),
-                                    button: 0,
-                                },
-                                interface.clone(),
-                            );
+                        let mouse_inside = area.contains(mouse_pos);
+                        let last_mouse_inside = area.contains(self.input_state.mouse_pos);
+
+                        let inside_event = MouseEvent {
+                            relative_pos: mouse_pos - area.top_left(),
+                            ..event
+                        };
+
+                        if mouse_inside && !last_mouse_inside {
+                            item.widget()
+                                .on_mouse_enter(inside_event.clone(), interface.clone());
+                        } else if last_mouse_inside && !mouse_inside {
+                            item.widget()
+                                .on_mouse_leave(inside_event.clone(), interface.clone());
                         }
+                        item.widget()
+                            .on_mouse_move(inside_event.clone(), interface.clone());
                     }
                 }
                 self.input_state.mouse_pos = (x as f32, y as f32).into();
@@ -138,37 +125,36 @@ impl App for UIApp {
                 if let Some(container) = &self.main_container {
                     for item in container.iter() {
                         let (_, area) = item.build_result();
-                        if area.contains((x as f32, y as f32).into()) {
-                            item.widget().on_mouse_down(
-                                MouseEvent {
-                                    relative_pos: (x as f32 - area.left, y as f32 - area.top)
-                                        .into(),
-                                    absolute_pos: (x as f32, y as f32).into(),
-                                    delta: Vec2::default(),
-                                    button: 0,
-                                },
-                                interface.clone(),
-                            );
-                        }
+                        let mouse_inside = area.contains((x as f32, y as f32).into());
+                        item.widget().on_mouse_down(
+                            MouseEvent {
+                                relative_pos: (x as f32 - area.left, y as f32 - area.top).into(),
+                                absolute_pos: (x as f32, y as f32).into(),
+                                delta: Vec2::default(),
+                                button: 0,
+                                inside: mouse_inside,
+                            },
+                            interface.clone(),
+                        );
                     }
                 }
             }
             AppEvent::MouseUp { x, y, .. } => {
+                let mouse_pos = (x as f32, y as f32).into();
                 if let Some(container) = &self.main_container {
                     for item in container.iter() {
                         let (_, area) = item.build_result();
-                        if area.contains((x as f32, y as f32).into()) {
-                            item.widget().on_mouse_up(
-                                MouseEvent {
-                                    relative_pos: (x as f32 - area.left, y as f32 - area.top)
-                                        .into(),
-                                    absolute_pos: (x as f32, y as f32).into(),
-                                    delta: Vec2::default(),
-                                    button: 0,
-                                },
-                                interface.clone(),
-                            );
-                        }
+                        let mouse_inside = area.contains(mouse_pos);
+                        item.widget().on_mouse_up(
+                            MouseEvent {
+                                relative_pos: (x as f32 - area.left, y as f32 - area.top).into(),
+                                absolute_pos: (x as f32, y as f32).into(),
+                                delta: Vec2::default(),
+                                button: 0,
+                                inside: mouse_inside,
+                            },
+                            interface.clone(),
+                        );
                     }
                 }
             }
