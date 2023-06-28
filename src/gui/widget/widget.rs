@@ -24,11 +24,11 @@ pub trait Widget {
         &[]
     }
 
-    fn on_mouse_down(&self, event: MouseEvent, _interface: AppInterface) {}
-    fn on_mouse_up(&self, event: MouseEvent, _interface: AppInterface) {}
-    fn on_mouse_move(&self, event: MouseEvent, _interface: AppInterface) {}
-    fn on_mouse_enter(&self, event: MouseEvent, _interface: AppInterface) {}
-    fn on_mouse_leave(&self, event: MouseEvent, _interface: AppInterface) {}
+    fn on_mouse_down(&self, _event: MouseEvent, _interface: AppInterface) {}
+    fn on_mouse_up(&self, _event: MouseEvent, _interface: AppInterface) {}
+    fn on_mouse_move(&self, _event: MouseEvent, _interface: AppInterface) {}
+    fn on_mouse_enter(&self, _event: MouseEvent, _interface: AppInterface) {}
+    fn on_mouse_leave(&self, _event: MouseEvent, _interface: AppInterface) {}
 }
 
 pub trait ToInstance {

@@ -1,13 +1,10 @@
-use rust_graphics::{color::Color, draw_command::Fill};
+use rust_graphics::draw_command::Fill;
 
 use crate::{
     gui::{
         app::interface::AppInterface,
         widget::{
-            builder::{
-                build_context::BuildContext,
-                build_results::{BuildResult, WidgetRenderItem, WidgetRenderRect},
-            },
+            builder::{build_context::BuildContext, build_results::BuildResult},
             rendering::drawable::rectangle::DrawRect,
             state::state::State,
             widget::MouseEvent,
