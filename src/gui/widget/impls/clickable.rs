@@ -1,5 +1,3 @@
-use rust_graphics::draw_command::Fill;
-
 use crate::{
     gui::{
         app::interface::AppInterface,
@@ -10,7 +8,7 @@ use crate::{
             widget::MouseEvent,
         },
     },
-    prelude::{Receiver, ToInstance, Widget, WidgetInstance},
+    prelude::{ColorId, Receiver, ToInstance, Widget, WidgetInstance},
 };
 
 pub struct Clicked;
@@ -41,22 +39,13 @@ impl Clickable {
 }
 
 impl Widget for Clickable {
-    fn build(&mut self, ctx: &mut BuildContext) -> BuildResult {
+    fn build(&mut self, _ctx: &mut BuildContext) -> BuildResult {
         let mut res = BuildResult::default();
-        let normal_color = ctx.theme().primary_color;
-        let hoverd_color = ctx.theme().primary_color_variant;
-        let clicked_color = ctx.theme().secondary_color;
 
         res.draw_rect(DrawRect::fill(self.mouse_state.map(move |v| match v {
-            MouseState::Normal => Some(Fill {
-                color: normal_color,
-            }),
-            MouseState::Hovered => Some(Fill {
-                color: hoverd_color,
-            }),
-            MouseState::Pressed => Some(Fill {
-                color: clicked_color,
-            }),
+            MouseState::Normal => Some(ColorId::Primary),
+            MouseState::Hovered => Some(ColorId::PrimaryVariant),
+            MouseState::Pressed => Some(ColorId::Secondary),
         })));
         res
     }

@@ -4,10 +4,11 @@ use crate::{
             build_context::{BuildContext, CursorDirection},
             build_results::BuildResult,
         },
+        rendering::drawable::rectangle::DrawRect,
         size_policy::SizePolicy,
         widget::ToInstance,
     },
-    prelude::{Widget, WidgetInstance},
+    prelude::{ColorId, Widget, WidgetInstance},
 };
 
 pub struct VStack {
@@ -58,7 +59,9 @@ impl Widget for VStack {
                 item.build(&mut child_context);
             }
         }
-        BuildResult::default()
+        let mut res = BuildResult::default();
+        res.draw_rect(DrawRect::fill(Some(ColorId::Background)));
+        res
     }
 
     fn children(&self) -> &[WidgetInstance] {

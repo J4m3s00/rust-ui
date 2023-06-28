@@ -2,6 +2,8 @@ pub mod button;
 pub mod clickable;
 pub mod hstack;
 pub mod label;
+pub mod menu;
+pub mod rectangle;
 pub mod slider;
 pub mod spacer;
 pub mod vstack;

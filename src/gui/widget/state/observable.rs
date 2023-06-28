@@ -18,6 +18,7 @@ pub(super) trait Observable {
     fn get(&self) -> Option<Self::Value>;
 }
 
+#[derive(Clone)]
 pub struct Observer<T>
 where
     T: Clone + 'static,
@@ -53,25 +54,19 @@ where
         Self::value(T::default())
     }
 
-    pub fn reference(&self) -> Self {
-        Self::new(Rc::new(ObserveObserver {
-            observer: Rc::downgrade(&self.state),
-        }))
-    }
-
     pub fn state(state: &State<T>) -> Self {
         Self::new(Rc::new(ObserveState {
             state: Rc::downgrade(&state.value),
         }))
     }
 
-    pub fn map<M, F>(state: Observer<T>, func: F) -> Observer<M>
+    pub fn map<M, F>(&self, func: F) -> Observer<M>
     where
         F: Fn(&T) -> M + 'static,
         M: Clone + 'static,
     {
         Observer::new(Rc::new(ObserveMap {
-            state,
+            state: self.clone(),
             map: Box::new(func),
         }))
     }
@@ -148,16 +143,5 @@ where
     type Value = M;
     fn get(&self) -> Option<Self::Value> {
         Some((self.map)(&self.state.get()?))
-    }
-}
-
-struct ObserveObserver<T> {
-    observer: Weak<dyn Observable<Value = T>>,
-}
-
-impl<T> Observable for ObserveObserver<T> {
-    type Value = T;
-    fn get(&self) -> Option<Self::Value> {
-        self.observer.upgrade().and_then(|observer| observer.get())
     }
 }

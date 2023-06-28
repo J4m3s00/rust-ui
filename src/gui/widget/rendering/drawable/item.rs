@@ -10,6 +10,7 @@ use crate::{
             },
             size_policy::SizePolicy2D,
             state::observable::Observer,
+            theme::theme::Theme,
         },
     },
     prelude::{AlignH, AlignV, SizePolicy},
@@ -199,8 +200,13 @@ impl DrawItem {
         Rect::new_from_xy(pos.x, pos.y, size.x, size.y)
     }
 
-    pub fn get_draw_command(&self, parent_rect: &Rect, font_manager: &FontManager) -> DrawCommand {
+    pub fn get_draw_command(
+        &self,
+        parent_rect: &Rect,
+        font_manager: &FontManager,
+        theme: &Theme,
+    ) -> DrawCommand {
         let rect = self.calculate_rect(parent_rect);
-        self.drawable.draw(rect, font_manager)
+        self.drawable.draw(rect, font_manager, theme)
     }
 }

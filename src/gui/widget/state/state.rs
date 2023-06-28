@@ -38,7 +38,7 @@ where
         F: Fn(&T) -> M + 'static,
         M: Clone + 'static,
     {
-        Observer::map(self.observe(), func)
+        self.observe().map(func)
     }
 }
 

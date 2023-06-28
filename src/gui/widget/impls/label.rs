@@ -29,7 +29,7 @@ impl Label {
 impl Widget for Label {
     fn build(&mut self, _ctx: &mut BuildContext) -> BuildResult {
         let mut res = BuildResult::default();
-        res.draw_text(DrawText(Observer::reference(&self.text)));
+        res.draw_text(DrawText(self.text.clone()));
         res
     }
 }

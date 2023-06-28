@@ -6,7 +6,10 @@ use rust_graphics::{
 };
 
 use crate::{
-    gui::{app::app::FontManager, widget::state::observable::Observer},
+    gui::{
+        app::app::FontManager,
+        widget::{state::observable::Observer, theme::theme::Theme},
+    },
     prelude::{AlignH, AlignV},
 };
 
@@ -66,7 +69,7 @@ impl Text {
 pub struct DrawText(pub Observer<Text>);
 
 impl Drawable for DrawText {
-    fn draw(&self, area: Rect, font_manager: &FontManager) -> DrawCommand {
+    fn draw(&self, area: Rect, font_manager: &FontManager, _theme: &Theme) -> DrawCommand {
         let Some(text) = self.0.get() else {
             println!("Failed to observe text of draw text!");
             return DrawCommand::Line { x1: 0., y1: 0., x2: 0., y2: 0., stroke: Stroke {color: COLOR_BLACK, width: 0.} };

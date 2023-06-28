@@ -1,17 +1,19 @@
-use rust_graphics::draw_command::Fill;
-
 use crate::{
     gui::widget::{
         builder::{build_context::BuildContext, build_results::BuildResult},
         rendering::drawable::rectangle::DrawRect,
         state::{observable::Observer, state::State},
+        style::Padding,
         widget::MouseEvent,
     },
     prelude::{
-        AlignH, AppInterface, HStack, Label, SizePolicy, Text, ToInstance, Widget, WidgetInstance,
+        AlignH, AppInterface, ColorId, HStack, Label, SizePolicy, Text, ToInstance, Widget,
+        WidgetInstance,
     },
     MapScalar,
 };
+
+use super::{rectangle::Rectangle, zstack::ZStack};
 
 const KNOB_WIDTH: f32 = 16.;
 
@@ -27,11 +29,15 @@ impl Slider {
         min: impl Into<Observer<f32>>,
         max: impl Into<Observer<f32>>,
     ) -> WidgetInstance {
-        HStack::new(vec![
-            Label::new_observe(init.map(|v| Text::from(format!("{:.0}", v))))
-                .set_width(SizePolicy::Fixed(50.)),
-            SliderBase::new_min_max(init, min, max),
+        ZStack::new(vec![
+            Rectangle::fill(ColorId::Primary),
+            HStack::new(vec![
+                Label::new_observe(init.map(|v| Text::from(format!("{:.0}", v))))
+                    .set_width(SizePolicy::Fixed(50.)),
+                SliderBase::new_min_max(init, min, max),
+            ]),
         ])
+        .set_padding(Padding::zero())
     }
 }
 
@@ -85,11 +91,11 @@ impl Widget for SliderBase {
         let content_area = ctx.get_content_rect().clone();
 
         let width = content_area.width() - KNOB_WIDTH;
-        self.slider_pixel_scale = Observer::map(self.max.reference(), move |v| width / v);
+        self.slider_pixel_scale = self.max.map(move |v| width / v);
 
         let knob_left = self.value.map({
-            let min = self.min.reference();
-            let max = self.max.reference();
+            let min = self.min.clone();
+            let max = self.max.clone();
             move |v| {
                 SizePolicy::Fixed(
                     (KNOB_WIDTH / 2.)
@@ -99,12 +105,11 @@ impl Widget for SliderBase {
         });
 
         let mut res = BuildResult::default();
-        res.draw_rect(DrawRect::fill(Observer::value(Some(Fill {
-            color: ctx.theme().primary_color,
-        }))))
-        .set_width(SizePolicy::Fixed(KNOB_WIDTH))
-        .set_alignment_h(AlignH::Left)
-        .set_offset_x(knob_left);
+        // Draw Knob
+        res.draw_rect(DrawRect::fill(Some(ColorId::Secondary)))
+            .set_width(SizePolicy::Fixed(KNOB_WIDTH))
+            .set_alignment_h(AlignH::Left)
+            .set_offset_x(knob_left);
         res
     }
 

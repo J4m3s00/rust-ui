@@ -14,6 +14,7 @@ use rust_graphics::{
 use crate::{
     gui::widget::{
         builder::build_context::{BuildContext, CursorDirection},
+        theme::theme::Theme,
         widget::MouseEvent,
     },
     prelude::WidgetInstance,
@@ -37,6 +38,7 @@ pub struct UIApp {
     font_manager: FontManager,
     input_state: InputState,
     quit: bool,
+    theme: Theme,
 }
 
 impl UIApp {
@@ -76,6 +78,7 @@ impl App for UIApp {
             },
             input_state: InputState::default(),
             quit: false,
+            theme: Theme::default(),
         }
     }
 
@@ -173,7 +176,7 @@ impl App for UIApp {
                 let (result, area) = item.build_result();
 
                 for item in result.render_items().iter() {
-                    run_draw_command(&item.get_draw_command(area, &self.font_manager));
+                    run_draw_command(&item.get_draw_command(area, &self.font_manager, &self.theme));
                     /*match item {
                         WidgetRenderItem::Text(text) => {
                             let text = text.get().unwrap_or_default();

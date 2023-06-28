@@ -1,6 +1,6 @@
 use rust_graphics::{rect::Rect, vec::Vec2};
 
-use crate::gui::widget::{style::Style, theme::Theme};
+use crate::gui::widget::style::Style;
 
 #[derive(Copy, Clone, Debug)]
 pub enum CursorDirection {
@@ -23,7 +23,6 @@ pub struct BuildContext {
     content_rect: Rect,
     cursor: Cursor,
     current_style: Style,
-    current_theme: Theme,
 }
 
 impl BuildContext {
@@ -35,7 +34,6 @@ impl BuildContext {
                 pos: content_rect.top_left(),
             },
             current_style: Style::default(),
-            current_theme: Theme::default(),
         }
     }
 
@@ -74,9 +72,5 @@ impl BuildContext {
 
     pub fn set_cursor_direction(&mut self, direction: CursorDirection) {
         self.cursor.direction = direction;
-    }
-
-    pub fn theme(&self) -> &Theme {
-        &self.current_theme
     }
 }

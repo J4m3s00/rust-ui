@@ -16,6 +16,7 @@ pub use crate::{
         },
         size_policy::SizePolicy,
         state::state::State,
+        theme::color_theme::ColorId,
         widget::{ToInstance, Widget},
         widget_instance::WidgetInstance,
     },
