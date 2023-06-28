@@ -10,16 +10,11 @@ fn menubar() -> WidgetInstance {
 }
 
 fn slider() -> WidgetInstance {
-    let slider_value = State::new(0.0);
-    HStack::new(vec![
-        Label::new_observe(slider_value.map(|v| Text::from(format!("{:.0}", v))))
-            .set_width(SizePolicy::Fixed(50.)),
-        Slider::new(slider_value.clone()),
-    ])
+    Slider::new(State::new(50.)).set_height(SizePolicy::Fixed(32.))
 }
 
 fn sidebar() -> WidgetInstance {
-    VStack::new(vec![slider().set_height(SizePolicy::Fixed(32.))])
+    VStack::new(vec![slider(), slider(), slider(), slider(), slider()])
         .set_width(SizePolicy::Fixed(250.0))
 }
 

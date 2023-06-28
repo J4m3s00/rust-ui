@@ -7,13 +7,35 @@ use crate::{
         state::{observable::Observer, state::State},
         widget::MouseEvent,
     },
-    prelude::{AlignH, AppInterface, SizePolicy, ToInstance, Widget, WidgetInstance},
+    prelude::{
+        AlignH, AppInterface, HStack, Label, SizePolicy, Text, ToInstance, Widget, WidgetInstance,
+    },
     MapScalar,
 };
 
 const KNOB_WIDTH: f32 = 16.;
 
-pub struct Slider {
+pub struct Slider;
+
+impl Slider {
+    pub fn new(init: State<f32>) -> WidgetInstance {
+        Self::new_min_max(init, 0., 100.)
+    }
+
+    pub fn new_min_max(
+        init: State<f32>,
+        min: impl Into<Observer<f32>>,
+        max: impl Into<Observer<f32>>,
+    ) -> WidgetInstance {
+        HStack::new(vec![
+            Label::new_observe(init.map(|v| Text::from(format!("{:.0}", v))))
+                .set_width(SizePolicy::Fixed(50.)),
+            SliderBase::new_min_max(init, min, max),
+        ])
+    }
+}
+
+struct SliderBase {
     knob: State<KnobState>,
     value: State<f32>,
     min: Observer<f32>,
@@ -22,12 +44,8 @@ pub struct Slider {
     slider_pixel_scale: Observer<f32>,
 }
 
-impl Slider {
-    pub fn new(init: State<f32>) -> WidgetInstance {
-        Self::new_min_max(init, 0., 100.)
-    }
-
-    pub fn new_min_max(
+impl SliderBase {
+    fn new_min_max(
         init: State<f32>,
         min: impl Into<Observer<f32>>,
         max: impl Into<Observer<f32>>,
@@ -62,7 +80,7 @@ impl Slider {
     }
 }
 
-impl Widget for Slider {
+impl Widget for SliderBase {
     fn build(&mut self, ctx: &mut BuildContext) -> BuildResult {
         let content_area = ctx.get_content_rect().clone();
 
