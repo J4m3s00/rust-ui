@@ -14,6 +14,7 @@ use rust_graphics::{
 use crate::{
     gui::widget::{
         builder::build_context::{BuildContext, CursorDirection},
+        style::space::ApplySpace,
         theme::theme::Theme,
         widget::MouseEvent,
     },
@@ -174,9 +175,15 @@ impl App for UIApp {
         if let Some(container) = &self.main_container {
             for item in container.iter() {
                 let (result, area) = item.build_result();
+                let mut padded_area = area.clone();
+                padded_area.apply_space(&item.style().padding);
 
                 for item in result.render_items().iter() {
-                    run_draw_command(&item.get_draw_command(area, &self.font_manager, &self.theme));
+                    run_draw_command(&item.get_draw_command(
+                        &padded_area,
+                        &self.font_manager,
+                        &self.theme,
+                    ));
                     /*match item {
                         WidgetRenderItem::Text(text) => {
                             let text = text.get().unwrap_or_default();

@@ -1,4 +1,5 @@
 pub mod button;
+pub mod checkbox;
 pub mod clickable;
 pub mod hstack;
 pub mod label;

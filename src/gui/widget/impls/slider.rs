@@ -3,11 +3,10 @@ use crate::{
         builder::{build_context::BuildContext, build_results::BuildResult},
         rendering::drawable::rectangle::DrawRect,
         state::{observable::Observer, state::State},
-        style::Padding,
         widget::MouseEvent,
     },
     prelude::{
-        AlignH, AppInterface, ColorId, HStack, Label, SizePolicy, Text, ToInstance, Widget,
+        AlignH, AppInterface, ColorId, HStack, Label, Margin, SizePolicy, Text, ToInstance, Widget,
         WidgetInstance,
     },
     MapScalar,
@@ -37,7 +36,7 @@ impl Slider {
                 SliderBase::new_min_max(init, min, max),
             ]),
         ])
-        .set_padding(Padding::zero())
+        .set_margin(Margin::zero())
     }
 }
 

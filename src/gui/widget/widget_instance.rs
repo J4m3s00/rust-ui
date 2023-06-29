@@ -2,13 +2,12 @@ use std::fmt::Debug;
 
 use rust_graphics::rect::Rect;
 
-use crate::prelude::{SizePolicy, Widget};
+use crate::prelude::{Margin, SizePolicy, Style, Widget};
 
 use super::{
     builder::{build_context::BuildContext, build_results::BuildResult},
     iterator::WidgetIter,
     size_policy::SizePolicy2D,
-    style::{Padding, Style},
 };
 
 pub struct WidgetInstance {
@@ -82,7 +81,12 @@ impl WidgetInstance {
         self
     }
 
-    pub fn set_padding(mut self, padding: Padding) -> Self {
+    pub fn set_margin(mut self, margin: Margin) -> Self {
+        self.style.margin = margin;
+        self
+    }
+
+    pub fn set_padding(mut self, padding: Margin) -> Self {
         self.style.padding = padding;
         self
     }
@@ -93,6 +97,10 @@ impl WidgetInstance {
 
     pub fn size(&self) -> SizePolicy2D {
         self.size
+    }
+
+    pub fn style(&self) -> &Style {
+        &self.style
     }
 
     pub fn iter(&self) -> WidgetIter {

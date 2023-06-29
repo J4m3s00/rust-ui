@@ -1,27 +1,18 @@
-#[derive(Clone, Debug)]
-pub struct Style {
-    pub padding: Padding,
-}
+use rust_graphics::rect::Rect;
 
-impl Default for Style {
-    fn default() -> Self {
-        Self {
-            padding: Padding::all(2.),
-        }
-    }
-}
-
-/// Padding
+/// Used for Padding and Margin
 /// Space between the content and the border
+pub type Margin = ElementSpace;
+pub type Padding = ElementSpace;
 #[derive(Clone, Debug)]
-pub struct Padding {
+pub struct ElementSpace {
     pub left: f32,
     pub right: f32,
     pub top: f32,
     pub bottom: f32,
 }
 
-impl Padding {
+impl ElementSpace {
     pub fn new(left: f32, right: f32, top: f32, bottom: f32) -> Self {
         Self {
             left,
@@ -69,5 +60,18 @@ impl Padding {
 
     pub fn zero() -> Self {
         Self::all(0.0)
+    }
+}
+
+pub trait ApplySpace {
+    fn apply_space(&mut self, space: &ElementSpace);
+}
+
+impl ApplySpace for Rect {
+    fn apply_space(&mut self, space: &ElementSpace) {
+        self.left += space.left;
+        self.top += space.top;
+        self.right -= space.right;
+        self.bottom -= space.bottom;
     }
 }
