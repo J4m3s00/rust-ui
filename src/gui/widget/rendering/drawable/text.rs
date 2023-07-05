@@ -69,10 +69,10 @@ impl Text {
 pub struct DrawText(pub Observer<Text>);
 
 impl Drawable for DrawText {
-    fn draw(&self, area: Rect, font_manager: &FontManager, _theme: &Theme) -> DrawCommand {
+    fn draw(&self, area: Rect, font_manager: &FontManager, _theme: &Theme) -> Vec<DrawCommand> {
         let Some(text) = self.0.get() else {
             println!("Failed to observe text of draw text!");
-            return DrawCommand::Line { x1: 0., y1: 0., x2: 0., y2: 0., stroke: Stroke {color: COLOR_BLACK, width: 0.} };
+            return vec![DrawCommand::Line { x1: 0., y1: 0., x2: 0., y2: 0., stroke: Stroke {color: COLOR_BLACK, width: 0.} }];
         };
         let line_top = font_manager.default_font().get_line_top() as f32;
         let line_bottom = font_manager.default_font().get_line_bottom() as f32;
@@ -89,12 +89,12 @@ impl Drawable for DrawText {
             AlignH::Center => area.center().x - (text_width / 2.),
             AlignH::Right => area.right - text_width,
         };
-        DrawCommand::Text {
+        vec![DrawCommand::Text {
             font: font_manager.default_font().clone(),
             text: text.text.clone(),
             position: (text_left, text_base_line).into(),
             color: text.color,
             stroke: None,
-        }
+        }]
     }
 }

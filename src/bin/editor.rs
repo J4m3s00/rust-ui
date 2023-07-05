@@ -1,7 +1,7 @@
 use rust_ui::{
-    gui::widget::{
-        impls::{checkbox::Checkbox, rectangle::Rectangle},
-        style::space::Padding,
+    gui::widget::impls::{
+        checkbox::Checkbox,
+        icon::{Icon, IconType},
     },
     prelude::*,
 };
@@ -32,10 +32,7 @@ fn sidebar() -> WidgetInstance {
 fn main_container() -> WidgetInstance {
     VStack::new(vec![
         menubar(),
-        HStack::new(vec![
-            sidebar(),
-            Rectangle::fill(ColorId::SecondaryVariant).set_padding(Padding::all(10.)),
-        ]),
+        HStack::new(vec![sidebar(), Icon::new(IconType::Checkmark)]),
     ])
 }
 

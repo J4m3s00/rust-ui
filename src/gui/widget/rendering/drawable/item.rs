@@ -205,7 +205,7 @@ impl DrawItem {
         parent_rect: &Rect,
         font_manager: &FontManager,
         theme: &Theme,
-    ) -> DrawCommand {
+    ) -> Vec<DrawCommand> {
         let rect = self.calculate_rect(parent_rect);
         self.drawable.draw(rect, font_manager, theme)
     }

@@ -2,7 +2,9 @@ use rust_graphics::draw_command::{Fill, Stroke};
 
 use crate::{
     gui::widget::{
-        rendering::drawable::{item::DrawItem, rectangle::DrawRect, text::DrawText},
+        rendering::drawable::{
+            draw_svg::DrawSvg, item::DrawItem, rectangle::DrawRect, text::DrawText,
+        },
         state::observable::Observer,
     },
     prelude::{SizePolicy, Text},
@@ -33,6 +35,10 @@ impl BuildResult {
 
     pub fn draw_rect(&mut self, rect: DrawRect) -> &mut DrawItem {
         self.push_item(DrawItem::new(rect))
+    }
+
+    pub fn draw_svg(&mut self, svg: DrawSvg) -> &mut DrawItem {
+        self.push_item(DrawItem::new(svg))
     }
 
     fn push_item(&mut self, item: DrawItem) -> &mut DrawItem {

@@ -42,7 +42,7 @@ impl DrawRect {
 }
 
 impl Drawable for DrawRect {
-    fn draw(&self, area: Rect, _font_manager: &FontManager, theme: &Theme) -> DrawCommand {
+    fn draw(&self, area: Rect, _font_manager: &FontManager, theme: &Theme) -> Vec<DrawCommand> {
         let fill = self.fill.get().unwrap().map(|id| Fill {
             color: theme.colors.from_id(id),
         });
@@ -52,13 +52,13 @@ impl Drawable for DrawRect {
             width,
         });
 
-        DrawCommand::Rect {
+        vec![DrawCommand::Rect {
             left: area.left,
             top: area.top,
             width: area.width(),
             height: area.height(),
             fill,
             stroke,
-        }
+        }]
     }
 }

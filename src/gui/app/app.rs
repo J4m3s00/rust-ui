@@ -179,11 +179,9 @@ impl App for UIApp {
                 padded_area.apply_space(&item.style().padding);
 
                 for item in result.render_items().iter() {
-                    run_draw_command(&item.get_draw_command(
-                        &padded_area,
-                        &self.font_manager,
-                        &self.theme,
-                    ));
+                    item.get_draw_command(&padded_area, &self.font_manager, &self.theme)
+                        .iter()
+                        .for_each(run_draw_command);
                     /*match item {
                         WidgetRenderItem::Text(text) => {
                             let text = text.get().unwrap_or_default();

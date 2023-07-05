@@ -3,6 +3,7 @@ use std::fmt::{Debug, Display, Formatter};
 pub enum Error {
     Generic(String),
     IO(std::io::Error),
+    SvgParseError(String),
 }
 
 pub type Result<T> = std::result::Result<T, Error>;
@@ -12,6 +13,7 @@ impl Debug for Error {
         match self {
             Error::Generic(msg) => write!(f, "Generic error: {}", msg),
             Error::IO(err) => write!(f, "IO error: {}", err),
+            Error::SvgParseError(msg) => write!(f, "Error parsing SVG: {}", msg),
         }
     }
 }
@@ -21,6 +23,7 @@ impl Display for Error {
         match self {
             Error::Generic(msg) => write!(f, "Generic error: {}", msg),
             Error::IO(err) => write!(f, "IO error: {}", err),
+            Error::SvgParseError(msg) => write!(f, "Error parsing SVG: {}", msg),
         }
     }
 }
@@ -28,7 +31,7 @@ impl Display for Error {
 impl std::error::Error for Error {
     fn cause(&self) -> Option<&dyn std::error::Error> {
         match self {
-            Error::Generic(_) => None,
+            Error::SvgParseError(_) | Error::Generic(_) => None,
             Error::IO(err) => Some(err),
         }
     }
