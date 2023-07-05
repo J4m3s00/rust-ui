@@ -174,6 +174,9 @@ impl App for UIApp {
     fn on_draw(&mut self) {
         if let Some(container) = &self.main_container {
             for item in container.iter() {
+                if !item.visible() {
+                    continue;
+                }
                 let (result, area) = item.build_result();
                 let mut padded_area = area.clone();
                 padded_area.apply_space(&item.style().padding);

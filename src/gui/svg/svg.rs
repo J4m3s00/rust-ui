@@ -1,6 +1,6 @@
 use rust_graphics::{
-    color::COLOR_BLACK,
-    draw_command::{DrawCommand, Stroke},
+    color::{COLOR_BLACK, COLOR_BLUE},
+    draw_command::{DrawCommand, Fill, Stroke},
     path_builder::{Path, PathBuilder},
     rect::Rect,
     vec::Vec2,
@@ -102,7 +102,8 @@ impl Svg {
                                 "Path should have a d attribute".into(),
                             ))?;
                         let mut path_builder = PathBuilder::new();
-                        path_builder.stroke(Some(Stroke::new(COLOR_BLACK, 2.0)));
+                        path_builder.stroke(Some(Stroke::new(COLOR_BLACK, 4.0)));
+                        path_builder.fill(Some(Fill::new(COLOR_BLUE)));
                         for seg in PathParser::from(d.as_str()) {
                             if let Ok(seg) = seg {
                                 match seg {

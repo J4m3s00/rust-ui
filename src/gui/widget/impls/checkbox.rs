@@ -3,7 +3,12 @@ use crate::{
     prelude::{ColorId, HStack, Label, SizePolicy, State, Text, WidgetInstance},
 };
 
-use super::{clickable::Clickable, rectangle::Rectangle, zstack::ZStack};
+use super::{
+    clickable::Clickable,
+    icon::{Icon, IconType},
+    rectangle::Rectangle,
+    zstack::ZStack,
+};
 
 pub struct Checkbox;
 
@@ -13,11 +18,13 @@ impl Checkbox {
     }
 
     fn click_area(checked: State<bool>) -> WidgetInstance {
+        let observer = checked.observe();
         ZStack::new(vec![
             Rectangle::fill(ColorId::PrimaryVariant).set_padding(Padding::all(10.)),
             Clickable::new(move |_, _| {
                 checked.set(!checked.get());
             }),
+            Icon::new(IconType::Checkmark).set_visible(observer),
         ])
         .set_width(SizePolicy::PercentageV(1.))
     }

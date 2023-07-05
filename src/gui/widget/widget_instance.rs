@@ -8,12 +8,14 @@ use super::{
     builder::{build_context::BuildContext, build_results::BuildResult},
     iterator::WidgetIter,
     size_policy::SizePolicy2D,
+    state::observable::Observer,
 };
 
 pub struct WidgetInstance {
     type_name: &'static str,
 
     widget: Box<dyn Widget>,
+    visible: Observer<bool>,
     // Stlying
     size: SizePolicy2D,
     style: Style,
@@ -51,6 +53,7 @@ impl WidgetInstance {
     {
         Self {
             widget: Box::new(widget),
+            visible: true.into(),
             size: SizePolicy2D::default(),
             style: Style::default(),
             build_result: BuildResult::default(),
@@ -91,6 +94,11 @@ impl WidgetInstance {
         self
     }
 
+    pub fn set_visible(mut self, visible: impl Into<Observer<bool>>) -> Self {
+        self.visible = visible.into();
+        self
+    }
+
     pub fn widget(&self) -> &dyn Widget {
         &*self.widget
     }
@@ -101,6 +109,10 @@ impl WidgetInstance {
 
     pub fn style(&self) -> &Style {
         &self.style
+    }
+
+    pub fn visible(&self) -> bool {
+        self.visible.get().unwrap()
     }
 
     pub fn iter(&self) -> WidgetIter {
