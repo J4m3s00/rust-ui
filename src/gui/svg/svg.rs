@@ -103,7 +103,7 @@ impl Svg {
                             ))?;
                         let mut path_builder = PathBuilder::new();
                         path_builder.stroke(Some(Stroke::new(COLOR_BLACK, 4.0)));
-                        path_builder.fill(Some(Fill::new(COLOR_BLUE)));
+                        //path_builder.fill(Some(Fill::new(COLOR_BLUE)));
                         for seg in PathParser::from(d.as_str()) {
                             if let Ok(seg) = seg {
                                 match seg {
@@ -112,6 +112,7 @@ impl Svg {
                                             path_builder.move_to(Vec2::new(x as f32, y as f32));
                                         } else {
                                             path_builder.move_to_rel(Vec2::new(x as f32, y as f32));
+                                            //path_builder.move_to(Vec2::new(x as f32, y as f32));
                                         }
                                     }
                                     PathSegment::LineTo { abs, x, y } => {
@@ -123,16 +124,16 @@ impl Svg {
                                     }
                                     PathSegment::VerticalLineTo { abs, y } => {
                                         if abs {
-                                            path_builder.line_to(Vec2::new(0.0, y as f32));
+                                            path_builder.vert(y as f32);
                                         } else {
-                                            path_builder.line_to_rel(Vec2::new(0.0, y as f32));
+                                            path_builder.vert_rel(y as f32);
                                         }
                                     }
                                     PathSegment::HorizontalLineTo { abs, x } => {
                                         if abs {
-                                            path_builder.line_to(Vec2::new(x as f32, 0.0));
+                                            path_builder.horiz(x as f32);
                                         } else {
-                                            path_builder.line_to_rel(Vec2::new(x as f32, 0.0));
+                                            path_builder.horiz_rel(x as f32);
                                         }
                                     }
                                     PathSegment::CurveTo {
@@ -158,6 +159,19 @@ impl Svg {
                                             );
                                         }
                                     }
+                                    PathSegment::SmoothCurveTo { abs, x2, y2, x, y } => {
+                                        if abs {
+                                            path_builder.smooth_cubic_to(
+                                                (x2 as f32, y2 as f32),
+                                                (x as f32, y as f32),
+                                            );
+                                        } else {
+                                            path_builder.smooth_cubic_to_rel(
+                                                (x2 as f32, y2 as f32),
+                                                (x as f32, y as f32),
+                                            );
+                                        }
+                                    }
                                     PathSegment::Quadratic { abs, x1, y1, x, y } => {
                                         if abs {
                                             path_builder.quad_to(
@@ -169,6 +183,15 @@ impl Svg {
                                                 Vec2::new(x1 as f32, y1 as f32),
                                                 Vec2::new(x as f32, y as f32),
                                             );
+                                        }
+                                    }
+                                    PathSegment::SmoothQuadratic { abs, x, y } => {
+                                        if abs {
+                                            path_builder
+                                                .smooth_quad_to(Vec2::new(x as f32, y as f32));
+                                        } else {
+                                            path_builder
+                                                .smooth_quad_to_rel(Vec2::new(x as f32, y as f32));
                                         }
                                     }
                                     PathSegment::EllipticalArc {
@@ -202,12 +225,10 @@ impl Svg {
                                     PathSegment::ClosePath { .. } => {
                                         path_builder.close();
                                     }
-                                    _ => {}
                                 }
                             }
                         }
                         result.segments.push(SvgElement::Path(path_builder.build()));
-                        println!("Path with d: {}", d);
                     }
                     elem => {
                         println!("Unknown svg element: {}", elem);

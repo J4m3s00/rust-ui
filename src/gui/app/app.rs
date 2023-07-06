@@ -48,7 +48,7 @@ impl UIApp {
     }
 
     pub fn main_container(mut self, widget: WidgetInstance) -> Self {
-        print_widget_tree(&widget, 0);
+        //print_widget_tree(&widget, 0);
         self.main_container = Some(widget);
         self
     }

@@ -32,7 +32,7 @@ fn sidebar() -> WidgetInstance {
 fn main_container() -> WidgetInstance {
     VStack::new(vec![
         menubar(),
-        HStack::new(vec![sidebar(), Icon::new(IconType::Checkmark)]),
+        HStack::new(vec![sidebar(), Icon::new(IconType::Refresh)]),
     ])
 }
 
