@@ -1,6 +1,6 @@
 use rust_graphics::{
-    color::{COLOR_BLACK, COLOR_BLUE},
-    draw_command::{DrawCommand, Fill, Stroke},
+    color::COLOR_BLACK,
+    draw_command::{DrawCommand, Stroke},
     path_builder::{Path, PathBuilder},
     rect::Rect,
     vec::Vec2,

@@ -19,7 +19,6 @@ use crate::{
         widget::MouseEvent,
     },
     prelude::WidgetInstance,
-    print_widget_tree,
 };
 
 use super::{input::InputState, interface::AppInterface};
@@ -184,61 +183,7 @@ impl App for UIApp {
                 for item in result.render_items().iter() {
                     item.get_draw_command(&padded_area, &self.font_manager, &self.theme)
                         .iter()
-                        .for_each(run_draw_command);
-                    /*match item {
-                        WidgetRenderItem::Text(text) => {
-                            let text = text.get().unwrap_or_default();
-                            let line_top = self.default_font.get_line_top() as f32;
-                            let line_bottom = self.default_font.get_line_bottom() as f32;
-                            let text_width = self.default_font.get_text_width(&text.text) as f32;
-                            let text_height = self.default_font.get_text_height(&text.text) as f32;
-
-                            let text_base_line = match text.alignment_v {
-                                AlignV::Top => area.top + line_top,
-                                AlignV::Center => {
-                                    area.center().y + line_bottom + (text_height / 2.)
-                                }
-                                AlignV::Bottom => area.bottom + line_bottom,
-                            };
-                            let text_left = match text.alignment_h {
-                                AlignH::Left => area.left,
-                                AlignH::Center => area.center().x - (text_width / 2.),
-                                AlignH::Right => area.right - text_width,
-                            };
-
-                            run_draw_command(&DrawCommand::Text {
-                                font: self.default_font,
-                                text: text.text.clone(),
-                                position: (text_left, text_base_line).into(),
-                                color: COLOR_BLACK,
-                            });
-                        }
-                        WidgetRenderItem::Rect(rect) => {
-                            let width = match rect.width.get().unwrap() {
-                                SizePolicy::Fixed(width) => width,
-                                SizePolicy::Percent(percent) => area.width() * percent,
-                                SizePolicy::PercentageH(percent) => area.width() * percent,
-                                SizePolicy::PercentageV(percent) => area.height() * percent,
-                                SizePolicy::Fraction(fraction) => area.width() / fraction,
-                            };
-                            let height = match rect.height.get().unwrap() {
-                                SizePolicy::Fixed(height) => height,
-                                SizePolicy::Percent(percent) => area.height() * percent,
-                                SizePolicy::PercentageH(percent) => area.width() * percent,
-                                SizePolicy::PercentageV(percent) => area.height() * percent,
-                                SizePolicy::Fraction(fraction) => area.height() / fraction,
-                            };
-
-                            run_draw_command(&DrawCommand::Rect {
-                                left: area.center().x - (width / 2.),
-                                top: area.center().y - (height / 2.),
-                                width: width,
-                                height: height,
-                                fill: rect.fill.get().unwrap_or(None),
-                                stroke: rect.stroke.get().unwrap_or(None),
-                            });
-                        }
-                    }*/
+                        .for_each(DrawCommand::run);
                 }
 
                 run_draw_command(&DrawCommand::Rect {
