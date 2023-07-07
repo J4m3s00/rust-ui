@@ -11,7 +11,7 @@ use crate::{
     prelude::{ColorId, Receiver, ToInstance, Widget, WidgetInstance},
 };
 
-pub struct Clicked;
+pub struct Clicked(pub MouseEvent);
 
 #[derive(Clone, Copy)]
 enum MouseState {
@@ -56,10 +56,10 @@ impl Widget for Clickable {
         }
     }
 
-    fn on_mouse_up(&self, _event: MouseEvent, interface: AppInterface) {
+    fn on_mouse_up(&self, event: MouseEvent, interface: AppInterface) {
         if let MouseState::Pressed = self.mouse_state.get() {
             self.mouse_state.set(MouseState::Hovered);
-            self.on_click.action(Clicked, interface);
+            self.on_click.action(Clicked(event), interface);
         }
     }
 

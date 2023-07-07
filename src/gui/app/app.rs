@@ -1,3 +1,5 @@
+use std::{cell::RefCell, rc::Rc};
+
 use rust_graphics::{
     app::App,
     color::Color,
@@ -21,7 +23,10 @@ use crate::{
     prelude::WidgetInstance,
 };
 
-use super::{input::InputState, interface::AppInterface};
+use super::{
+    input::InputState,
+    interface::{AppInterface, AppInterfaceEvent},
+};
 
 pub struct FontManager {
     default_font: Font,
@@ -33,8 +38,26 @@ impl FontManager {
     }
 }
 
+struct Panel {
+    widget: WidgetInstance,
+    position: Vec2,
+    size: Vec2,
+}
+
+impl Panel {
+    fn build(&mut self) {
+        let mut build_context = BuildContext::new(
+            Rect::new_from_xy(self.position.x, self.position.y, self.size.x, self.size.y),
+            CursorDirection::Vertical,
+        );
+
+        self.widget.build(&mut build_context);
+    }
+}
 pub struct UIApp {
     main_container: Option<WidgetInstance>,
+    panels: Vec<Panel>,
+
     font_manager: FontManager,
     input_state: InputState,
     quit: bool,
@@ -47,13 +70,11 @@ impl UIApp {
     }
 
     pub fn main_container(mut self, widget: WidgetInstance) -> Self {
-        //print_widget_tree(&widget, 0);
         self.main_container = Some(widget);
         self
     }
 
     fn rebuild_main_container(&mut self, width: f32, height: f32) {
-        //self.builder = WidgetBuilder::new(Rect::new_from_xy(0., 0., width, height));
         if let Some(container) = &mut self.main_container {
             let mut build_context = BuildContext::new(
                 Rect::new_from_xy(0., 0., width, height),
@@ -73,6 +94,7 @@ impl App for UIApp {
     fn init() -> Self {
         Self {
             main_container: None,
+            panels: Vec::new(),
             font_manager: FontManager {
                 default_font: Font::from_file("Roboto.ttf", 16),
             },
@@ -87,18 +109,24 @@ impl App for UIApp {
     }
 
     fn on_event(&mut self, event: AppEvent) {
-        let interface = AppInterface::new();
+        let interface_events = Rc::new(RefCell::new(Vec::new()));
+
+        let interface = AppInterface::new(&interface_events);
+
+        for panel in self.panels.iter_mut() {
+            for widget in panel.widget.iter() {
+                if let Some(event) = MouseEvent::from_app_event(&event, widget, panel.position) {
+                    widget.handle_mouse_event(&event);
+                }
+            }
+        }
+
         match event {
             AppEvent::WindowResize(width, height) => {
                 self.rebuild_main_container(width as f32, height as f32);
             }
             AppEvent::MouseMove { x, y } => {
                 let mouse_pos: Vec2 = (x as f32, y as f32).into();
-                let event = MouseEvent {
-                    absolute_pos: (x as f32, y as f32).into(),
-                    delta: mouse_pos - self.input_state.mouse_pos,
-                    ..Default::default()
-                };
 
                 if let Some(container) = &self.main_container {
                     for item in container.iter() {
@@ -108,7 +136,7 @@ impl App for UIApp {
 
                         let inside_event = MouseEvent {
                             relative_pos: mouse_pos - area.top_left(),
-                            ..event
+                            ..Default::default()
                         };
 
                         if mouse_inside && !last_mouse_inside {
@@ -124,7 +152,7 @@ impl App for UIApp {
                 }
                 self.input_state.mouse_pos = (x as f32, y as f32).into();
             }
-            AppEvent::MouseDown { x, y, .. } => {
+            AppEvent::MouseDown { x, y, key } => {
                 if let Some(container) = &self.main_container {
                     for item in container.iter() {
                         let (_, area) = item.build_result();
@@ -133,16 +161,16 @@ impl App for UIApp {
                             MouseEvent {
                                 relative_pos: (x as f32 - area.left, y as f32 - area.top).into(),
                                 absolute_pos: (x as f32, y as f32).into(),
-                                delta: Vec2::default(),
-                                button: 0,
+                                button_down: Some(key),
                                 inside: mouse_inside,
+                                ..Default::default()
                             },
                             interface.clone(),
                         );
                     }
                 }
             }
-            AppEvent::MouseUp { x, y, .. } => {
+            AppEvent::MouseUp { x, y, key } => {
                 let mouse_pos = (x as f32, y as f32).into();
                 if let Some(container) = &self.main_container {
                     for item in container.iter() {
@@ -152,9 +180,9 @@ impl App for UIApp {
                             MouseEvent {
                                 relative_pos: (x as f32 - area.left, y as f32 - area.top).into(),
                                 absolute_pos: (x as f32, y as f32).into(),
-                                delta: Vec2::default(),
-                                button: 0,
+                                button_up: Some(key),
                                 inside: mouse_inside,
+                                ..Default::default()
                             },
                             interface.clone(),
                         );
@@ -165,8 +193,22 @@ impl App for UIApp {
             _ => (),
         };
 
-        if interface.inner.borrow().should_quit {
-            self.quit();
+        for event in match Rc::try_unwrap(interface_events) {
+            Ok(this) => this,
+            Err(_) => panic!(
+                "Failed to unwrap Rc. This should never hapen. Something went wrong in the API. Some event still has access to the event queue of the ipc."
+            ),
+        }
+        .into_inner()
+        .into_iter()
+        {
+            match event {
+                AppInterfaceEvent::Quit => self.quit(),
+                AppInterfaceEvent::OpenPanel(panel, pos) => {
+                    println!("Open panel");
+                    self.panels.push(Panel { widget: panel, position: pos, size: (250., 24.).into() });
+                }
+            }
         }
     }
 

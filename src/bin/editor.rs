@@ -1,6 +1,7 @@
 use rust_ui::{
     gui::widget::impls::{
         checkbox::Checkbox,
+        clickable::Clicked,
         icon::{Icon, IconType},
     },
     prelude::*,
@@ -16,15 +17,14 @@ fn menubar() -> WidgetInstance {
 }
 
 fn sidebar() -> WidgetInstance {
-    let shared_state = State::new(50.);
+    let x: Clicked;
     VStack::new(vec![
-        Slider::new(shared_state.clone()).set_height(SizePolicy::Fixed(32.)),
-        Slider::new(shared_state.clone()).set_height(SizePolicy::Fixed(32.)),
-        Slider::new(shared_state.clone()).set_height(SizePolicy::Fixed(32.)),
-        Slider::new(State::new(50.)).set_height(SizePolicy::Fixed(32.)),
         Slider::new(State::new(50.)).set_height(SizePolicy::Fixed(32.)),
         Checkbox::new(Text::from("My Checkbox"), State::new(false))
             .set_height(SizePolicy::Fixed(32.)),
+        Button::new("Button", |click: Clicked, inter: AppInterface| {
+            inter.open_panel(Label::new("Hello World!"), click.0.absolute_pos);
+        }),
     ])
     .set_width(SizePolicy::Fixed(250.0))
 }

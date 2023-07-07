@@ -9,6 +9,7 @@ use super::{
     iterator::WidgetIter,
     size_policy::SizePolicy2D,
     state::observable::Observer,
+    widget::MouseEvent,
 };
 
 pub struct WidgetInstance {
@@ -126,4 +127,6 @@ impl WidgetInstance {
     pub fn type_name(&self) -> &'static str {
         self.type_name
     }
+
+    pub fn handle_mouse_event(&self, event: &MouseEvent) {}
 }

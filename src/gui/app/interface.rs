@@ -1,23 +1,40 @@
-use std::{cell::RefCell, rc::Rc};
+use std::{
+    cell::RefCell,
+    rc::{Rc, Weak},
+};
 
-#[derive(Clone)]
-pub(super) struct Inner {
-    pub(super) should_quit: bool,
+use rust_graphics::vec::Vec2;
+
+use crate::prelude::WidgetInstance;
+
+pub enum AppInterfaceEvent {
+    Quit,
+    OpenPanel(WidgetInstance, Vec2),
 }
 
 #[derive(Clone)]
 pub struct AppInterface {
-    pub(super) inner: Rc<RefCell<Inner>>,
+    pub(super) events: Weak<RefCell<Vec<AppInterfaceEvent>>>,
 }
 
 impl AppInterface {
-    pub fn new() -> Self {
+    pub fn new(events: &Rc<RefCell<Vec<AppInterfaceEvent>>>) -> Self {
         Self {
-            inner: Rc::new(RefCell::new(Inner { should_quit: false })),
+            events: Rc::downgrade(events),
         }
     }
 
     pub fn quit(&self) {
-        Rc::as_ref(&self.inner).borrow_mut().should_quit = true;
+        self.push_event(AppInterfaceEvent::Quit)
+    }
+
+    pub fn open_panel(&self, panel: WidgetInstance, position: Vec2) {
+        self.push_event(AppInterfaceEvent::OpenPanel(panel, position));
+    }
+
+    fn push_event(&self, event: AppInterfaceEvent) {
+        if let Some(events) = Weak::upgrade(&self.events) {
+            RefCell::borrow_mut(Rc::as_ref(&events)).push(event);
+        }
     }
 }
