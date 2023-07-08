@@ -175,15 +175,23 @@ impl App for UIApp {
             AppEvent::MouseMove { x, y } => {
                 self.input_state.mouse_pos = (x as f32, y as f32).into();
             }
-            AppEvent::MouseDown { key, x, y } => self.panels.retain(|panel| {
-                Rect::new_from_xy(
-                    panel.position.x,
-                    panel.position.y,
-                    panel.size.x,
-                    panel.size.y,
-                )
-                .contains((x as f32, y as f32).into())
-            }),
+            AppEvent::MouseDown { key, x, y } => {
+                let mut first = true;
+
+                self.panels.retain(|panel| {
+                    if first {
+                        first = false;
+                        return true;
+                    }
+                    Rect::new_from_xy(
+                        panel.position.x,
+                        panel.position.y,
+                        panel.size.x,
+                        panel.size.y,
+                    )
+                    .contains((x as f32, y as f32).into())
+                })
+            }
             AppEvent::KeyDown(KeyCode::Escape, _) => self.quit(),
             _ => (),
         };
