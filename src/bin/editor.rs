@@ -17,14 +17,15 @@ fn menubar() -> WidgetInstance {
 }
 
 fn sidebar() -> WidgetInstance {
-    let x: Clicked;
     VStack::new(vec![
         Slider::new(State::new(50.)).set_height(SizePolicy::Fixed(32.)),
         Checkbox::new(Text::from("My Checkbox"), State::new(false))
             .set_height(SizePolicy::Fixed(32.)),
         Button::new("Button", |click: Clicked, inter: AppInterface| {
-            inter.open_panel(Label::new("Hello World!"), click.0.absolute_pos);
-        }),
+            inter.open_panel(Button::new("Hello World!", |_, _| {}), click.0.absolute_pos);
+        })
+        .set_height(SizePolicy::Fixed(32.)),
+        Button::new("Test Button", |_, _| {}).set_height(SizePolicy::Fixed(32.)),
     ])
     .set_width(SizePolicy::Fixed(250.0))
 }

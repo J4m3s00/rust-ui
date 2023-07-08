@@ -2,7 +2,7 @@ use std::fmt::Debug;
 
 use rust_graphics::rect::Rect;
 
-use crate::prelude::{Margin, SizePolicy, Style, Widget};
+use crate::prelude::{AppInterface, Margin, SizePolicy, Style, Widget};
 
 use super::{
     builder::{build_context::BuildContext, build_results::BuildResult},
@@ -128,5 +128,26 @@ impl WidgetInstance {
         self.type_name
     }
 
-    pub fn handle_mouse_event(&self, event: &MouseEvent) {}
+    pub fn handle_mouse_event(&self, event: &MouseEvent, app_interface: AppInterface) {
+        if event.mouse_entered {
+            self.widget
+                .on_mouse_enter(event.clone(), app_interface.clone());
+        }
+        if event.mouse_exited {
+            self.widget
+                .on_mouse_leave(event.clone(), app_interface.clone());
+        }
+        if event.button_down.is_some() {
+            self.widget
+                .on_mouse_down(event.clone(), app_interface.clone());
+        }
+        if event.button_up.is_some() {
+            self.widget
+                .on_mouse_up(event.clone(), app_interface.clone());
+        }
+        if event.delta != (0.0, 0.0).into() {
+            self.widget
+                .on_mouse_move(event.clone(), app_interface.clone());
+        }
+    }
 }

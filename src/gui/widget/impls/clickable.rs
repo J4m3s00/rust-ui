@@ -13,7 +13,7 @@ use crate::{
 
 pub struct Clicked(pub MouseEvent);
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 enum MouseState {
     Normal,
     Hovered,
@@ -44,8 +44,8 @@ impl Widget for Clickable {
 
         res.draw_rect(DrawRect::fill(self.mouse_state.map(move |v| match v {
             MouseState::Normal => Some(ColorId::Primary),
-            MouseState::Hovered => Some(ColorId::PrimaryVariant),
-            MouseState::Pressed => Some(ColorId::Secondary),
+            MouseState::Hovered => Some(ColorId::PrimaryVariantLight),
+            MouseState::Pressed => Some(ColorId::PrimaryVariantDark),
         })));
         res
     }

@@ -34,6 +34,8 @@ impl MouseEvent {
                 let delta = absolute_pos - last_mouse_pos;
                 let mouse_entered =
                     build_rect.contains(absolute_pos) && !build_rect.contains(last_mouse_pos);
+                let mouse_exited =
+                    !build_rect.contains(absolute_pos) && build_rect.contains(last_mouse_pos);
 
                 Some(MouseEvent {
                     relative_pos,
@@ -41,7 +43,7 @@ impl MouseEvent {
                     delta,
                     inside: build_rect.contains(absolute_pos),
                     mouse_entered,
-                    mouse_exited: !mouse_entered,
+                    mouse_exited,
                     button_down: None,
                     button_up: None,
                 })
@@ -52,6 +54,8 @@ impl MouseEvent {
                 let delta = absolute_pos - last_mouse_pos;
                 let mouse_entered =
                     build_rect.contains(absolute_pos) && !build_rect.contains(last_mouse_pos);
+                let mouse_exited =
+                    !build_rect.contains(absolute_pos) && build_rect.contains(last_mouse_pos);
 
                 Some(MouseEvent {
                     relative_pos,
@@ -59,7 +63,7 @@ impl MouseEvent {
                     delta,
                     inside: build_rect.contains(absolute_pos),
                     mouse_entered,
-                    mouse_exited: !mouse_entered,
+                    mouse_exited,
                     button_down: Some(*key),
                     button_up: None,
                 })
@@ -70,6 +74,8 @@ impl MouseEvent {
                 let delta = absolute_pos - last_mouse_pos;
                 let mouse_entered =
                     build_rect.contains(absolute_pos) && !build_rect.contains(last_mouse_pos);
+                let mouse_exited =
+                    !build_rect.contains(absolute_pos) && build_rect.contains(last_mouse_pos);
 
                 Some(MouseEvent {
                     relative_pos,
@@ -77,7 +83,7 @@ impl MouseEvent {
                     delta,
                     inside: build_rect.contains(absolute_pos),
                     mouse_entered,
-                    mouse_exited: !mouse_entered,
+                    mouse_exited,
                     button_down: None,
                     button_up: Some(*key),
                 })

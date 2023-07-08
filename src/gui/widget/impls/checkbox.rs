@@ -20,7 +20,7 @@ impl Checkbox {
     fn click_area(checked: State<bool>) -> WidgetInstance {
         let observer = checked.observe();
         ZStack::new(vec![
-            Rectangle::fill(ColorId::PrimaryVariant).set_padding(Padding::all(10.)),
+            Rectangle::fill(ColorId::PrimaryVariantLight).set_padding(Padding::all(10.)),
             Clickable::new(move |_, _| {
                 checked.set(!checked.get());
             }),

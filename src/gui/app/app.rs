@@ -3,7 +3,7 @@ use std::{cell::RefCell, rc::Rc};
 use rust_graphics::{
     app::App,
     color::Color,
-    draw_command::{DrawCommand, Stroke},
+    draw_command::{DrawCommand, Fill, Stroke},
     events::app_events::AppEvent,
     font::Font,
     init_app,
@@ -20,7 +20,7 @@ use crate::{
         theme::theme::Theme,
         widget::MouseEvent,
     },
-    prelude::WidgetInstance,
+    prelude::{ColorId, WidgetInstance},
 };
 
 use super::{
@@ -53,9 +53,50 @@ impl Panel {
 
         self.widget.build(&mut build_context);
     }
+
+    fn draw(&self, font_manager: &FontManager, theme: &Theme) {
+        DrawCommand::rect_fill(
+            self.position.x,
+            self.position.y,
+            self.size.x,
+            self.size.y,
+            Fill::new(theme.colors.from_id(ColorId::Background)),
+        )
+        .run();
+        for item in self.widget.iter() {
+            if !item.visible() {
+                continue;
+            }
+            let (result, area) = item.build_result();
+            let mut padded_area = area.clone();
+            padded_area.apply_space(&item.style().padding);
+
+            for item in result.render_items().iter() {
+                item.get_draw_command(&padded_area, font_manager, theme)
+                    .iter()
+                    .for_each(DrawCommand::run);
+            }
+
+            run_draw_command(&DrawCommand::Rect {
+                left: area.left,
+                top: area.top,
+                width: area.width(),
+                height: area.height(),
+                fill: None,
+                stroke: Some(Stroke {
+                    width: 1.,
+                    color: Color::new(
+                        0, //((node.id & 0xff000000) >> 24) as u8,
+                        0, //((node.id & 0xff0000) >> 16) as u8,
+                        0, //((node.id & 0xff00) >> 8) as u8,
+                        255,
+                    ),
+                }),
+            });
+        }
+    }
 }
 pub struct UIApp {
-    main_container: Option<WidgetInstance>,
     panels: Vec<Panel>,
 
     font_manager: FontManager,
@@ -70,19 +111,24 @@ impl UIApp {
     }
 
     pub fn main_container(mut self, widget: WidgetInstance) -> Self {
-        self.main_container = Some(widget);
+        if self.panels.len() > 0 {
+            panic!("Main container must be set before any other panel");
+        }
+        self.panels.push(Panel {
+            widget,
+            position: (0., 0.).into(),
+            size: (0., 0.).into(),
+        });
         self
     }
 
     fn rebuild_main_container(&mut self, width: f32, height: f32) {
-        if let Some(container) = &mut self.main_container {
-            let mut build_context = BuildContext::new(
-                Rect::new_from_xy(0., 0., width, height),
-                CursorDirection::Vertical,
-            );
-
-            container.build(&mut build_context);
-        }
+        let Some(main_container) = self.panels.first_mut() else {
+            println!("No main container set. Cant rebuild");
+            return;
+        };
+        main_container.size = (width, height).into();
+        main_container.build();
     }
 
     pub fn quit(&mut self) {
@@ -93,7 +139,6 @@ impl UIApp {
 impl App for UIApp {
     fn init() -> Self {
         Self {
-            main_container: None,
             panels: Vec::new(),
             font_manager: FontManager {
                 default_font: Font::from_file("Roboto.ttf", 16),
@@ -115,8 +160,10 @@ impl App for UIApp {
 
         for panel in self.panels.iter_mut() {
             for widget in panel.widget.iter() {
-                if let Some(event) = MouseEvent::from_app_event(&event, widget, panel.position) {
-                    widget.handle_mouse_event(&event);
+                if let Some(event) =
+                    MouseEvent::from_app_event(&event, widget, self.input_state.mouse_pos)
+                {
+                    widget.handle_mouse_event(&event, interface.clone());
                 }
             }
         }
@@ -126,69 +173,17 @@ impl App for UIApp {
                 self.rebuild_main_container(width as f32, height as f32);
             }
             AppEvent::MouseMove { x, y } => {
-                let mouse_pos: Vec2 = (x as f32, y as f32).into();
-
-                if let Some(container) = &self.main_container {
-                    for item in container.iter() {
-                        let (_, area) = item.build_result();
-                        let mouse_inside = area.contains(mouse_pos);
-                        let last_mouse_inside = area.contains(self.input_state.mouse_pos);
-
-                        let inside_event = MouseEvent {
-                            relative_pos: mouse_pos - area.top_left(),
-                            ..Default::default()
-                        };
-
-                        if mouse_inside && !last_mouse_inside {
-                            item.widget()
-                                .on_mouse_enter(inside_event.clone(), interface.clone());
-                        } else if last_mouse_inside && !mouse_inside {
-                            item.widget()
-                                .on_mouse_leave(inside_event.clone(), interface.clone());
-                        }
-                        item.widget()
-                            .on_mouse_move(inside_event.clone(), interface.clone());
-                    }
-                }
                 self.input_state.mouse_pos = (x as f32, y as f32).into();
             }
-            AppEvent::MouseDown { x, y, key } => {
-                if let Some(container) = &self.main_container {
-                    for item in container.iter() {
-                        let (_, area) = item.build_result();
-                        let mouse_inside = area.contains((x as f32, y as f32).into());
-                        item.widget().on_mouse_down(
-                            MouseEvent {
-                                relative_pos: (x as f32 - area.left, y as f32 - area.top).into(),
-                                absolute_pos: (x as f32, y as f32).into(),
-                                button_down: Some(key),
-                                inside: mouse_inside,
-                                ..Default::default()
-                            },
-                            interface.clone(),
-                        );
-                    }
-                }
-            }
-            AppEvent::MouseUp { x, y, key } => {
-                let mouse_pos = (x as f32, y as f32).into();
-                if let Some(container) = &self.main_container {
-                    for item in container.iter() {
-                        let (_, area) = item.build_result();
-                        let mouse_inside = area.contains(mouse_pos);
-                        item.widget().on_mouse_up(
-                            MouseEvent {
-                                relative_pos: (x as f32 - area.left, y as f32 - area.top).into(),
-                                absolute_pos: (x as f32, y as f32).into(),
-                                button_up: Some(key),
-                                inside: mouse_inside,
-                                ..Default::default()
-                            },
-                            interface.clone(),
-                        );
-                    }
-                }
-            }
+            AppEvent::MouseDown { key, x, y } => self.panels.retain(|panel| {
+                Rect::new_from_xy(
+                    panel.position.x,
+                    panel.position.y,
+                    panel.size.x,
+                    panel.size.y,
+                )
+                .contains((x as f32, y as f32).into())
+            }),
             AppEvent::KeyDown(KeyCode::Escape, _) => self.quit(),
             _ => (),
         };
@@ -206,45 +201,17 @@ impl App for UIApp {
                 AppInterfaceEvent::Quit => self.quit(),
                 AppInterfaceEvent::OpenPanel(panel, pos) => {
                     println!("Open panel");
-                    self.panels.push(Panel { widget: panel, position: pos, size: (250., 24.).into() });
+                    let mut panel = Panel { widget: panel, position: pos, size: (250., 24.).into() };
+                    panel.build();
+                    self.panels.push(panel);
                 }
             }
         }
     }
 
     fn on_draw(&mut self) {
-        if let Some(container) = &self.main_container {
-            for item in container.iter() {
-                if !item.visible() {
-                    continue;
-                }
-                let (result, area) = item.build_result();
-                let mut padded_area = area.clone();
-                padded_area.apply_space(&item.style().padding);
-
-                for item in result.render_items().iter() {
-                    item.get_draw_command(&padded_area, &self.font_manager, &self.theme)
-                        .iter()
-                        .for_each(DrawCommand::run);
-                }
-
-                run_draw_command(&DrawCommand::Rect {
-                    left: area.left,
-                    top: area.top,
-                    width: area.width(),
-                    height: area.height(),
-                    fill: None,
-                    stroke: Some(Stroke {
-                        width: 1.,
-                        color: Color::new(
-                            0, //((node.id & 0xff000000) >> 24) as u8,
-                            0, //((node.id & 0xff0000) >> 16) as u8,
-                            0, //((node.id & 0xff00) >> 8) as u8,
-                            255,
-                        ),
-                    }),
-                });
-            }
+        for panel in self.panels.iter() {
+            panel.draw(&self.font_manager, &self.theme);
         }
     }
     fn should_quit(&self) -> bool {
