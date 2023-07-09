@@ -175,7 +175,7 @@ impl App for UIApp {
             AppEvent::MouseMove { x, y } => {
                 self.input_state.mouse_pos = (x as f32, y as f32).into();
             }
-            AppEvent::MouseDown { key, x, y } => {
+            AppEvent::MouseDown { x, y, .. } => {
                 let mut first = true;
 
                 self.panels.retain(|panel| {
