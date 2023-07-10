@@ -3,10 +3,10 @@ use crate::{
         builder::{build_context::BuildContext, build_results::BuildResult},
         rendering::drawable::text::DrawText,
         state::observable::Observer,
-        widget::ToInstance,
+        widget::{ToInstance, WidgetMouseState},
         widget_instance::WidgetInstance,
     },
-    prelude::{Text, Widget},
+    prelude::{State, Text, Widget},
 };
 
 pub struct Label {
@@ -27,7 +27,7 @@ impl Label {
 }
 
 impl Widget for Label {
-    fn build(&mut self, _ctx: &mut BuildContext) -> BuildResult {
+    fn build(&mut self, _ctx: &mut BuildContext, _: &State<WidgetMouseState>) -> BuildResult {
         let mut res = BuildResult::default();
         res.draw_text(DrawText(self.text.clone()));
         res

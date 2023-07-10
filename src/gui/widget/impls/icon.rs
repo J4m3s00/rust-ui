@@ -1,6 +1,9 @@
 use crate::{
-    gui::{svg::svg::Svg, widget::rendering::drawable::draw_svg::DrawSvg},
-    prelude::{BuildContext, BuildResult, ToInstance, Widget, WidgetInstance},
+    gui::{
+        svg::svg::Svg,
+        widget::{rendering::drawable::draw_svg::DrawSvg, widget::WidgetMouseState},
+    },
+    prelude::{BuildContext, BuildResult, State, ToInstance, Widget, WidgetInstance},
 };
 
 pub struct Icon {
@@ -16,7 +19,7 @@ impl Icon {
 }
 
 impl Widget for Icon {
-    fn build(&mut self, _ctx: &mut BuildContext) -> BuildResult {
+    fn build(&mut self, _ctx: &mut BuildContext, _: &State<WidgetMouseState>) -> BuildResult {
         let mut res = BuildResult::default();
         res.draw_svg(DrawSvg::new(self.icon.clone()));
         res

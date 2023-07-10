@@ -2,9 +2,10 @@ use crate::{
     gui::widget::{
         builder::{build_context::BuildContext, build_results::BuildResult},
         rendering::drawable::rectangle::DrawRect,
-        state::observable::Observer,
+        state::observable::{MapObserver, Observer},
+        widget::WidgetMouseState,
     },
-    prelude::{ColorId, ToInstance, Widget, WidgetInstance},
+    prelude::{ColorId, State, ToInstance, Widget, WidgetInstance},
 };
 
 pub struct Rectangle {
@@ -42,7 +43,7 @@ impl Rectangle {
 }
 
 impl Widget for Rectangle {
-    fn build(&mut self, _context: &mut BuildContext) -> BuildResult {
+    fn build(&mut self, _context: &mut BuildContext, _: &State<WidgetMouseState>) -> BuildResult {
         let mut res = BuildResult::default();
         res.draw_rect(DrawRect::fill_and_stroke(
             self.fill.clone(),

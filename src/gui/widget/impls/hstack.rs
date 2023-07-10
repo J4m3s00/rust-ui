@@ -4,9 +4,9 @@ use crate::{
             build_context::{BuildContext, CursorDirection},
             build_results::BuildResult,
         },
-        widget::ToInstance,
+        widget::{ToInstance, WidgetMouseState},
     },
-    prelude::{SizePolicy, Widget, WidgetInstance},
+    prelude::{SizePolicy, State, Widget, WidgetInstance},
 };
 
 pub struct HStack {
@@ -20,7 +20,7 @@ impl HStack {
 }
 
 impl Widget for HStack {
-    fn build(&mut self, ctx: &mut BuildContext) -> BuildResult {
+    fn build(&mut self, ctx: &mut BuildContext, _: &State<WidgetMouseState>) -> BuildResult {
         // Update context cursor direction for the children
         ctx.set_cursor_direction(CursorDirection::Horizontal);
 

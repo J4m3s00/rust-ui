@@ -1,11 +1,18 @@
 use rust_graphics::{events::app_events::AppEvent, vec::Vec2};
 
-use crate::gui::app::interface::AppInterface;
+use crate::{gui::app::interface::AppInterface, prelude::State};
 
 use super::{
     builder::{build_context::BuildContext, build_results::BuildResult},
     widget_instance::WidgetInstance,
 };
+
+#[derive(Clone, Copy, Debug)]
+pub enum WidgetMouseState {
+    Normal,
+    Hovered,
+    Pressed,
+}
 
 #[derive(Default, Clone)]
 pub struct MouseEvent {
@@ -94,7 +101,11 @@ impl MouseEvent {
 }
 
 pub trait Widget {
-    fn build(&mut self, _ctx: &mut BuildContext) -> BuildResult {
+    fn build(
+        &mut self,
+        _ctx: &mut BuildContext,
+        _mouse_state: &State<WidgetMouseState>,
+    ) -> BuildResult {
         BuildResult::default()
     }
     fn children(&self) -> &[WidgetInstance] {

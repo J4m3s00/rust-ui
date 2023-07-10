@@ -41,7 +41,7 @@ impl Theme {
                 primary: Color::from("2C3639"),
                 primary_variant_light: Color::from("3F4E4F"),
                 primary_variant_dark: Color::from("243131"),
-                secondary: Color::from("3F4E4F"),
+                secondary: Color::from("3F4E6F"),
                 secondary_variant_light: Color::from("434253"),
                 secondary_variant_dark: Color::from("3d4c4d"),
                 background: Color::from("1a1a1a"),

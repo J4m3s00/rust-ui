@@ -1,10 +1,13 @@
-use crate::gui::widget::{
-    builder::{
-        build_context::{BuildContext, CursorDirection},
-        build_results::BuildResult,
+use crate::{
+    gui::widget::{
+        builder::{
+            build_context::{BuildContext, CursorDirection},
+            build_results::BuildResult,
+        },
+        widget::{ToInstance, Widget, WidgetMouseState},
+        widget_instance::WidgetInstance,
     },
-    widget::{ToInstance, Widget},
-    widget_instance::WidgetInstance,
+    prelude::State,
 };
 
 pub struct ZStack {
@@ -18,7 +21,7 @@ impl ZStack {
 }
 
 impl Widget for ZStack {
-    fn build(&mut self, ctx: &mut BuildContext) -> BuildResult {
+    fn build(&mut self, ctx: &mut BuildContext, _: &State<WidgetMouseState>) -> BuildResult {
         // Update context cursor direction for the children
         ctx.set_cursor_direction(CursorDirection::Stacked);
 

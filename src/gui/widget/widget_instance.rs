@@ -2,14 +2,14 @@ use std::fmt::Debug;
 
 use rust_graphics::rect::Rect;
 
-use crate::prelude::{AppInterface, Margin, SizePolicy, Style, Widget};
+use crate::prelude::{AppInterface, Margin, SizePolicy, State, Style, Widget};
 
 use super::{
     builder::{build_context::BuildContext, build_results::BuildResult},
     iterator::WidgetIter,
     size_policy::SizePolicy2D,
     state::observable::Observer,
-    widget::MouseEvent,
+    widget::{MouseEvent, WidgetMouseState},
 };
 
 pub struct WidgetInstance {
@@ -17,6 +17,7 @@ pub struct WidgetInstance {
 
     widget: Box<dyn Widget>,
     visible: Observer<bool>,
+    mouse_state: State<WidgetMouseState>,
     // Stlying
     size: SizePolicy2D,
     style: Style,
@@ -55,6 +56,7 @@ impl WidgetInstance {
         Self {
             widget: Box::new(widget),
             visible: true.into(),
+            mouse_state: WidgetMouseState::Normal.into(),
             size: SizePolicy2D::default(),
             style: Style::default(),
             build_result: BuildResult::default(),
@@ -67,7 +69,7 @@ impl WidgetInstance {
         //context.allocate_space(self.size);
         self.build_rect = context.get_content_rect().clone();
         context.set_style(self.style.clone());
-        self.build_result = self.widget.build(context);
+        self.build_result = self.widget.build(context, &self.mouse_state);
     }
 
     pub fn set_size(mut self, size: SizePolicy2D) -> Self {
@@ -148,6 +150,28 @@ impl WidgetInstance {
         if event.delta != (0.0, 0.0).into() {
             self.widget
                 .on_mouse_move(event.clone(), app_interface.clone());
+        }
+
+        match self.mouse_state.get() {
+            WidgetMouseState::Normal => {
+                if event.inside {
+                    self.mouse_state.set(WidgetMouseState::Hovered);
+                }
+            }
+            WidgetMouseState::Hovered => {
+                if !event.inside {
+                    self.mouse_state.set(WidgetMouseState::Normal);
+                } else if let Some(1) = event.button_down {
+                    self.mouse_state.set(WidgetMouseState::Pressed);
+                }
+            }
+            WidgetMouseState::Pressed => {
+                if !event.inside {
+                    self.mouse_state.set(WidgetMouseState::Normal);
+                } else if let Some(1) = event.button_up {
+                    self.mouse_state.set(WidgetMouseState::Hovered);
+                }
+            }
         }
     }
 }

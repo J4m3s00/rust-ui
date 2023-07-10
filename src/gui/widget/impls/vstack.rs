@@ -6,9 +6,9 @@ use crate::{
         },
         rendering::drawable::rectangle::DrawRect,
         size_policy::SizePolicy,
-        widget::ToInstance,
+        widget::{ToInstance, WidgetMouseState},
     },
-    prelude::{ColorId, Widget, WidgetInstance},
+    prelude::{ColorId, State, Widget, WidgetInstance},
 };
 
 pub struct VStack {
@@ -22,7 +22,7 @@ impl VStack {
 }
 
 impl Widget for VStack {
-    fn build(&mut self, ctx: &mut BuildContext) -> BuildResult {
+    fn build(&mut self, ctx: &mut BuildContext, _: &State<WidgetMouseState>) -> BuildResult {
         // Update context cursor direction for the children
         ctx.set_cursor_direction(CursorDirection::Vertical);
         let content_area = ctx.get_content_rect().clone();

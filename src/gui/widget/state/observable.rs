@@ -60,17 +60,6 @@ where
         }))
     }
 
-    pub fn map<M, F>(&self, func: F) -> Observer<M>
-    where
-        F: Fn(&T) -> M + 'static,
-        M: Clone + 'static,
-    {
-        Observer::new(Rc::new(ObserveMap {
-            state: self.clone(),
-            map: Box::new(func),
-        }))
-    }
-
     pub fn get(&self) -> Option<T> {
         self.state.get()
     }
@@ -143,5 +132,71 @@ where
     type Value = M;
     fn get(&self) -> Option<Self::Value> {
         Some((self.map)(&self.state.get()?))
+    }
+}
+
+pub struct ObserveMapT<T, U, M>
+where
+    T: Clone + 'static,
+    U: Clone + 'static,
+{
+    state_a: Observer<T>,
+    state_b: Observer<U>,
+    map: Box<dyn Fn(&(T, U)) -> M>,
+}
+
+impl<T, U, M> Observable for ObserveMapT<T, U, M>
+where
+    T: Clone + 'static,
+    U: Clone + 'static,
+    M: Clone,
+{
+    type Value = M;
+    fn get(&self) -> Option<Self::Value> {
+        Some((self.map)(&(self.state_a.get()?, self.state_b.get()?)))
+    }
+}
+
+pub trait MapObserver {
+    type Value;
+    fn map<M, F>(&self, func: F) -> Observer<M>
+    where
+        F: Fn(&Self::Value) -> M + 'static,
+        M: Clone + 'static;
+}
+
+impl<T> MapObserver for Observer<T>
+where
+    T: Clone,
+{
+    type Value = T;
+    fn map<M, F>(&self, func: F) -> Observer<M>
+    where
+        F: Fn(&Self::Value) -> M + 'static,
+        M: Clone + 'static,
+    {
+        Observer::new(Rc::new(ObserveMap {
+            state: self.clone(),
+            map: Box::new(func),
+        }))
+    }
+}
+
+impl<T, U> MapObserver for (Observer<T>, Observer<U>)
+where
+    T: Clone,
+    U: Clone,
+{
+    type Value = (T, U);
+    fn map<M, F>(&self, func: F) -> Observer<M>
+    where
+        F: Fn(&Self::Value) -> M + 'static,
+        M: Clone + 'static,
+    {
+        Observer::new(Rc::new(ObserveMapT {
+            state_a: self.0.clone(),
+            state_b: self.1.clone(),
+            map: Box::new(func),
+        }))
     }
 }

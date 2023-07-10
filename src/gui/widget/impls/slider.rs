@@ -2,8 +2,11 @@ use crate::{
     gui::widget::{
         builder::{build_context::BuildContext, build_results::BuildResult},
         rendering::drawable::rectangle::DrawRect,
-        state::{observable::Observer, state::State},
-        widget::MouseEvent,
+        state::{
+            observable::{MapObserver, Observer},
+            state::State,
+        },
+        widget::{MouseEvent, WidgetMouseState},
     },
     prelude::{
         AlignH, AppInterface, ColorId, HStack, Label, Margin, SizePolicy, Text, ToInstance, Widget,
@@ -86,7 +89,11 @@ impl SliderBase {
 }
 
 impl Widget for SliderBase {
-    fn build(&mut self, ctx: &mut BuildContext) -> BuildResult {
+    fn build(
+        &mut self,
+        ctx: &mut BuildContext,
+        mouse_state: &State<WidgetMouseState>,
+    ) -> BuildResult {
         let content_area = ctx.get_content_rect().clone();
 
         let width = content_area.width() - KNOB_WIDTH;
@@ -103,9 +110,15 @@ impl Widget for SliderBase {
             }
         });
 
+        let color = (&self.knob, mouse_state).map(|state| match state {
+            (KnobState::Idle, WidgetMouseState::Hovered) => Some(ColorId::SecondaryVariantLight),
+            (KnobState::Dragging, _) => Some(ColorId::SecondaryVariantDark),
+            _ => Some(ColorId::Secondary),
+        });
+
         let mut res = BuildResult::default();
         // Draw Knob
-        res.draw_rect(DrawRect::fill(Some(ColorId::Secondary)))
+        res.draw_rect(DrawRect::fill(color))
             .set_width(SizePolicy::Fixed(KNOB_WIDTH))
             .set_alignment_h(AlignH::Left)
             .set_offset_x(knob_left);

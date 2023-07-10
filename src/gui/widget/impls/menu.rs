@@ -1,6 +1,9 @@
 use crate::{
-    gui::widget::builder::{build_context::BuildContext, build_results::BuildResult},
-    prelude::{Widget, WidgetInstance},
+    gui::widget::{
+        builder::{build_context::BuildContext, build_results::BuildResult},
+        widget::WidgetMouseState,
+    },
+    prelude::{State, Widget, WidgetInstance},
 };
 
 pub struct Menu {
@@ -14,7 +17,7 @@ impl Menu {
 }
 
 impl Widget for Menu {
-    fn build(&mut self, _ctx: &mut BuildContext) -> BuildResult {
+    fn build(&mut self, _ctx: &mut BuildContext, _: &State<WidgetMouseState>) -> BuildResult {
         let res = BuildResult::default();
         res
     }

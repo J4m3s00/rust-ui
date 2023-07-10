@@ -1,6 +1,6 @@
 use std::{cell::RefCell, rc::Rc};
 
-use super::observable::Observer;
+use super::observable::{MapObserver, Observer};
 
 pub(super) type StateInner<T> = RefCell<T>;
 
@@ -32,8 +32,23 @@ where
     pub fn observe(&self) -> Observer<T> {
         Observer::state(self)
     }
+}
 
-    pub fn map<M, F>(&self, func: F) -> Observer<M>
+impl<T> From<T> for State<T>
+where
+    T: Clone + 'static,
+{
+    fn from(value: T) -> Self {
+        Self::new(value.into())
+    }
+}
+
+impl<T> MapObserver for State<T>
+where
+    T: Clone + 'static,
+{
+    type Value = T;
+    fn map<M, F>(&self, func: F) -> Observer<M>
     where
         F: Fn(&T) -> M + 'static,
         M: Clone + 'static,
@@ -42,11 +57,17 @@ where
     }
 }
 
-impl<T> From<T> for State<String>
+impl<T, U> MapObserver for (&State<T>, &State<U>)
 where
-    T: Into<String>,
+    T: Clone + 'static,
+    U: Clone + 'static,
 {
-    fn from(value: T) -> Self {
-        Self::new(value.into())
+    type Value = (T, U);
+    fn map<M, F>(&self, func: F) -> Observer<M>
+    where
+        F: Fn(&Self::Value) -> M + 'static,
+        M: Clone + 'static,
+    {
+        (self.0.observe(), self.1.observe()).map(func)
     }
 }
