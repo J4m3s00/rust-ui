@@ -10,7 +10,7 @@ use crate::{
         app::app::FontManager,
         widget::{state::observable::Observer, theme::theme::Theme},
     },
-    prelude::{AlignH, AlignV},
+    prelude::{AlignH, AlignV, ColorId},
 };
 
 use super::Drawable;
@@ -69,7 +69,7 @@ impl Text {
 //pub struct DrawText(pub Observer<Text>);
 
 impl Drawable for Observer<Text> {
-    fn draw(&self, area: Rect, font_manager: &FontManager, _theme: &Theme) -> Vec<DrawCommand> {
+    fn draw(&self, area: Rect, font_manager: &FontManager, theme: &Theme) -> Vec<DrawCommand> {
         let Some(text) = self.get() else {
             println!("Failed to observe text of draw text!");
             return vec![DrawCommand::Line { x1: 0., y1: 0., x2: 0., y2: 0., stroke: Stroke {color: COLOR_BLACK, width: 0.} }];
@@ -93,7 +93,7 @@ impl Drawable for Observer<Text> {
             font: *font_manager.default_font(),
             text: text.text.clone(),
             position: (text_left, text_base_line).into(),
-            color: text.color,
+            color: theme.colors.from_id(ColorId::OnPrimary),
             stroke: None,
         }]
     }

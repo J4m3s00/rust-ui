@@ -26,13 +26,18 @@ impl Svg {
         self.size
     }
 
-    pub fn generate_draw_commands(&self, rect: Rect) -> Vec<DrawCommand> {
+    pub fn generate_draw_commands(
+        &self,
+        rect: Rect,
+        override_stroke: Option<Stroke>,
+    ) -> Vec<DrawCommand> {
         let mut res = Vec::new();
         for elem in self.segments.iter() {
             match elem {
-                SvgElement::Path(path) => {
-                    res.push(DrawCommand::Path(path.clone(), self.size, rect))
-                }
+                SvgElement::Path(path) => res.push(match override_stroke {
+                    Some(stroke) => DrawCommand::path_stroke(path.clone(), self.size, rect, stroke),
+                    None => DrawCommand::path(path.clone(), self.size, rect),
+                }),
             }
         }
         res

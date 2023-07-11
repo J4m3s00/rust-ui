@@ -4,7 +4,7 @@ use crate::{
     gui::{
         svg::svg::Svg,
         widget::{
-            rendering::drawable::{item::DrawItem, rectangle::DrawRect},
+            rendering::drawable::{draw_svg::DrawSvg, item::DrawItem, rectangle::DrawRect},
             state::observable::Observer,
         },
     },
@@ -38,8 +38,8 @@ impl BuildResult {
         self.push_item(DrawItem::new(rect))
     }
 
-    pub fn draw_svg(&mut self, svg: impl Into<Observer<Svg>>) -> &mut DrawItem {
-        self.push_item(DrawItem::new(svg.into()))
+    pub fn draw_svg(&mut self, svg: DrawSvg) -> &mut DrawItem {
+        self.push_item(DrawItem::new(svg))
     }
 
     fn push_item(&mut self, item: DrawItem) -> &mut DrawItem {
