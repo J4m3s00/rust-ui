@@ -4,10 +4,12 @@ use super::observable::{MapObserver, Observer};
 
 pub(super) type StateInner<T> = RefCell<T>;
 
-#[derive(Debug, Clone, Default)]
+#[derive(Clone, Default)]
 
 pub struct State<T: Clone> {
     pub(super) value: Rc<StateInner<T>>,
+    /// new value, old value
+    on_change: Option<Rc<dyn Fn(&T, &T)>>,
 }
 
 impl<T> State<T>
@@ -17,7 +19,16 @@ where
     pub fn new(value: T) -> Self {
         Self {
             value: Rc::new(RefCell::new(value)),
+            on_change: None,
         }
+    }
+
+    pub fn changed<F>(mut self, func: F) -> Self
+    where
+        F: Fn(&T, &T) + 'static,
+    {
+        self.on_change = Some(Rc::new(func));
+        self
     }
 
     pub fn get(&self) -> T {
@@ -26,6 +37,9 @@ where
     }
 
     pub fn set(&self, value: T) {
+        if let Some(change) = &self.on_change {
+            change(&value, &self.value.as_ref().borrow());
+        }
         self.value.as_ref().replace(value);
     }
 
