@@ -66,11 +66,11 @@ impl Text {
     }
 }
 
-pub struct DrawText(pub Observer<Text>);
+//pub struct DrawText(pub Observer<Text>);
 
-impl Drawable for DrawText {
+impl Drawable for Observer<Text> {
     fn draw(&self, area: Rect, font_manager: &FontManager, _theme: &Theme) -> Vec<DrawCommand> {
-        let Some(text) = self.0.get() else {
+        let Some(text) = self.get() else {
             println!("Failed to observe text of draw text!");
             return vec![DrawCommand::Line { x1: 0., y1: 0., x2: 0., y2: 0., stroke: Stroke {color: COLOR_BLACK, width: 0.} }];
         };

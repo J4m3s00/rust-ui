@@ -1,11 +1,12 @@
 use rust_graphics::draw_command::{Fill, Stroke};
 
 use crate::{
-    gui::widget::{
-        rendering::drawable::{
-            draw_svg::DrawSvg, item::DrawItem, rectangle::DrawRect, text::DrawText,
+    gui::{
+        svg::svg::Svg,
+        widget::{
+            rendering::drawable::{item::DrawItem, rectangle::DrawRect},
+            state::observable::Observer,
         },
-        state::observable::Observer,
     },
     prelude::{SizePolicy, Text},
 };
@@ -29,16 +30,16 @@ pub struct BuildResult {
 }
 
 impl BuildResult {
-    pub fn draw_text(&mut self, text: DrawText) -> &mut DrawItem {
-        self.push_item(DrawItem::new(text))
+    pub fn draw_text(&mut self, text: impl Into<Observer<Text>>) -> &mut DrawItem {
+        self.push_item(DrawItem::new(text.into()))
     }
 
     pub fn draw_rect(&mut self, rect: DrawRect) -> &mut DrawItem {
         self.push_item(DrawItem::new(rect))
     }
 
-    pub fn draw_svg(&mut self, svg: DrawSvg) -> &mut DrawItem {
-        self.push_item(DrawItem::new(svg))
+    pub fn draw_svg(&mut self, svg: impl Into<Observer<Svg>>) -> &mut DrawItem {
+        self.push_item(DrawItem::new(svg.into()))
     }
 
     fn push_item(&mut self, item: DrawItem) -> &mut DrawItem {

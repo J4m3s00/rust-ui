@@ -8,20 +8,9 @@ use crate::gui::{
 
 use super::Drawable;
 
-pub struct DrawSvg {
-    svg: Observer<Svg>,
-}
-
-impl DrawSvg {
-    pub fn new(svg: impl Into<Observer<Svg>>) -> Self {
-        Self { svg: svg.into() }
-    }
-}
-
-impl Drawable for DrawSvg {
+impl Drawable for Observer<Svg> {
     fn draw(&self, area: Rect, _font_manager: &FontManager, _theme: &Theme) -> Vec<DrawCommand> {
-        self.svg
-            .get()
+        self.get()
             .map(|svg| svg.generate_draw_commands(area))
             .unwrap_or_default()
     }

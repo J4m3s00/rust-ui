@@ -1,13 +1,4 @@
-use crate::{
-    gui::widget::{
-        builder::{build_context::BuildContext, build_results::BuildResult},
-        rendering::drawable::text::DrawText,
-        state::observable::Observer,
-        widget::{ToInstance, WidgetMouseState},
-        widget_instance::WidgetInstance,
-    },
-    prelude::{State, Text, Widget},
-};
+use crate::prelude::*;
 
 pub struct Label {
     text: Observer<Text>,
@@ -29,7 +20,7 @@ impl Label {
 impl Widget for Label {
     fn build(&mut self, _ctx: &mut BuildContext, _: &State<WidgetMouseState>) -> BuildResult {
         let mut res = BuildResult::default();
-        res.draw_text(DrawText(self.text.clone()));
+        res.draw_text(self.text.clone());
         res
     }
 }
