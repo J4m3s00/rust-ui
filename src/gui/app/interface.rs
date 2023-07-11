@@ -5,11 +5,12 @@ use std::{
 
 use rust_graphics::vec::Vec2;
 
-use crate::prelude::WidgetInstance;
+use crate::{gui::widget::theme::theme::Theme, prelude::WidgetInstance};
 
 pub enum AppInterfaceEvent {
     Quit,
     OpenPanel(WidgetInstance, Vec2),
+    ChangeTheme(Theme),
 }
 
 #[derive(Clone)]
@@ -30,6 +31,10 @@ impl AppInterface {
 
     pub fn open_panel(&self, panel: WidgetInstance, position: Vec2) {
         self.push_event(AppInterfaceEvent::OpenPanel(panel, position));
+    }
+
+    pub fn change_theme(&self, theme: Theme) {
+        self.push_event(AppInterfaceEvent::ChangeTheme(theme));
     }
 
     fn push_event(&self, event: AppInterfaceEvent) {

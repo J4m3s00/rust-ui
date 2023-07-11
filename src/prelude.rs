@@ -10,6 +10,7 @@ pub use crate::{
             impls::label::Label,
             impls::slider::Slider,
             impls::spacer::Spacer,
+            impls::text_input::TextInput,
             impls::vstack::VStack,
             rendering::{
                 align::{AlignH, AlignV},

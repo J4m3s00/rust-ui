@@ -219,6 +219,7 @@ impl App for UIApp {
                     panel.build();
                     self.panels.push(panel);
                 }
+                AppInterfaceEvent::ChangeTheme(theme) => self.theme = theme,
             }
         }
     }

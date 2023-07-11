@@ -12,3 +12,7 @@ where
         self(data, interface)
     }
 }
+
+impl<T> Receiver<T> for () {
+    fn action(&self, data: T, interface: AppInterface) {}
+}
