@@ -11,9 +11,9 @@ pub type Result<T> = std::result::Result<T, Error>;
 impl Debug for Error {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            Error::Generic(msg) => write!(f, "Generic error: {}", msg),
-            Error::IO(err) => write!(f, "IO error: {}", err),
-            Error::SvgParseError(msg) => write!(f, "Error parsing SVG: {}", msg),
+            Error::Generic(msg) => write!(f, "Generic error: {msg}"),
+            Error::IO(err) => write!(f, "IO error: {err}"),
+            Error::SvgParseError(msg) => write!(f, "Error parsing SVG: {msg}"),
         }
     }
 }
@@ -21,9 +21,9 @@ impl Debug for Error {
 impl Display for Error {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            Error::Generic(msg) => write!(f, "Generic error: {}", msg),
-            Error::IO(err) => write!(f, "IO error: {}", err),
-            Error::SvgParseError(msg) => write!(f, "Error parsing SVG: {}", msg),
+            Error::Generic(msg) => write!(f, "Generic error: {msg}"),
+            Error::IO(err) => write!(f, "IO error: {err}"),
+            Error::SvgParseError(msg) => write!(f, "Error parsing SVG: {msg}"),
         }
     }
 }

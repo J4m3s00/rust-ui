@@ -34,7 +34,7 @@ impl Slider {
         ZStack::new(vec![
             Rectangle::fill(ColorId::Primary),
             HStack::new(vec![
-                Label::new_observe(init.map(|v| Text::from(format!("{:.0}", v))))
+                Label::new_observe(init.map(|v| Text::from(format!("{v:.0}"))))
                     .set_width(SizePolicy::Fixed(50.)),
                 SliderBase::new_min_max(init, min, max),
             ]),
@@ -94,7 +94,7 @@ impl Widget for SliderBase {
         ctx: &mut BuildContext,
         mouse_state: &State<WidgetMouseState>,
     ) -> BuildResult {
-        let content_area = ctx.get_content_rect().clone();
+        let content_area = *ctx.get_content_rect();
 
         let width = content_area.width() - KNOB_WIDTH;
         self.slider_pixel_scale = self.max.map(move |v| width / v);

@@ -24,7 +24,7 @@ impl Widget for HStack {
         // Update context cursor direction for the children
         ctx.set_cursor_direction(CursorDirection::Horizontal);
 
-        let content_area = ctx.get_content_rect().clone();
+        let content_area = *ctx.get_content_rect();
         let mut remaining_width = content_area.width();
         let mut total_frac = 0.;
         for item in self.children().iter() {

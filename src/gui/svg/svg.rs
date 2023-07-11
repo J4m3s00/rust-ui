@@ -61,8 +61,7 @@ impl Svg {
                             .map(|a| {
                                 a.value.parse::<f32>().map_err(|e| {
                                     Error::SvgParseError(format!(
-                                        "Could not parse width from \"{}\"",
-                                        e.to_string()
+                                        "Could not parse width from \"{e}\""
                                     ))
                                 })
                             })
@@ -76,8 +75,7 @@ impl Svg {
                             .map(|a: &xml::attribute::OwnedAttribute| {
                                 a.value.parse::<f32>().map_err(|e| {
                                     Error::SvgParseError(format!(
-                                        "Could not parse height from \"{}\"",
-                                        e.to_string()
+                                        "Could not parse height from \"{e}\""
                                     ))
                                 })
                             })
@@ -104,134 +102,131 @@ impl Svg {
                         let mut path_builder = PathBuilder::new();
                         path_builder.stroke(Some(Stroke::new(COLOR_BLACK, 4.0)));
                         //path_builder.fill(Some(Fill::new(COLOR_BLUE)));
-                        for seg in PathParser::from(d.as_str()) {
-                            if let Ok(seg) = seg {
-                                match seg {
-                                    PathSegment::MoveTo { abs, x, y } => {
-                                        if abs {
-                                            path_builder.move_to(Vec2::new(x as f32, y as f32));
-                                        } else {
-                                            path_builder.move_to_rel(Vec2::new(x as f32, y as f32));
-                                            //path_builder.move_to(Vec2::new(x as f32, y as f32));
-                                        }
+                        for seg in PathParser::from(d.as_str()).flatten() {
+                            match seg {
+                                PathSegment::MoveTo { abs, x, y } => {
+                                    if abs {
+                                        path_builder.move_to(Vec2::new(x as f32, y as f32));
+                                    } else {
+                                        path_builder.move_to_rel(Vec2::new(x as f32, y as f32));
+                                        //path_builder.move_to(Vec2::new(x as f32, y as f32));
                                     }
-                                    PathSegment::LineTo { abs, x, y } => {
-                                        if abs {
-                                            path_builder.line_to(Vec2::new(x as f32, y as f32));
-                                        } else {
-                                            path_builder.line_to_rel(Vec2::new(x as f32, y as f32));
-                                        }
+                                }
+                                PathSegment::LineTo { abs, x, y } => {
+                                    if abs {
+                                        path_builder.line_to(Vec2::new(x as f32, y as f32));
+                                    } else {
+                                        path_builder.line_to_rel(Vec2::new(x as f32, y as f32));
                                     }
-                                    PathSegment::VerticalLineTo { abs, y } => {
-                                        if abs {
-                                            path_builder.vert(y as f32);
-                                        } else {
-                                            path_builder.vert_rel(y as f32);
-                                        }
+                                }
+                                PathSegment::VerticalLineTo { abs, y } => {
+                                    if abs {
+                                        path_builder.vert(y as f32);
+                                    } else {
+                                        path_builder.vert_rel(y as f32);
                                     }
-                                    PathSegment::HorizontalLineTo { abs, x } => {
-                                        if abs {
-                                            path_builder.horiz(x as f32);
-                                        } else {
-                                            path_builder.horiz_rel(x as f32);
-                                        }
+                                }
+                                PathSegment::HorizontalLineTo { abs, x } => {
+                                    if abs {
+                                        path_builder.horiz(x as f32);
+                                    } else {
+                                        path_builder.horiz_rel(x as f32);
                                     }
-                                    PathSegment::CurveTo {
-                                        abs,
-                                        x1,
-                                        y1,
-                                        x2,
-                                        y2,
-                                        x,
-                                        y,
-                                    } => {
-                                        if abs {
-                                            path_builder.cubic_to(
-                                                Vec2::new(x1 as f32, y1 as f32),
-                                                Vec2::new(x2 as f32, y2 as f32),
-                                                Vec2::new(x as f32, y as f32),
-                                            );
-                                        } else {
-                                            path_builder.cubic_to_rel(
-                                                Vec2::new(x1 as f32, y1 as f32),
-                                                Vec2::new(x2 as f32, y2 as f32),
-                                                Vec2::new(x as f32, y as f32),
-                                            );
-                                        }
+                                }
+                                PathSegment::CurveTo {
+                                    abs,
+                                    x1,
+                                    y1,
+                                    x2,
+                                    y2,
+                                    x,
+                                    y,
+                                } => {
+                                    if abs {
+                                        path_builder.cubic_to(
+                                            Vec2::new(x1 as f32, y1 as f32),
+                                            Vec2::new(x2 as f32, y2 as f32),
+                                            Vec2::new(x as f32, y as f32),
+                                        );
+                                    } else {
+                                        path_builder.cubic_to_rel(
+                                            Vec2::new(x1 as f32, y1 as f32),
+                                            Vec2::new(x2 as f32, y2 as f32),
+                                            Vec2::new(x as f32, y as f32),
+                                        );
                                     }
-                                    PathSegment::SmoothCurveTo { abs, x2, y2, x, y } => {
-                                        if abs {
-                                            path_builder.smooth_cubic_to(
-                                                (x2 as f32, y2 as f32),
-                                                (x as f32, y as f32),
-                                            );
-                                        } else {
-                                            path_builder.smooth_cubic_to_rel(
-                                                (x2 as f32, y2 as f32),
-                                                (x as f32, y as f32),
-                                            );
-                                        }
+                                }
+                                PathSegment::SmoothCurveTo { abs, x2, y2, x, y } => {
+                                    if abs {
+                                        path_builder.smooth_cubic_to(
+                                            (x2 as f32, y2 as f32),
+                                            (x as f32, y as f32),
+                                        );
+                                    } else {
+                                        path_builder.smooth_cubic_to_rel(
+                                            (x2 as f32, y2 as f32),
+                                            (x as f32, y as f32),
+                                        );
                                     }
-                                    PathSegment::Quadratic { abs, x1, y1, x, y } => {
-                                        if abs {
-                                            path_builder.quad_to(
-                                                Vec2::new(x1 as f32, y1 as f32),
-                                                Vec2::new(x as f32, y as f32),
-                                            );
-                                        } else {
-                                            path_builder.quad_to_rel(
-                                                Vec2::new(x1 as f32, y1 as f32),
-                                                Vec2::new(x as f32, y as f32),
-                                            );
-                                        }
+                                }
+                                PathSegment::Quadratic { abs, x1, y1, x, y } => {
+                                    if abs {
+                                        path_builder.quad_to(
+                                            Vec2::new(x1 as f32, y1 as f32),
+                                            Vec2::new(x as f32, y as f32),
+                                        );
+                                    } else {
+                                        path_builder.quad_to_rel(
+                                            Vec2::new(x1 as f32, y1 as f32),
+                                            Vec2::new(x as f32, y as f32),
+                                        );
                                     }
-                                    PathSegment::SmoothQuadratic { abs, x, y } => {
-                                        if abs {
-                                            path_builder
-                                                .smooth_quad_to(Vec2::new(x as f32, y as f32));
-                                        } else {
-                                            path_builder
-                                                .smooth_quad_to_rel(Vec2::new(x as f32, y as f32));
-                                        }
+                                }
+                                PathSegment::SmoothQuadratic { abs, x, y } => {
+                                    if abs {
+                                        path_builder.smooth_quad_to(Vec2::new(x as f32, y as f32));
+                                    } else {
+                                        path_builder
+                                            .smooth_quad_to_rel(Vec2::new(x as f32, y as f32));
                                     }
-                                    PathSegment::EllipticalArc {
-                                        abs,
-                                        rx,
-                                        ry,
-                                        x_axis_rotation,
-                                        large_arc,
-                                        sweep,
-                                        x,
-                                        y,
-                                    } => {
-                                        if abs {
-                                            path_builder.arc_to(
-                                                (x as f32, y as f32),
-                                                (rx as f32, ry as f32),
-                                                x_axis_rotation as f32,
-                                                large_arc,
-                                                sweep,
-                                            )
-                                        } else {
-                                            path_builder.arc_to_rel(
-                                                (x as f32, y as f32),
-                                                (rx as f32, ry as f32),
-                                                x_axis_rotation as f32,
-                                                large_arc,
-                                                sweep,
-                                            )
-                                        }
+                                }
+                                PathSegment::EllipticalArc {
+                                    abs,
+                                    rx,
+                                    ry,
+                                    x_axis_rotation,
+                                    large_arc,
+                                    sweep,
+                                    x,
+                                    y,
+                                } => {
+                                    if abs {
+                                        path_builder.arc_to(
+                                            (x as f32, y as f32),
+                                            (rx as f32, ry as f32),
+                                            x_axis_rotation as f32,
+                                            large_arc,
+                                            sweep,
+                                        )
+                                    } else {
+                                        path_builder.arc_to_rel(
+                                            (x as f32, y as f32),
+                                            (rx as f32, ry as f32),
+                                            x_axis_rotation as f32,
+                                            large_arc,
+                                            sweep,
+                                        )
                                     }
-                                    PathSegment::ClosePath { .. } => {
-                                        path_builder.close();
-                                    }
+                                }
+                                PathSegment::ClosePath { .. } => {
+                                    path_builder.close();
                                 }
                             }
                         }
                         result.segments.push(SvgElement::Path(path_builder.build()));
                     }
                     elem => {
-                        println!("Unknown svg element: {}", elem);
+                        println!("Unknown svg element: {elem}");
                     }
                 },
                 XmlEvent::EndElement { name } => {

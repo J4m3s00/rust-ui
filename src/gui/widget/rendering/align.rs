@@ -24,19 +24,10 @@ impl Default for AlignV {
     }
 }
 
-#[derive(Clone, Debug, Copy)]
+#[derive(Clone, Debug, Copy, Default)]
 pub struct Align2D {
     pub horizontal: AlignH,
     pub vertical: AlignV,
-}
-
-impl Default for Align2D {
-    fn default() -> Self {
-        Self {
-            horizontal: AlignH::default(),
-            vertical: AlignV::default(),
-        }
-    }
 }
 
 impl From<(AlignH, AlignV)> for Align2D {

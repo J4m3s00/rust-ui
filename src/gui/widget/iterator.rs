@@ -2,6 +2,7 @@ use std::{mem, slice::from_ref};
 
 use crate::prelude::WidgetInstance;
 
+#[derive(Default)]
 pub struct WidgetIter<'a> {
     children: &'a [WidgetInstance],
     parent: Option<Box<WidgetIter<'a>>>,
@@ -11,15 +12,6 @@ impl<'a> WidgetIter<'a> {
     pub fn new(root: &'a WidgetInstance) -> Self {
         Self {
             children: from_ref(root),
-            parent: None,
-        }
-    }
-}
-
-impl Default for WidgetIter<'_> {
-    fn default() -> Self {
-        Self {
-            children: &[],
             parent: None,
         }
     }
@@ -42,7 +34,7 @@ impl<'a> Iterator for WidgetIter<'a> {
                 self.children = &self.children[1..];
 
                 let children = item.widget().children();
-                if children.len() != 0 {
+                if !children.is_empty() {
                     // start iterating the child trees
                     *self = WidgetIter {
                         children,

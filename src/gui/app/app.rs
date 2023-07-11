@@ -68,7 +68,7 @@ impl Panel {
                 continue;
             }
             let (result, area) = item.build_result();
-            let mut padded_area = area.clone();
+            let mut padded_area = *area;
             padded_area.apply_space(&item.style().padding);
 
             for item in result.render_items().iter() {
@@ -105,13 +105,19 @@ pub struct UIApp {
     theme: Theme,
 }
 
+impl Default for UIApp {
+    fn default() -> Self {
+        init_app::<Self>().expect("Failed to initialize app")
+    }
+}
+
 impl UIApp {
     pub fn new() -> Self {
-        init_app::<Self>().expect("Failed to initialize app")
+        Self::default()
     }
 
     pub fn main_container(mut self, widget: WidgetInstance) -> Self {
-        if self.panels.len() > 0 {
+        if !self.panels.is_empty() {
             panic!("Main container must be set before any other panel");
         }
         self.panels.push(Panel {

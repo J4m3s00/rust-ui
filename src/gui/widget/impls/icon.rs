@@ -75,7 +75,7 @@ impl IconType {
             IconType::FileOpen => Svg::load_from_str(include_str!("icons/file_open.svg")),
         }
         .map_err(|e| {
-            println!("Could not load svg: {}", e);
+            println!("Could not load svg: {e}");
         })
         .unwrap()
     }

@@ -90,7 +90,7 @@ impl Drawable for Observer<Text> {
             AlignH::Right => area.right - text_width,
         };
         vec![DrawCommand::Text {
-            font: font_manager.default_font().clone(),
+            font: *font_manager.default_font(),
             text: text.text.clone(),
             position: (text_left, text_base_line).into(),
             color: text.color,

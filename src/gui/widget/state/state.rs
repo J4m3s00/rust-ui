@@ -39,7 +39,7 @@ where
     T: Clone + 'static,
 {
     fn from(value: T) -> Self {
-        Self::new(value.into())
+        Self::new(value)
     }
 }
 

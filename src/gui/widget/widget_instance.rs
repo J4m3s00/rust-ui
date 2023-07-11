@@ -67,7 +67,7 @@ impl WidgetInstance {
 
     pub fn build(&mut self, context: &mut BuildContext) {
         //context.allocate_space(self.size);
-        self.build_rect = context.get_content_rect().clone();
+        self.build_rect = *context.get_content_rect();
         context.set_style(self.style.clone());
         self.build_result = self.widget.build(context, &self.mouse_state);
     }
@@ -148,8 +148,7 @@ impl WidgetInstance {
                 .on_mouse_up(event.clone(), app_interface.clone());
         }
         if event.delta != (0.0, 0.0).into() {
-            self.widget
-                .on_mouse_move(event.clone(), app_interface.clone());
+            self.widget.on_mouse_move(event.clone(), app_interface);
         }
 
         match self.mouse_state.get() {

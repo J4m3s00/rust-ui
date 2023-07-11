@@ -11,19 +11,10 @@ impl Default for Anchor {
     }
 }
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, Default)]
 pub struct Anchor2D {
     pub horizontal: Anchor,
     pub vertical: Anchor,
-}
-
-impl Default for Anchor2D {
-    fn default() -> Self {
-        Self {
-            horizontal: Anchor::default(),
-            vertical: Anchor::default(),
-        }
-    }
 }
 
 impl From<(Anchor, Anchor)> for Anchor2D {

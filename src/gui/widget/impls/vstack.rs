@@ -25,7 +25,7 @@ impl Widget for VStack {
     fn build(&mut self, ctx: &mut BuildContext, _: &State<WidgetMouseState>) -> BuildResult {
         // Update context cursor direction for the children
         ctx.set_cursor_direction(CursorDirection::Vertical);
-        let content_area = ctx.get_content_rect().clone();
+        let content_area = *ctx.get_content_rect();
         let mut remaining_height = content_area.height();
         let mut total_frac = 0.;
         for item in self.children().iter() {
