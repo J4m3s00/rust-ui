@@ -1,10 +1,7 @@
 use rust_graphics::keycodes::KeyCode;
 
 use crate::{
-    gui::{
-        app::interface::AppInterface,
-        events::{keyboard::KeyboardEvent, mouse::MouseEvent},
-    },
+    gui::{app::interface::AppInterface, events::mouse::MouseEvent},
     prelude::State,
 };
 
