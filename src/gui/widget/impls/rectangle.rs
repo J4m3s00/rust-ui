@@ -5,7 +5,7 @@ use crate::{
         state::observable::{MapObserver, Observer},
         widget::WidgetMouseState,
     },
-    prelude::{ColorId, State, ToInstance, Widget, WidgetInstance},
+    prelude::{ColorId, ToInstance, Widget, WidgetInstance},
 };
 
 pub struct Rectangle {
@@ -43,7 +43,12 @@ impl Rectangle {
 }
 
 impl Widget for Rectangle {
-    fn build(&mut self, _context: &mut BuildContext, _: &State<WidgetMouseState>) -> BuildResult {
+    fn build(
+        &mut self,
+        _context: &mut BuildContext,
+        _: Observer<WidgetMouseState>,
+        _: Observer<bool>,
+    ) -> BuildResult {
         let mut res = BuildResult::default();
         res.draw_rect(DrawRect::fill_and_stroke(
             self.fill.clone(),

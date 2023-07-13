@@ -22,6 +22,7 @@ pub struct WidgetInstance {
     widget: Box<dyn Widget>,
     visible: Observer<bool>,
     mouse_state: State<WidgetMouseState>,
+    focused: State<bool>,
     // Stlying
     size: SizePolicy2D,
     style: Style,
@@ -69,6 +70,7 @@ impl WidgetInstance {
             id: get_id(),
             visible: true.into(),
             mouse_state: WidgetMouseState::Normal.into(),
+            focused: false.into(),
             size: SizePolicy2D::default(),
             style: Style::default(),
             build_result: BuildResult::default(),
@@ -86,11 +88,13 @@ impl WidgetInstance {
 
     /// When tab press focuses the widget
     pub fn on_focus(&self) {
-        self.mouse_state.set(WidgetMouseState::Hovered);
+        self.focused.set(true);
+        self.widget.on_gain_focus();
     }
 
     pub fn on_lose_focus(&self) {
-        self.mouse_state.set(WidgetMouseState::Normal);
+        self.focused.set(false);
+        self.widget.on_lose_focus();
     }
 
     pub fn id(&self) -> usize {
@@ -105,7 +109,9 @@ impl WidgetInstance {
         //context.allocate_space(self.size);
         self.build_rect = *context.get_content_rect();
         context.set_style(self.style.clone());
-        self.build_result = self.widget.build(context, &self.mouse_state);
+        self.build_result =
+            self.widget
+                .build(context, self.mouse_state.observe(), self.focused.observe());
     }
 
     pub fn set_size(mut self, size: SizePolicy2D) -> Self {

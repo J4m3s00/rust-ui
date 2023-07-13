@@ -1,10 +1,4 @@
-use crate::{
-    gui::{
-        svg::svg::Svg,
-        widget::{rendering::drawable::draw_svg::DrawSvg, widget::WidgetMouseState},
-    },
-    prelude::{BuildContext, BuildResult, ColorId, State, ToInstance, Widget, WidgetInstance},
-};
+use crate::prelude::*;
 
 pub struct Icon {
     icon: Svg,
@@ -19,7 +13,12 @@ impl Icon {
 }
 
 impl Widget for Icon {
-    fn build(&mut self, _ctx: &mut BuildContext, _: &State<WidgetMouseState>) -> BuildResult {
+    fn build(
+        &mut self,
+        _ctx: &mut BuildContext,
+        _: Observer<WidgetMouseState>,
+        _: Observer<bool>,
+    ) -> BuildResult {
         let mut res = BuildResult::default();
         res.draw_svg(DrawSvg::new_color(self.icon.clone(), ColorId::OnPrimary));
         res

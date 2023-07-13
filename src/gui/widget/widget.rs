@@ -2,7 +2,7 @@ use rust_graphics::keycodes::KeyCode;
 
 use crate::{
     gui::{app::interface::AppInterface, events::mouse::MouseEvent},
-    prelude::State,
+    prelude::Observer,
 };
 
 use super::{
@@ -21,7 +21,8 @@ pub trait Widget {
     fn build(
         &mut self,
         _ctx: &mut BuildContext,
-        _mouse_state: &State<WidgetMouseState>,
+        _mouse_state: Observer<WidgetMouseState>,
+        _focused: Observer<bool>,
     ) -> BuildResult {
         BuildResult::default()
     }
@@ -38,6 +39,7 @@ pub trait Widget {
     fn on_key_up(&self, _key: KeyCode, _interface: AppInterface) {}
     fn on_text_input(&self, _text: String, _interface: AppInterface) {}
 
+    /// Tab focus
     fn on_gain_focus(&self) {}
     fn on_lose_focus(&self) {}
 }

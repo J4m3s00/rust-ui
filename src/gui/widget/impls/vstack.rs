@@ -8,7 +8,7 @@ use crate::{
         size_policy::SizePolicy,
         widget::{ToInstance, WidgetMouseState},
     },
-    prelude::{ColorId, State, Widget, WidgetInstance},
+    prelude::{ColorId, Observer, Widget, WidgetInstance},
 };
 
 pub struct VStack {
@@ -22,7 +22,12 @@ impl VStack {
 }
 
 impl Widget for VStack {
-    fn build(&mut self, ctx: &mut BuildContext, _: &State<WidgetMouseState>) -> BuildResult {
+    fn build(
+        &mut self,
+        ctx: &mut BuildContext,
+        _: Observer<WidgetMouseState>,
+        _: Observer<bool>,
+    ) -> BuildResult {
         // Update context cursor direction for the children
         ctx.set_cursor_direction(CursorDirection::Vertical);
         let content_area = *ctx.get_content_rect();

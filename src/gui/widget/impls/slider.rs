@@ -78,7 +78,8 @@ impl Widget for SliderBase {
     fn build(
         &mut self,
         ctx: &mut BuildContext,
-        mouse_state: &State<WidgetMouseState>,
+        mouse_state: Observer<WidgetMouseState>,
+        _: Observer<bool>,
     ) -> BuildResult {
         let content_area = *ctx.get_content_rect();
 
@@ -96,7 +97,7 @@ impl Widget for SliderBase {
             }
         });
 
-        let color = (&self.knob, mouse_state).map(|state| match state {
+        let color = (self.knob.observe(), mouse_state).map(|state| match state {
             (KnobState::Idle, WidgetMouseState::Hovered) => Some(ColorId::SecondaryVariantLight),
             (KnobState::Dragging, _) => Some(ColorId::SecondaryVariantDark),
             _ => Some(ColorId::Secondary),

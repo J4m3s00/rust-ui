@@ -76,6 +76,19 @@ where
     }
 }
 
+impl<T> From<&State<T>> for Observer<T>
+where
+    T: Clone + 'static,
+{
+    fn from(state: &State<T>) -> Self {
+        Self {
+            state: Rc::new(ObserveState {
+                state: Rc::downgrade(&state.value),
+            }),
+        }
+    }
+}
+
 struct ObserveState<T: Clone> {
     state: Weak<StateInner<T>>,
 }

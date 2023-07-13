@@ -18,7 +18,12 @@ impl Label {
 }
 
 impl Widget for Label {
-    fn build(&mut self, _ctx: &mut BuildContext, _: &State<WidgetMouseState>) -> BuildResult {
+    fn build(
+        &mut self,
+        _ctx: &mut BuildContext,
+        _: Observer<WidgetMouseState>,
+        _: Observer<bool>,
+    ) -> BuildResult {
         let mut res = BuildResult::default();
         res.draw_text(self.text.clone());
         res

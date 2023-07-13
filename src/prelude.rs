@@ -4,6 +4,7 @@ pub use crate::{
     gui::{
         app::{app::UIApp, interface::AppInterface},
         events::{keyboard::KeyboardEvent, mouse::MouseEvent},
+        svg::svg::Svg,
         widget::{
             builder::{build_context::BuildContext, build_results::BuildResult},
             impls::button::Button,
@@ -15,7 +16,7 @@ pub use crate::{
             impls::vstack::VStack,
             rendering::{
                 align::{AlignH, AlignV},
-                drawable::{rectangle::DrawRect, text::Text, Drawable},
+                drawable::{draw_svg::DrawSvg, rectangle::DrawRect, text::Text, Drawable},
             },
             size_policy::SizePolicy,
             state::{observable::MapObserver, observable::Observer, state::State},

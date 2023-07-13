@@ -206,6 +206,11 @@ impl App for UIApp {
                     MouseEvent::from_app_event(&event, widget, self.input_state.mouse_pos)
                 {
                     widget.handle_mouse_event(&event, interface.clone());
+                    if event.button_down.is_some() && event.inside {
+                        if widget.does_accept_input() {
+                            self.input_state.focused_input = Some(widget.id()); // Silently gain focus
+                        }
+                    }
                 }
                 // If the widget is input active, we send over the key events
                 if let Some(id) = self.input_state.focused_input {

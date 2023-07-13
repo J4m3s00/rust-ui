@@ -1,13 +1,4 @@
-use crate::{
-    gui::widget::{
-        builder::{
-            build_context::{BuildContext, CursorDirection},
-            build_results::BuildResult,
-        },
-        widget::{ToInstance, WidgetMouseState},
-    },
-    prelude::{SizePolicy, State, Widget, WidgetInstance},
-};
+use crate::{gui::widget::builder::build_context::CursorDirection, prelude::*};
 
 pub struct HStack {
     children: Vec<WidgetInstance>,
@@ -20,7 +11,12 @@ impl HStack {
 }
 
 impl Widget for HStack {
-    fn build(&mut self, ctx: &mut BuildContext, _: &State<WidgetMouseState>) -> BuildResult {
+    fn build(
+        &mut self,
+        ctx: &mut BuildContext,
+        _: Observer<WidgetMouseState>,
+        _: Observer<bool>,
+    ) -> BuildResult {
         // Update context cursor direction for the children
         ctx.set_cursor_direction(CursorDirection::Horizontal);
 

@@ -7,7 +7,7 @@ use crate::{
         widget::{ToInstance, Widget, WidgetMouseState},
         widget_instance::WidgetInstance,
     },
-    prelude::State,
+    prelude::Observer,
 };
 
 pub struct ZStack {
@@ -21,7 +21,12 @@ impl ZStack {
 }
 
 impl Widget for ZStack {
-    fn build(&mut self, ctx: &mut BuildContext, _: &State<WidgetMouseState>) -> BuildResult {
+    fn build(
+        &mut self,
+        ctx: &mut BuildContext,
+        _: Observer<WidgetMouseState>,
+        _: Observer<bool>,
+    ) -> BuildResult {
         // Update context cursor direction for the children
         ctx.set_cursor_direction(CursorDirection::Stacked);
 
