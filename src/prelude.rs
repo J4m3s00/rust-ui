@@ -3,6 +3,7 @@ pub use crate::{
     error::Result,
     gui::{
         app::{app::UIApp, interface::AppInterface},
+        events::{keyboard::KeyboardEvent, mouse::MouseEvent},
         widget::{
             builder::{build_context::BuildContext, build_results::BuildResult},
             impls::button::Button,
@@ -26,4 +27,5 @@ pub use crate::{
     },
 };
 pub use rust_graphics::app::App;
+pub use rust_graphics::keycodes::KeyCode;
 pub use rust_graphics::vec::*;

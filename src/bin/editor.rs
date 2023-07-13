@@ -12,10 +12,12 @@ use rust_ui::{
 
 // Functional component
 fn menubar() -> WidgetInstance {
-    HStack::new(vec![Button::new("x", |_, inter: AppInterface| {
-        inter.quit()
-    })
-    .set_width(SizePolicy::PercentageV(1.))])
+    HStack::new(vec![
+        Button::new("x", |_, inter: AppInterface| inter.quit())
+            .set_width(SizePolicy::PercentageV(1.)),
+        Button::new("y", |_, inter: AppInterface| inter.quit())
+            .set_width(SizePolicy::PercentageV(1.)),
+    ])
     .set_height(SizePolicy::Fixed(30.0))
 }
 

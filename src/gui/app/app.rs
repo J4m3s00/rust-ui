@@ -2,7 +2,6 @@ use std::{cell::RefCell, rc::Rc};
 
 use rust_graphics::{
     app::App,
-    color::Color,
     draw_command::{DrawCommand, Fill, Stroke},
     events::app_events::AppEvent,
     font::Font,
@@ -14,13 +13,16 @@ use rust_graphics::{
 };
 
 use crate::{
-    gui::widget::{
-        builder::build_context::{BuildContext, CursorDirection},
-        style::space::ApplySpace,
-        theme::theme::Theme,
-        widget::MouseEvent,
+    gui::{
+        events::{keyboard::KeyboardEvent, mouse::MouseEvent},
+        widget::{
+            builder::build_context::{BuildContext, CursorDirection},
+            style::space::ApplySpace,
+            theme::theme::Theme,
+        },
     },
     prelude::{ColorId, WidgetInstance},
+    print_widget_tree,
 };
 
 use super::{
@@ -45,6 +47,14 @@ struct Panel {
 }
 
 impl Panel {
+    fn new(widget: WidgetInstance, position: Vec2, size: Vec2) -> Self {
+        Self {
+            widget,
+            position,
+            size,
+        }
+    }
+
     fn build(&mut self) {
         let mut build_context = BuildContext::new(
             Rect::new_from_xy(self.position.x, self.position.y, self.size.x, self.size.y),
@@ -54,7 +64,7 @@ impl Panel {
         self.widget.build(&mut build_context);
     }
 
-    fn draw(&self, font_manager: &FontManager, theme: &Theme) {
+    fn draw(&self, font_manager: &FontManager, theme: &Theme, input_state: &InputState) {
         DrawCommand::rect_fill(
             self.position.x,
             self.position.y,
@@ -67,7 +77,7 @@ impl Panel {
             if !item.visible() {
                 continue;
             }
-            let (result, area) = item.build_result();
+            let (result, area, _) = item.build_result();
             let mut padded_area = *area;
             padded_area.apply_space(&item.style().padding);
 
@@ -76,23 +86,21 @@ impl Panel {
                     .iter()
                     .for_each(DrawCommand::run);
             }
-
-            run_draw_command(&DrawCommand::Rect {
-                left: area.left,
-                top: area.top,
-                width: area.width(),
-                height: area.height(),
-                fill: None,
-                stroke: Some(Stroke {
-                    width: 1.,
-                    color: Color::new(
-                        0, //((node.id & 0xff000000) >> 24) as u8,
-                        0, //((node.id & 0xff0000) >> 16) as u8,
-                        0, //((node.id & 0xff00) >> 8) as u8,
-                        255,
-                    ),
-                }),
-            });
+            if let Some(id) = input_state.focused_input {
+                if id == item.id() && false {
+                    run_draw_command(&DrawCommand::Rect {
+                        left: area.left,
+                        top: area.top,
+                        width: area.width(),
+                        height: area.height(),
+                        fill: None,
+                        stroke: Some(Stroke {
+                            width: 1.,
+                            color: theme.colors.from_id(ColorId::OnPrimary),
+                        }),
+                    });
+                }
+            }
         }
     }
 }
@@ -120,11 +128,9 @@ impl UIApp {
         if !self.panels.is_empty() {
             panic!("Main container must be set before any other panel");
         }
-        self.panels.push(Panel {
-            widget,
-            position: (0., 0.).into(),
-            size: (0., 0.).into(),
-        });
+        print_widget_tree(&widget, 0);
+        self.panels
+            .push(Panel::new(widget, (0., 0.).into(), (0., 0.).into()));
         self
     }
 
@@ -135,6 +141,36 @@ impl UIApp {
         };
         main_container.size = (width, height).into();
         main_container.build();
+    }
+
+    pub fn focus_next_input(&mut self) {
+        if let Some(top_panel) = self.panels.last() {
+            if let Some(current_active) = self.input_state.focused_input {
+                let mut current_active_iter = top_panel
+                    .widget
+                    .iter()
+                    .filter(|widget| widget.does_accept_input())
+                    .skip_while(|widget| widget.id() != current_active);
+                let last_selected = current_active_iter.next();
+                let next_selected = current_active_iter.next();
+                self.input_state.focused_input = next_selected.map(WidgetInstance::id);
+                if let Some(last_selected) = last_selected {
+                    last_selected.on_lose_focus();
+                }
+                if let Some(next_selected) = next_selected {
+                    next_selected.on_focus();
+                }
+            } else {
+                self.input_state.focused_input = top_panel.widget.iter().find_map(|widget| {
+                    if widget.does_accept_input() {
+                        widget.on_focus();
+                        Some(widget.id())
+                    } else {
+                        None
+                    }
+                });
+            }
+        }
     }
 
     pub fn quit(&mut self) {
@@ -171,6 +207,14 @@ impl App for UIApp {
                 {
                     widget.handle_mouse_event(&event, interface.clone());
                 }
+                // If the widget is input active, we send over the key events
+                if let Some(id) = self.input_state.focused_input {
+                    if id == widget.id() {
+                        if let Some(keyboard_event) = KeyboardEvent::from_app_event(&event) {
+                            widget.handle_keyboard_event(&keyboard_event, interface.clone());
+                        }
+                    }
+                }
             }
         }
 
@@ -198,7 +242,11 @@ impl App for UIApp {
                     .contains((x as f32, y as f32).into())
                 })
             }
-            AppEvent::KeyDown(KeyCode::Escape, _) => self.quit(),
+            AppEvent::KeyDown(KeyCode::Escape, _) => self.input_state.focused_input = None,
+            AppEvent::KeyDown(KeyCode::Tab, _) => self.focus_next_input(),
+            AppEvent::TextInput(text) => {
+                println!("Text input: {}", text);
+            }
             _ => (),
         };
 
@@ -215,7 +263,7 @@ impl App for UIApp {
                 AppInterfaceEvent::Quit => self.quit(),
                 AppInterfaceEvent::OpenPanel(panel, pos) => {
                     println!("Open panel");
-                    let mut panel = Panel { widget: panel, position: pos, size: (250., 24.).into() };
+                    let mut panel = Panel::new(panel, pos, (250., 24.).into());
                     panel.build();
                     self.panels.push(panel);
                 }
@@ -226,7 +274,7 @@ impl App for UIApp {
 
     fn on_draw(&mut self) {
         for panel in self.panels.iter() {
-            panel.draw(&self.font_manager, &self.theme);
+            panel.draw(&self.font_manager, &self.theme, &self.input_state);
         }
     }
     fn should_quit(&self) -> bool {

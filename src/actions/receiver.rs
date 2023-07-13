@@ -14,5 +14,5 @@ where
 }
 
 impl<T> Receiver<T> for () {
-    fn action(&self, data: T, interface: AppInterface) {}
+    fn action(&self, _: T, _: AppInterface) {}
 }

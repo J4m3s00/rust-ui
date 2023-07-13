@@ -1,12 +1,9 @@
 use rust_graphics::draw_command::{Fill, Stroke};
 
 use crate::{
-    gui::{
-        svg::svg::Svg,
-        widget::{
-            rendering::drawable::{draw_svg::DrawSvg, item::DrawItem, rectangle::DrawRect},
-            state::observable::Observer,
-        },
+    gui::widget::{
+        rendering::drawable::{draw_svg::DrawSvg, item::DrawItem, rectangle::DrawRect},
+        state::observable::Observer,
     },
     prelude::{SizePolicy, Text},
 };

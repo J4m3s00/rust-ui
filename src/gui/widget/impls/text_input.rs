@@ -10,6 +10,7 @@ impl TextInput {
             value: State::new(Text::from(init_value).hor_align(AlignH::Left)),
         }
         .instance()
+        .accept_input()
     }
 }
 

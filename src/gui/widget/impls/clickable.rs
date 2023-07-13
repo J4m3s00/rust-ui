@@ -1,18 +1,4 @@
-use crate::{
-    gui::{
-        app::interface::AppInterface,
-        widget::{
-            builder::{build_context::BuildContext, build_results::BuildResult},
-            rendering::drawable::rectangle::DrawRect,
-            state::{
-                observable::{MapObserver, Observer},
-                state::State,
-            },
-            widget::{MouseEvent, WidgetMouseState},
-        },
-    },
-    prelude::{ColorId, Receiver, ToInstance, Widget, WidgetInstance},
-};
+use crate::prelude::*;
 
 pub struct Clicked(pub MouseEvent);
 
@@ -31,6 +17,7 @@ impl Clickable {
             on_click: Box::new(on_click),
         }
         .instance()
+        .accept_input()
     }
 }
 
@@ -52,9 +39,16 @@ impl Widget for Clickable {
         res
     }
 
-    fn on_mouse_up(&self, event: MouseEvent, interface: AppInterface) {
+    fn on_mouse_up(&self, event: &MouseEvent, interface: AppInterface) {
         if let Some(WidgetMouseState::Pressed) = self.mouse_state.get() {
-            self.on_click.action(Clicked(event), interface);
+            self.on_click.action(Clicked(event.clone()), interface);
+        }
+    }
+
+    fn on_key_down(&self, key: KeyCode, _interface: AppInterface) {
+        if KeyCode::Return == key {
+            self.on_click
+                .action(Clicked(MouseEvent::default()), _interface);
         }
     }
 

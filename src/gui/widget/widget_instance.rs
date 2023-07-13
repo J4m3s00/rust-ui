@@ -2,18 +2,22 @@ use std::fmt::Debug;
 
 use rust_graphics::rect::Rect;
 
-use crate::prelude::{AppInterface, Margin, SizePolicy, State, Style, Widget};
+use crate::{
+    gui::events::{keyboard::KeyboardEvent, mouse::MouseEvent},
+    prelude::{AppInterface, Margin, SizePolicy, State, Style, Widget},
+};
 
 use super::{
     builder::{build_context::BuildContext, build_results::BuildResult},
     iterator::WidgetIter,
     size_policy::SizePolicy2D,
     state::observable::Observer,
-    widget::{MouseEvent, WidgetMouseState},
+    widget::WidgetMouseState,
 };
 
 pub struct WidgetInstance {
     type_name: &'static str,
+    id: usize,
 
     widget: Box<dyn Widget>,
     visible: Observer<bool>,
@@ -25,6 +29,8 @@ pub struct WidgetInstance {
     // Build Results
     build_result: BuildResult,
     build_rect: Rect,
+    receive_input: bool,
+    child_input_ids: Vec<usize>,
 }
 
 impl Debug for WidgetInstance {
@@ -48,6 +54,11 @@ where
     }
 }
 
+fn get_id() -> usize {
+    static COUNTER: std::sync::atomic::AtomicUsize = std::sync::atomic::AtomicUsize::new(1);
+    COUNTER.fetch_add(1, std::sync::atomic::Ordering::Relaxed)
+}
+
 impl WidgetInstance {
     pub fn new<T>(widget: T) -> Self
     where
@@ -55,14 +66,39 @@ impl WidgetInstance {
     {
         Self {
             widget: Box::new(widget),
+            id: get_id(),
             visible: true.into(),
             mouse_state: WidgetMouseState::Normal.into(),
             size: SizePolicy2D::default(),
             style: Style::default(),
             build_result: BuildResult::default(),
             build_rect: Rect::default(),
+            child_input_ids: Vec::new(),
+            receive_input: false,
             type_name: std::any::type_name::<T>(),
         }
+    }
+
+    pub fn accept_input(mut self) -> Self {
+        self.receive_input = true;
+        self
+    }
+
+    /// When tab press focuses the widget
+    pub fn on_focus(&self) {
+        self.mouse_state.set(WidgetMouseState::Hovered);
+    }
+
+    pub fn on_lose_focus(&self) {
+        self.mouse_state.set(WidgetMouseState::Normal);
+    }
+
+    pub fn id(&self) -> usize {
+        self.id
+    }
+
+    pub fn does_accept_input(&self) -> bool {
+        self.receive_input
     }
 
     pub fn build(&mut self, context: &mut BuildContext) {
@@ -122,8 +158,8 @@ impl WidgetInstance {
         WidgetIter::new(self)
     }
 
-    pub fn build_result(&self) -> (&BuildResult, &Rect) {
-        (&self.build_result, &self.build_rect)
+    pub fn build_result(&self) -> (&BuildResult, &Rect, &Vec<usize>) {
+        (&self.build_result, &self.build_rect, &self.child_input_ids)
     }
 
     pub fn type_name(&self) -> &'static str {
@@ -132,23 +168,19 @@ impl WidgetInstance {
 
     pub fn handle_mouse_event(&self, event: &MouseEvent, app_interface: AppInterface) {
         if event.mouse_entered {
-            self.widget
-                .on_mouse_enter(event.clone(), app_interface.clone());
+            self.widget.on_mouse_enter(event, app_interface.clone());
         }
         if event.mouse_exited {
-            self.widget
-                .on_mouse_leave(event.clone(), app_interface.clone());
+            self.widget.on_mouse_leave(event, app_interface.clone());
         }
         if event.button_down.is_some() {
-            self.widget
-                .on_mouse_down(event.clone(), app_interface.clone());
+            self.widget.on_mouse_down(event, app_interface.clone());
         }
         if event.button_up.is_some() {
-            self.widget
-                .on_mouse_up(event.clone(), app_interface.clone());
+            self.widget.on_mouse_up(event, app_interface.clone());
         }
         if event.delta != (0.0, 0.0).into() {
-            self.widget.on_mouse_move(event.clone(), app_interface);
+            self.widget.on_mouse_move(event, app_interface);
         }
 
         match self.mouse_state.get() {
@@ -158,7 +190,7 @@ impl WidgetInstance {
                 }
             }
             WidgetMouseState::Hovered => {
-                if !event.inside {
+                if event.mouse_exited {
                     self.mouse_state.set(WidgetMouseState::Normal);
                 } else if let Some(1) = event.button_down {
                     self.mouse_state.set(WidgetMouseState::Pressed);
@@ -171,6 +203,14 @@ impl WidgetInstance {
                     self.mouse_state.set(WidgetMouseState::Hovered);
                 }
             }
+        }
+    }
+
+    pub fn handle_keyboard_event(&self, event: &KeyboardEvent, app_interface: AppInterface) {
+        match event {
+            KeyboardEvent::KeyDown(kc) => self.widget.on_key_down(*kc, app_interface),
+            KeyboardEvent::KeyUp(kc) => self.widget.on_key_up(*kc, app_interface),
+            KeyboardEvent::Text(text) => self.widget.on_text_input(text.clone(), app_interface),
         }
     }
 }

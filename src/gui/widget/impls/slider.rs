@@ -1,19 +1,4 @@
-use crate::{
-    gui::widget::{
-        builder::{build_context::BuildContext, build_results::BuildResult},
-        rendering::drawable::rectangle::DrawRect,
-        state::{
-            observable::{MapObserver, Observer},
-            state::State,
-        },
-        widget::{MouseEvent, WidgetMouseState},
-    },
-    prelude::{
-        AlignH, AppInterface, ColorId, HStack, Label, Margin, SizePolicy, Text, ToInstance, Widget,
-        WidgetInstance,
-    },
-    MapScalar,
-};
+use crate::{prelude::*, MapScalar};
 
 use super::{rectangle::Rectangle, zstack::ZStack};
 
@@ -68,6 +53,7 @@ impl SliderBase {
             slider_pixel_scale: Observer::value(1.),
         }
         .instance()
+        .accept_input()
     }
 
     fn get_value_from_piexels(&self, pixels: f32) -> f32 {
@@ -125,20 +111,28 @@ impl Widget for SliderBase {
         res
     }
 
-    fn on_mouse_down(&self, event: MouseEvent, _interface: AppInterface) {
+    fn on_mouse_down(&self, event: &MouseEvent, _interface: AppInterface) {
         if event.inside {
             self.knob.set(KnobState::Dragging);
             self.set_value(self.get_value_from_piexels(event.relative_pos.x));
         }
     }
 
-    fn on_mouse_up(&self, _event: MouseEvent, _interface: AppInterface) {
+    fn on_mouse_up(&self, _event: &MouseEvent, _interface: AppInterface) {
         self.knob.set(KnobState::Idle);
     }
 
-    fn on_mouse_move(&self, event: MouseEvent, _interface: AppInterface) {
+    fn on_mouse_move(&self, event: &MouseEvent, _interface: AppInterface) {
         if let KnobState::Dragging = self.knob.get() {
             self.set_value(self.get_value_from_piexels(event.relative_pos.x));
+        }
+    }
+
+    fn on_key_down(&self, key: KeyCode, _interface: AppInterface) {
+        match key {
+            KeyCode::Left => self.set_value(self.value.get() - 1.),
+            KeyCode::Right => self.set_value(self.value.get() + 1.),
+            _ => {}
         }
     }
 }
