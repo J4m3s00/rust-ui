@@ -3,7 +3,7 @@ use std::{
     rc::{Rc, Weak},
 };
 
-use rust_graphics::vec::Vec2;
+use rust_graphics::{cursor::SystemCursor, vec::Vec2};
 
 use crate::{gui::widget::theme::theme::Theme, prelude::WidgetInstance};
 
@@ -11,6 +11,7 @@ pub enum AppInterfaceEvent {
     Quit,
     OpenPanel(WidgetInstance, Vec2),
     ChangeTheme(Theme),
+    ChangeCursor(SystemCursor),
 }
 
 #[derive(Clone)]
@@ -35,6 +36,10 @@ impl AppInterface {
 
     pub fn change_theme(&self, theme: Theme) {
         self.push_event(AppInterfaceEvent::ChangeTheme(theme));
+    }
+
+    pub fn change_cursor(&self, cursor: SystemCursor) {
+        self.push_event(AppInterfaceEvent::ChangeCursor(cursor));
     }
 
     fn push_event(&self, event: AppInterfaceEvent) {

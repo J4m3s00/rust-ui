@@ -39,7 +39,7 @@ impl BuildResult {
         self.push_item(DrawItem::new(svg))
     }
 
-    fn push_item(&mut self, item: DrawItem) -> &mut DrawItem {
+    pub fn push_item(&mut self, item: DrawItem) -> &mut DrawItem {
         self.render_items.push(item);
         self.render_items.last_mut().unwrap()
     }

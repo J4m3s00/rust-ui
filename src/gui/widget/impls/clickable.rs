@@ -42,7 +42,7 @@ impl Widget for Clickable {
         }
     }
 
-    fn on_key_down(&self, key: KeyCode, _interface: AppInterface) {
+    fn on_key_down(&self, key: KeyCode, _: KeyMods, _interface: AppInterface) {
         if KeyCode::Return == key {
             self.on_click
                 .action(Clicked(MouseEvent::default()), _interface);

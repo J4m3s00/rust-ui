@@ -8,7 +8,7 @@ use rust_graphics::{
     init_app,
     keycodes::KeyCode,
     rect::Rect,
-    run_draw_command,
+    run_draw_command, set_cursor,
     vec::Vec2,
 };
 
@@ -273,6 +273,9 @@ impl App for UIApp {
                     self.panels.push(panel);
                 }
                 AppInterfaceEvent::ChangeTheme(theme) => self.theme = theme,
+                AppInterfaceEvent::ChangeCursor(cursor) => {
+                    set_cursor(cursor);
+                }
             }
         }
     }

@@ -129,7 +129,7 @@ impl Widget for SliderBase {
         }
     }
 
-    fn on_key_down(&self, key: KeyCode, _interface: AppInterface) {
+    fn on_key_down(&self, key: KeyCode, _: KeyMods, _interface: AppInterface) {
         match key {
             KeyCode::Left => self.set_value(self.value.get() - 1.),
             KeyCode::Right => self.set_value(self.value.get() + 1.),

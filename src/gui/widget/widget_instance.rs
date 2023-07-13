@@ -1,6 +1,6 @@
 use std::fmt::Debug;
 
-use rust_graphics::rect::Rect;
+use rust_graphics::{cursor::SystemCursor, rect::Rect};
 
 use crate::{
     gui::events::{keyboard::KeyboardEvent, mouse::MouseEvent},
@@ -26,6 +26,7 @@ pub struct WidgetInstance {
     // Stlying
     size: SizePolicy2D,
     style: Style,
+    custom_cursor: Option<SystemCursor>,
 
     // Build Results
     build_result: BuildResult,
@@ -73,6 +74,7 @@ impl WidgetInstance {
             focused: false.into(),
             size: SizePolicy2D::default(),
             style: Style::default(),
+            custom_cursor: None,
             build_result: BuildResult::default(),
             build_rect: Rect::default(),
             child_input_ids: Vec::new(),
@@ -83,6 +85,11 @@ impl WidgetInstance {
 
     pub fn accept_input(mut self) -> Self {
         self.receive_input = true;
+        self
+    }
+
+    pub fn custom_cursor(mut self, cursor: SystemCursor) -> Self {
+        self.custom_cursor = Some(cursor);
         self
     }
 
@@ -174,9 +181,15 @@ impl WidgetInstance {
 
     pub fn handle_mouse_event(&self, event: &MouseEvent, app_interface: AppInterface) {
         if event.mouse_entered {
+            if let Some(cursor) = &self.custom_cursor {
+                app_interface.change_cursor(cursor.clone());
+            }
             self.widget.on_mouse_enter(event, app_interface.clone());
         }
         if event.mouse_exited {
+            if let Some(_) = &self.custom_cursor {
+                app_interface.change_cursor(SystemCursor::Arrow);
+            }
             self.widget.on_mouse_leave(event, app_interface.clone());
         }
         if event.button_down.is_some() {
@@ -214,8 +227,8 @@ impl WidgetInstance {
 
     pub fn handle_keyboard_event(&self, event: &KeyboardEvent, app_interface: AppInterface) {
         match event {
-            KeyboardEvent::KeyDown(kc) => self.widget.on_key_down(*kc, app_interface),
-            KeyboardEvent::KeyUp(kc) => self.widget.on_key_up(*kc, app_interface),
+            KeyboardEvent::KeyDown(kc, mods) => self.widget.on_key_down(*kc, *mods, app_interface),
+            KeyboardEvent::KeyUp(kc, mods) => self.widget.on_key_up(*kc, *mods, app_interface),
             KeyboardEvent::Text(text) => self.widget.on_text_input(text.clone(), app_interface),
         }
     }

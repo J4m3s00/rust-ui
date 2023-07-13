@@ -1,4 +1,4 @@
-use rust_graphics::keycodes::KeyCode;
+use rust_graphics::{events::app_events::KeyMods, keycodes::KeyCode};
 
 use crate::{
     gui::{app::interface::AppInterface, events::mouse::MouseEvent},
@@ -35,8 +35,8 @@ pub trait Widget {
     fn on_mouse_move(&self, _event: &MouseEvent, _interface: AppInterface) {}
     fn on_mouse_enter(&self, _event: &MouseEvent, _interface: AppInterface) {}
     fn on_mouse_leave(&self, _event: &MouseEvent, _interface: AppInterface) {}
-    fn on_key_down(&self, _key: KeyCode, _interface: AppInterface) {}
-    fn on_key_up(&self, _key: KeyCode, _interface: AppInterface) {}
+    fn on_key_down(&self, _key: KeyCode, _mods: KeyMods, _interface: AppInterface) {}
+    fn on_key_up(&self, _key: KeyCode, _mods: KeyMods, _interface: AppInterface) {}
     fn on_text_input(&self, _text: String, _interface: AppInterface) {}
 
     /// Tab focus
