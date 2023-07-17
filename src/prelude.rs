@@ -7,13 +7,10 @@ pub use crate::{
         svg::svg::Svg,
         widget::{
             builder::{build_context::BuildContext, build_results::BuildResult},
-            impls::button::Button,
-            impls::hstack::HStack,
-            impls::label::Label,
-            impls::slider::Slider,
-            impls::spacer::Spacer,
-            impls::text_input::TextInput,
-            impls::vstack::VStack,
+            impls::{
+                button::*, checkbox::*, hstack::*, icon::*, icon_button::*, label::*, menu::*,
+                panel::*, slider::*, spacer::*, text_input::*, vstack::*, zstack::*,
+            },
             rendering::{
                 align::{AlignH, AlignV},
                 drawable::{draw_svg::DrawSvg, rectangle::DrawRect, text::Text, Drawable},
@@ -28,5 +25,6 @@ pub use crate::{
     },
 };
 pub use rust_graphics::{
-    app::App, cursor::SystemCursor, events::app_events::KeyMods, keycodes::KeyCode, vec::*,
+    app::App, cursor::SystemCursor, events::app_events::KeyMods, keycodes::KeyCode, rect::Rect,
+    vec::*,
 };

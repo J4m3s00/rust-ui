@@ -1,64 +1,32 @@
-use rust_ui::{
-    gui::widget::{
-        impls::{
-            checkbox::{Checkbox, CheckboxChange},
-            clickable::Clicked,
-            icon::{Icon, IconType},
-        },
-        theme::theme::Theme,
-    },
-    prelude::*,
-};
+use rust_ui::prelude::*;
 
-// Functional component
-fn menubar() -> WidgetInstance {
+fn footer() -> WidgetInstance {
     HStack::new(vec![
-        Button::new("x", |_, inter: AppInterface| inter.quit())
-            .set_width(SizePolicy::PercentageV(1.)),
-        Button::new("y", |_, inter: AppInterface| inter.quit())
-            .set_width(SizePolicy::PercentageV(1.)),
+        Button::new("Save", |_, _| {
+            println!("Save");
+        }),
+        Button::new("Save As", |_, _| {
+            println!("Save As");
+        }),
+        Button::new("Open", |_, _| {
+            println!("Open");
+        }),
     ])
-    .set_height(SizePolicy::Fixed(30.0))
+    .set_height(SizePolicy::Fixed(24.))
 }
 
-fn sidebar() -> WidgetInstance {
-    let theme_state = State::new(true);
-
+fn side_bar() -> WidgetInstance {
     VStack::new(vec![
-        Slider::new(State::new(50.)).set_height(SizePolicy::Fixed(32.)),
-        Checkbox::new_c(
-            theme_state.map(|checked| {
-                if *checked {
-                    Text::from("Dark Theme")
-                } else {
-                    Text::from("Light Theme")
-                }
-            }),
-            theme_state,
-            |checked: CheckboxChange, inter: AppInterface| {
-                inter.change_theme(if checked.checked {
-                    Theme::dark_theme()
-                } else {
-                    Theme::light_theme()
-                });
-            },
-        )
-        .set_height(SizePolicy::Fixed(32.)),
-        Button::new("Button", |click: Clicked, inter: AppInterface| {
-            inter.open_panel(Button::new("Hello World!", |_, _| {}), click.0.absolute_pos);
-        })
-        .set_height(SizePolicy::Fixed(32.)),
-        Button::new("Test Button", |_, _| {}).set_height(SizePolicy::Fixed(32.)),
-        TextInput::new("Hello World").set_height(SizePolicy::Fixed(32.)),
+        IconButton::new(IconType::Home, |_, _| {}).set_height(SizePolicy::PercentageH(1.)),
+        IconButton::new(IconType::Home, |_, _| {}).set_height(SizePolicy::PercentageH(1.)),
+        IconButton::new(IconType::Home, |_, _| {}).set_height(SizePolicy::PercentageH(1.)),
+        IconButton::new(IconType::Home, |_, _| {}).set_height(SizePolicy::PercentageH(1.)),
     ])
-    .set_width(SizePolicy::Fixed(250.0))
+    .set_width(SizePolicy::Fixed(56.))
 }
 
 fn main_container() -> WidgetInstance {
-    VStack::new(vec![
-        menubar(),
-        HStack::new(vec![sidebar(), Icon::new(IconType::Refresh)]),
-    ])
+    VStack::new(vec![HStack::new(vec![side_bar()]), footer()])
 }
 
 fn main() {

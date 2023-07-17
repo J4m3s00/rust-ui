@@ -1,27 +1,16 @@
 use std::{cell::RefCell, rc::Rc};
 
 use rust_graphics::{
-    app::App,
-    draw_command::{DrawCommand, Fill, Stroke},
-    events::app_events::AppEvent,
-    font::Font,
-    init_app,
-    keycodes::KeyCode,
-    rect::Rect,
-    run_draw_command, set_cursor,
-    vec::Vec2,
+    app::App, events::app_events::AppEvent, font::Font, init_app, keycodes::KeyCode, rect::Rect,
+    set_cursor,
 };
 
 use crate::{
     gui::{
         events::{keyboard::KeyboardEvent, mouse::MouseEvent},
-        widget::{
-            builder::build_context::{BuildContext, CursorDirection},
-            style::space::ApplySpace,
-            theme::theme::Theme,
-        },
+        widget::theme::theme::Theme,
     },
-    prelude::{ColorId, WidgetInstance},
+    prelude::*,
     print_widget_tree,
 };
 
@@ -40,70 +29,6 @@ impl FontManager {
     }
 }
 
-struct Panel {
-    widget: WidgetInstance,
-    position: Vec2,
-    size: Vec2,
-}
-
-impl Panel {
-    fn new(widget: WidgetInstance, position: Vec2, size: Vec2) -> Self {
-        Self {
-            widget,
-            position,
-            size,
-        }
-    }
-
-    fn build(&mut self) {
-        let mut build_context = BuildContext::new(
-            Rect::new_from_xy(self.position.x, self.position.y, self.size.x, self.size.y),
-            CursorDirection::Vertical,
-        );
-
-        self.widget.build(&mut build_context);
-    }
-
-    fn draw(&self, font_manager: &FontManager, theme: &Theme, input_state: &InputState) {
-        DrawCommand::rect_fill(
-            self.position.x,
-            self.position.y,
-            self.size.x,
-            self.size.y,
-            Fill::new(theme.colors.from_id(ColorId::Background)),
-        )
-        .run();
-        for item in self.widget.iter() {
-            if !item.visible() {
-                continue;
-            }
-            let (result, area, _) = item.build_result();
-            let mut padded_area = *area;
-            padded_area.apply_space(&item.style().padding);
-
-            for item in result.render_items().iter() {
-                item.get_draw_command(&padded_area, font_manager, theme)
-                    .iter()
-                    .for_each(DrawCommand::run);
-            }
-            if let Some(id) = input_state.focused_input {
-                if id == item.id() && false {
-                    run_draw_command(&DrawCommand::Rect {
-                        left: area.left,
-                        top: area.top,
-                        width: area.width(),
-                        height: area.height(),
-                        fill: None,
-                        stroke: Some(Stroke {
-                            width: 1.,
-                            color: theme.colors.from_id(ColorId::OnPrimary),
-                        }),
-                    });
-                }
-            }
-        }
-    }
-}
 pub struct UIApp {
     panels: Vec<Panel>,
 
@@ -139,7 +64,7 @@ impl UIApp {
             println!("No main container set. Cant rebuild");
             return;
         };
-        main_container.size = (width, height).into();
+        main_container.set_size((width, height).into());
         main_container.build();
     }
 
