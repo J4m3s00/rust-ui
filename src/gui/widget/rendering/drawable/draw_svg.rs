@@ -44,7 +44,7 @@ impl Drawable for DrawSvg {
                     area,
                     self.color
                         .as_ref()
-                        .map(|c| c.get().map(|c| Stroke::new(theme.colors.from_id(c), 2.0)))
+                        .map(|c| c.get().map(|c| Stroke::new(theme.colors.from_id(c), 1.0)))
                         .unwrap_or(None),
                 )
             })

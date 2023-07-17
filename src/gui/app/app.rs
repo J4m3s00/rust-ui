@@ -64,7 +64,7 @@ impl UIApp {
             println!("No main container set. Cant rebuild");
             return;
         };
-        main_container.set_size((width, height).into());
+        main_container.set_size((width, height));
         main_container.build();
     }
 
@@ -164,10 +164,10 @@ impl App for UIApp {
                         return true;
                     }
                     Rect::new_from_xy(
-                        panel.position.x,
-                        panel.position.y,
-                        panel.size.x,
-                        panel.size.y,
+                        panel.position().x,
+                        panel.position().y,
+                        panel.size().x,
+                        panel.size().y,
                     )
                     .contains((x as f32, y as f32).into())
                 })

@@ -13,29 +13,9 @@ use crate::{
     prelude::*,
 };
 pub struct Panel {
-    widget: WidgetInstance,
-    position: State<Vec2>,
-    size: State<Vec2>,
-}
-
-impl Widget for Panel {
-    fn build(
-        &mut self,
-        _ctx: &mut BuildContext,
-        _mouse_state: Observer<WidgetMouseState>,
-        _focused: Observer<bool>,
-    ) -> BuildResult {
-        let position = self.position.get();
-        let size = self.size.get();
-
-        let mut build_context = BuildContext::new(
-            Rect::new_from_xy(position.x, position.y, size.x, size.y),
-            CursorDirection::Vertical,
-        );
-
-        self.widget.build(&mut build_context);
-        BuildResult::default()
-    }
+    pub(crate) widget: WidgetInstance,
+    pub(crate) position: State<Vec2>,
+    pub(crate) size: State<Vec2>,
 }
 
 impl Panel {
@@ -45,6 +25,18 @@ impl Panel {
             position: State::new(position),
             size: State::new(size),
         }
+    }
+
+    pub fn build(&mut self) {
+        let position = self.position.get();
+        let size = self.size.get();
+
+        let mut build_context = BuildContext::new(
+            Rect::new_from_xy(position.x, position.y, size.x, size.y),
+            CursorDirection::Vertical,
+        );
+
+        self.widget.build(&mut build_context);
     }
 
     pub fn draw(&self, font_manager: &FontManager, theme: &Theme, input_state: &InputState) {

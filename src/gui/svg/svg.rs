@@ -105,7 +105,7 @@ impl Svg {
                                 "Path should have a d attribute".into(),
                             ))?;
                         let mut path_builder = PathBuilder::new();
-                        path_builder.stroke(Some(Stroke::new(COLOR_BLACK, 4.0)));
+                        path_builder.stroke(Some(Stroke::new(COLOR_BLACK, 1.0)));
                         //path_builder.fill(Some(Fill::new(COLOR_BLUE)));
                         for seg in PathParser::from(d.as_str()).flatten() {
                             match seg {

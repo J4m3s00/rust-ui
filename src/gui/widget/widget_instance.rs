@@ -44,18 +44,6 @@ impl Debug for WidgetInstance {
     }
 }
 
-impl<T> From<T> for WidgetInstance
-where
-    T: Widget + 'static,
-{
-    fn from(widget: T) -> Self
-    where
-        T: Widget + 'static,
-    {
-        Self::new(widget)
-    }
-}
-
 fn get_id() -> usize {
     static COUNTER: std::sync::atomic::AtomicUsize = std::sync::atomic::AtomicUsize::new(1);
     COUNTER.fetch_add(1, std::sync::atomic::Ordering::Relaxed)
