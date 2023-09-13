@@ -1,7 +1,4 @@
-use rust_graphics::{
-    color::Color,
-    draw_command::{DrawCommand, Fill},
-};
+use rust_graphics::draw_command::{DrawCommand, Fill};
 
 use crate::{gui::widget::rendering::drawable::item::DrawItem, prelude::*};
 
