@@ -4,6 +4,7 @@ pub mod actions;
 pub mod error;
 pub mod gui;
 pub mod prelude;
+pub mod rect;
 
 pub fn print_widget_tree(widget: &WidgetInstance, indent: usize) {
     let indent_str = "\t".repeat(indent);

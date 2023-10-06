@@ -11,7 +11,7 @@ pub struct Style {
 impl Default for Style {
     fn default() -> Self {
         Self {
-            margin: Margin::all(2.),
+            margin: Margin::new_all(2.),
             padding: Padding::zero(),
         }
     }

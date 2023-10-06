@@ -1,14 +1,16 @@
 use rust_graphics::{
-    color::COLOR_BLACK,
+    color::Color,
     draw_command::{DrawCommand, Stroke},
     path_builder::{Path, PathBuilder},
-    rect::Rect,
     vec::Vec2,
 };
 use svgtypes::{PathParser, PathSegment};
 use xml::{reader::XmlEvent, EventReader};
 
-use crate::{error::Error, prelude::Result};
+use crate::{
+    error::Error,
+    prelude::{Rect, Result},
+};
 
 #[derive(Debug, Clone)]
 enum SvgElement {
@@ -35,8 +37,16 @@ impl Svg {
         for elem in self.segments.iter() {
             match elem {
                 SvgElement::Path(path) => res.push(match override_stroke {
-                    Some(stroke) => DrawCommand::path_stroke(path.clone(), self.size, rect, stroke),
-                    None => DrawCommand::path(path.clone(), self.size, rect),
+                    Some(stroke) => DrawCommand::path_stroke(
+                        path.clone(),
+                        self.size,
+                        rect.position(),
+                        rect.size(),
+                        stroke,
+                    ),
+                    None => {
+                        DrawCommand::path(path.clone(), self.size, rect.position(), rect.size())
+                    }
                 }),
             }
         }
@@ -105,7 +115,7 @@ impl Svg {
                                 "Path should have a d attribute".into(),
                             ))?;
                         let mut path_builder = PathBuilder::new();
-                        path_builder.stroke(Some(Stroke::new(COLOR_BLACK, 1.0)));
+                        path_builder.stroke(Some(Stroke::new(Color::BLACK, 1.0)));
                         //path_builder.fill(Some(Fill::new(COLOR_BLUE)));
                         for seg in PathParser::from(d.as_str()).flatten() {
                             match seg {

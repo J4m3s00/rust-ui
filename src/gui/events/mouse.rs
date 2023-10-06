@@ -25,7 +25,7 @@ impl MouseEvent {
         match event {
             AppEvent::MouseMove { x, y } => {
                 let absolute_pos = Vec2::new(*x as f32, *y as f32);
-                let relative_pos = absolute_pos - build_rect.top_left();
+                let relative_pos = absolute_pos - build_rect.position();
                 let delta = absolute_pos - last_mouse_pos;
                 let mouse_entered =
                     build_rect.contains(absolute_pos) && !build_rect.contains(last_mouse_pos);
@@ -45,7 +45,7 @@ impl MouseEvent {
             }
             AppEvent::MouseDown { key, x, y } => {
                 let absolute_pos = Vec2::new(*x as f32, *y as f32);
-                let relative_pos = absolute_pos - build_rect.top_left();
+                let relative_pos = absolute_pos - build_rect.position();
                 let delta = absolute_pos - last_mouse_pos;
                 let mouse_entered =
                     build_rect.contains(absolute_pos) && !build_rect.contains(last_mouse_pos);
@@ -65,7 +65,7 @@ impl MouseEvent {
             }
             AppEvent::MouseUp { key, x, y } => {
                 let absolute_pos = Vec2::new(*x as f32, *y as f32);
-                let relative_pos = absolute_pos - build_rect.top_left();
+                let relative_pos = absolute_pos - build_rect.position();
                 let delta = absolute_pos - last_mouse_pos;
                 let mouse_entered =
                     build_rect.contains(absolute_pos) && !build_rect.contains(last_mouse_pos);

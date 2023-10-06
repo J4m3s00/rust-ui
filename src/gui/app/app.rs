@@ -1,8 +1,7 @@
 use std::{cell::RefCell, rc::Rc};
 
 use rust_graphics::{
-    app::App, events::app_events::AppEvent, font::Font, init_app, keycodes::KeyCode, rect::Rect,
-    set_cursor,
+    app::App, events::app_events::AppEvent, font::Font, init_app, keycodes::KeyCode, set_cursor,
 };
 
 use crate::{
@@ -163,13 +162,7 @@ impl App for UIApp {
                         first = false;
                         return true;
                     }
-                    Rect::new_from_xy(
-                        panel.position().x,
-                        panel.position().y,
-                        panel.size().x,
-                        panel.size().y,
-                    )
-                    .contains((x as f32, y as f32).into())
+                    Rect::new(panel.position(), panel.size()).contains((x as f32, y as f32))
                 })
             }
             AppEvent::KeyDown(KeyCode::Escape, _) => self.input_state.focused_input = None,

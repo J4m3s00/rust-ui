@@ -23,8 +23,8 @@ pub use crate::{
             widget_instance::WidgetInstance,
         },
     },
+    rect::Rect,
 };
 pub use rust_graphics::{
-    app::App, cursor::SystemCursor, events::app_events::KeyMods, keycodes::KeyCode, rect::Rect,
-    vec::*,
+    app::App, cursor::SystemCursor, events::app_events::KeyMods, keycodes::KeyCode, vec::*,
 };

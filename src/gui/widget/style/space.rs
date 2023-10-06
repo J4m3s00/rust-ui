@@ -1,4 +1,6 @@
-use rust_graphics::rect::Rect;
+use rust_graphics::vec::Vec2;
+
+use crate::prelude::Rect;
 
 /// Used for Padding and Margin
 /// Space between the content and the border
@@ -22,7 +24,7 @@ impl ElementSpace {
         }
     }
 
-    pub fn axis(horizontal: f32, vertical: f32) -> Self {
+    pub fn new_axis(horizontal: f32, vertical: f32) -> Self {
         Self {
             left: horizontal,
             right: horizontal,
@@ -31,7 +33,7 @@ impl ElementSpace {
         }
     }
 
-    pub fn horizontal(horizontal: f32) -> Self {
+    pub fn new_horizontal(horizontal: f32) -> Self {
         Self {
             left: horizontal,
             right: horizontal,
@@ -40,7 +42,7 @@ impl ElementSpace {
         }
     }
 
-    pub fn vertical(vertical: f32) -> Self {
+    pub fn new_vertical(vertical: f32) -> Self {
         Self {
             left: 0.0,
             right: 0.0,
@@ -49,7 +51,7 @@ impl ElementSpace {
         }
     }
 
-    pub fn all(value: f32) -> Self {
+    pub fn new_all(value: f32) -> Self {
         Self {
             left: value,
             right: value,
@@ -59,19 +61,18 @@ impl ElementSpace {
     }
 
     pub fn zero() -> Self {
-        Self::all(0.0)
+        Self::new_all(0.0)
     }
-}
 
-pub trait ApplySpace {
-    fn apply_space(&mut self, space: &ElementSpace);
-}
+    pub fn horizontal(&self) -> f32 {
+        self.left + self.right
+    }
 
-impl ApplySpace for Rect {
-    fn apply_space(&mut self, space: &ElementSpace) {
-        self.left += space.left;
-        self.top += space.top;
-        self.right -= space.right;
-        self.bottom -= space.bottom;
+    pub fn vertical(&self) -> f32 {
+        self.top + self.bottom
+    }
+
+    pub fn axis(&self) -> Vec2 {
+        Vec2::new(self.horizontal(), self.vertical())
     }
 }

@@ -1,14 +1,11 @@
-use rust_graphics::{
-    draw_command::{DrawCommand, Fill, Stroke},
-    rect::Rect,
-};
+use rust_graphics::draw_command::{DrawCommand, Fill, Stroke};
 
 use crate::{
     gui::{
         app::app::FontManager,
         widget::{state::observable::Observer, theme::theme::Theme},
     },
-    prelude::ColorId,
+    prelude::{ColorId, Rect},
 };
 
 use super::Drawable;
@@ -53,8 +50,8 @@ impl Drawable for DrawRect {
         });
 
         vec![DrawCommand::Rect {
-            left: area.left,
-            top: area.top,
+            left: area.left(),
+            top: area.top(),
             width: area.width(),
             height: area.height(),
             fill,

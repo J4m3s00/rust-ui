@@ -1,7 +1,4 @@
-use rust_graphics::{
-    draw_command::{DrawCommand, Stroke},
-    rect::Rect,
-};
+use rust_graphics::draw_command::{DrawCommand, Stroke};
 
 use crate::{
     gui::{
@@ -9,7 +6,7 @@ use crate::{
         svg::svg::Svg,
         widget::{state::observable::Observer, theme::theme::Theme},
     },
-    prelude::ColorId,
+    prelude::{ColorId, Rect},
 };
 
 use super::Drawable;

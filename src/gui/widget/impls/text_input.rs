@@ -21,7 +21,7 @@ struct CursorDrawer {
 impl Drawable for CursorDrawer {
     fn draw(
         &self,
-        area: rust_graphics::rect::Rect,
+        area: Rect,
         font_manager: &crate::gui::app::app::FontManager,
         theme: &crate::gui::widget::theme::theme::Theme,
     ) -> Vec<rust_graphics::draw_command::DrawCommand> {
@@ -36,8 +36,8 @@ impl Drawable for CursorDrawer {
         let offset_x = font.get_text_width(&text.text[..cursor_pos]);
         println!("Offset: {offset_x}; {cursor_pos}");
         vec![DrawCommand::rect_fill(
-            area.left + offset_x as f32,
-            area.top + CURSOR_PADDING_V,
+            area.left() + offset_x as f32,
+            area.top() + CURSOR_PADDING_V,
             CURSOR_WIDTH,
             area.height() - (CURSOR_PADDING_V * 2.0),
             Fill::new(theme.colors.from_id(ColorId::OnPrimary)),

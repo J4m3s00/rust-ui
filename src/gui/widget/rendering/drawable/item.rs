@@ -1,4 +1,4 @@
-use rust_graphics::{draw_command::DrawCommand, rect::Rect, vec::Vec2};
+use rust_graphics::{draw_command::DrawCommand, vec::Vec2};
 
 use crate::{
     gui::{
@@ -13,7 +13,7 @@ use crate::{
             theme::theme::Theme,
         },
     },
-    prelude::{AlignH, AlignV, SizePolicy},
+    prelude::{AlignH, AlignV, Rect, SizePolicy},
 };
 
 use super::Drawable;
@@ -173,14 +173,14 @@ impl DrawItem {
         let position_offset = offset.calculate_size(parent_rect.size());
         let align_point = Vec2::from((
             match alignment.horizontal {
-                AlignH::Left => parent_rect.left,
+                AlignH::Left => parent_rect.left(),
                 AlignH::Center => parent_rect.center().x,
-                AlignH::Right => parent_rect.right,
+                AlignH::Right => parent_rect.right(),
             },
             match alignment.vertical {
-                AlignV::Top => parent_rect.top,
+                AlignV::Top => parent_rect.top(),
                 AlignV::Center => parent_rect.center().y,
-                AlignV::Bottom => parent_rect.bottom,
+                AlignV::Bottom => parent_rect.bottom(),
             },
         ));
         let anchor_offset = Vec2::from((
@@ -197,7 +197,7 @@ impl DrawItem {
         ));
 
         let pos = align_point - anchor_offset + position_offset;
-        Rect::new_from_xy(pos.x, pos.y, size.x, size.y)
+        Rect::new(pos, size)
     }
 
     pub fn get_draw_command(

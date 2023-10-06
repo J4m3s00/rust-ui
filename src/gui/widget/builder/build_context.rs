@@ -1,6 +1,6 @@
-use rust_graphics::{rect::Rect, vec::Vec2};
+use rust_graphics::vec::Vec2;
 
-use crate::prelude::Style;
+use crate::prelude::{Rect, Style};
 
 #[derive(Copy, Clone, Debug)]
 pub enum CursorDirection {
@@ -31,7 +31,7 @@ impl BuildContext {
             content_rect,
             cursor: Cursor {
                 direction: cursor_direction,
-                pos: content_rect.top_left(),
+                pos: content_rect.position(),
             },
             current_style: Style::default(),
         }
@@ -43,11 +43,15 @@ impl BuildContext {
     /// of the allocated space.
     pub fn allocate_space(&mut self, size: impl Into<Vec2>) -> Option<BuildContext> {
         let size = size.into();
-        let content_area = Rect::new_from_xy(
-            self.cursor.pos.x + self.current_style.margin.left,
-            self.cursor.pos.y + self.current_style.margin.top,
-            size.x - (self.current_style.margin.left + self.current_style.margin.right),
-            size.y - (self.current_style.margin.top + self.current_style.margin.bottom),
+        let content_area = Rect::new(
+            (
+                self.cursor.pos.x + self.current_style.margin.left,
+                self.cursor.pos.y + self.current_style.margin.top,
+            ),
+            (
+                size.x - (self.current_style.margin.left + self.current_style.margin.right),
+                size.y - (self.current_style.margin.top + self.current_style.margin.bottom),
+            ),
         );
         let advance = match self.cursor.direction {
             CursorDirection::Horizontal => (size.x, 0.).into(),

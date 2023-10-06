@@ -44,7 +44,7 @@ impl Checkbox {
     ) -> WidgetInstance {
         let observer = checked.observe();
         ZStack::new(vec![
-            Rectangle::fill(ColorId::PrimaryVariantLight).set_padding(Padding::all(10.)),
+            Rectangle::fill(ColorId::PrimaryVariantLight).set_padding(Padding::new_all(10.)),
             Clickable::new(move |_, i| {
                 checked.set(!checked.get());
                 on_change.action(

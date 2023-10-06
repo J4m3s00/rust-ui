@@ -1,8 +1,7 @@
 use rust_graphics::{
-    color::{Color, COLOR_BLACK},
+    color::Color,
     draw_command::{DrawCommand, Stroke},
     font::Font,
-    rect::Rect,
 };
 
 use crate::{
@@ -10,7 +9,7 @@ use crate::{
         app::app::FontManager,
         widget::{state::observable::Observer, theme::theme::Theme},
     },
-    prelude::{AlignH, AlignV, ColorId},
+    prelude::{AlignH, AlignV, ColorId, Rect},
 };
 
 use super::Drawable;
@@ -30,7 +29,7 @@ impl Default for Text {
         Self {
             text: String::new(),
             font: None,
-            color: COLOR_BLACK,
+            color: Color::BLACK,
             alignment_h: AlignH::Center,
             alignment_v: AlignV::Center,
             outline: None,
@@ -72,7 +71,7 @@ impl Drawable for Observer<Text> {
     fn draw(&self, area: Rect, font_manager: &FontManager, theme: &Theme) -> Vec<DrawCommand> {
         let Some(text) = self.get() else {
             println!("Failed to observe text of draw text!");
-            return vec![DrawCommand::Line { x1: 0., y1: 0., x2: 0., y2: 0., stroke: Stroke {color: COLOR_BLACK, width: 0.} }];
+            return vec![DrawCommand::Line { x1: 0., y1: 0., x2: 0., y2: 0., stroke: Stroke {color: Color::BLACK, width: 0.} }];
         };
         let line_top = font_manager.default_font().get_line_top() as f32;
         let line_bottom = font_manager.default_font().get_line_bottom() as f32;
@@ -80,14 +79,14 @@ impl Drawable for Observer<Text> {
         let text_height = font_manager.default_font().get_text_height(&text.text) as f32;
 
         let text_base_line = match text.alignment_v {
-            AlignV::Top => area.top + line_top,
+            AlignV::Top => area.top() + line_top,
             AlignV::Center => area.center().y + line_bottom + (text_height / 2.),
-            AlignV::Bottom => area.bottom + line_bottom,
+            AlignV::Bottom => area.bottom() + line_bottom,
         };
         let text_left = match text.alignment_h {
-            AlignH::Left => area.left,
+            AlignH::Left => area.left(),
             AlignH::Center => area.center().x - (text_width / 2.),
-            AlignH::Right => area.right - text_width,
+            AlignH::Right => area.right() - text_width,
         };
         vec![DrawCommand::Text {
             font: *font_manager.default_font(),

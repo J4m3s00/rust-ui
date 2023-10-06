@@ -1,10 +1,10 @@
 use std::fmt::Debug;
 
-use rust_graphics::{cursor::SystemCursor, rect::Rect};
+use rust_graphics::cursor::SystemCursor;
 
 use crate::{
     gui::events::{keyboard::KeyboardEvent, mouse::MouseEvent},
-    prelude::{AppInterface, Margin, SizePolicy, State, Style, Widget},
+    prelude::{AppInterface, Margin, Rect, SizePolicy, State, Style, Widget},
 };
 
 use super::{

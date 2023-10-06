@@ -6,9 +6,7 @@ use rust_graphics::{
 use crate::{
     gui::{
         app::{app::FontManager, input::InputState},
-        widget::{
-            builder::build_context::CursorDirection, style::space::ApplySpace, theme::theme::Theme,
-        },
+        widget::{builder::build_context::CursorDirection, theme::theme::Theme},
     },
     prelude::*,
 };
@@ -31,10 +29,8 @@ impl Panel {
         let position = self.position.get();
         let size = self.size.get();
 
-        let mut build_context = BuildContext::new(
-            Rect::new_from_xy(position.x, position.y, size.x, size.y),
-            CursorDirection::Vertical,
-        );
+        let mut build_context =
+            BuildContext::new(Rect::new(position, size), CursorDirection::Vertical);
 
         self.widget.build(&mut build_context);
     }
@@ -67,8 +63,8 @@ impl Panel {
             if let Some(id) = input_state.focused_input {
                 if id == item.id() {
                     run_draw_command(&DrawCommand::Rect {
-                        left: area.left,
-                        top: area.top,
+                        left: area.left(),
+                        top: area.top(),
                         width: area.width(),
                         height: area.height(),
                         fill: None,
