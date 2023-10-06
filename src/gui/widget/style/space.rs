@@ -1,7 +1,5 @@
 use rust_graphics::vec::Vec2;
 
-use crate::prelude::Rect;
-
 /// Used for Padding and Margin
 /// Space between the content and the border
 pub type Margin = ElementSpace;
